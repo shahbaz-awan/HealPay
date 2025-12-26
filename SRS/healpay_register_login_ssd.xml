@@ -1,0 +1,133 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 Edg/141.0.0.0" version="28.2.7">
+  <diagram name="HealPay Register/Login SSD" id="register-login-ssd">
+    <mxGraphModel dx="1111" dy="614" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="HealPay Register/Login - System Sequence Diagram" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1A237E;" parent="1" vertex="1">
+          <mxGeometry x="300" y="20" width="500" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="patient-actor" value="Patient" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#FFF3E0;strokeColor=#F57C00;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="100" y="100" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="doctor-actor" value="Doctor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#E8F5E8;strokeColor=#4CAF50;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="100" y="250" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="billing-actor" value="Billing Staff" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#FFF8E1;strokeColor=#FF9800;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="100" y="400" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-actor" value="System Admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#FFEBEE;strokeColor=#F44336;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="100" y="550" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="healpay-system" value="HealPay System" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=14;fontStyle=1;fillColor=#E3F2FD;strokeColor=#1976D2;" parent="1" vertex="1">
+          <mxGeometry x="320" y="80" width="200" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="msg1" value="1. register(patientData)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#F57C00;" parent="1" source="patient-actor" target="healpay-system" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="150" as="sourcePoint" />
+            <mxPoint x="400" y="130" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg1-response" value="1.1. registrationConfirmation()" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#F57C00;dashed=1;" parent="1" source="healpay-system" target="patient-actor" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="150" as="sourcePoint" />
+            <mxPoint x="140" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg2" value="2. login(credentials)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#F57C00;" parent="1" source="patient-actor" target="healpay-system" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="190" as="sourcePoint" />
+            <mxPoint x="400" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg2-response" value="2.1. loginSuccess(sessionToken)" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#F57C00;dashed=1;" parent="1" source="healpay-system" target="patient-actor" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="190" as="sourcePoint" />
+            <mxPoint x="140" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg3" value="3. register(doctorData)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#4CAF50;" parent="1" source="doctor-actor" target="healpay-system" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="300" as="sourcePoint" />
+            <mxPoint x="400" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg3-response" value="3.1. registrationConfirmation()" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#4CAF50;dashed=1;" parent="1" source="healpay-system" target="doctor-actor" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="300" as="sourcePoint" />
+            <mxPoint x="140" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg4" value="4. login(credentials)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#4CAF50;" parent="1" source="doctor-actor" target="healpay-system" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="340" as="sourcePoint" />
+            <mxPoint x="400" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg4-response" value="4.1. loginSuccess(sessionToken)" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#4CAF50;dashed=1;" parent="1" source="healpay-system" target="doctor-actor" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="340" as="sourcePoint" />
+            <mxPoint x="140" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg5" value="5. register(billingData)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#FF9800;" parent="1" source="billing-actor" target="healpay-system" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="450" as="sourcePoint" />
+            <mxPoint x="400" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg5-response" value="5.1. registrationConfirmation()" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#FF9800;dashed=1;" parent="1" source="healpay-system" target="billing-actor" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="450" as="sourcePoint" />
+            <mxPoint x="140" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg6" value="6. login(credentials)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#FF9800;" parent="1" source="billing-actor" target="healpay-system" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="490" as="sourcePoint" />
+            <mxPoint x="400" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg6-response" value="6.1. loginSuccess(sessionToken)" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#FF9800;dashed=1;" parent="1" source="healpay-system" target="billing-actor" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="490" as="sourcePoint" />
+            <mxPoint x="140" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg7" value="7. register(adminData)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#F44336;" parent="1" source="admin-actor" target="healpay-system" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="600" as="sourcePoint" />
+            <mxPoint x="400" y="580" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg7-response" value="7.1. registrationConfirmation()" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#F44336;dashed=1;" parent="1" source="healpay-system" target="admin-actor" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="600" as="sourcePoint" />
+            <mxPoint x="140" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg8" value="8. login(credentials)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#F44336;" parent="1" source="admin-actor" target="healpay-system" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="640" as="sourcePoint" />
+            <mxPoint x="400" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg8-response" value="8.1. loginSuccess(sessionToken)" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#F44336;dashed=1;" parent="1" source="healpay-system" target="admin-actor" edge="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="640" as="sourcePoint" />
+            <mxPoint x="140" y="660" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note1" value="Key Features:&#xa;• Multi-actor Registration&#xa;• Secure Authentication&#xa;• Session Management&#xa;• Role-based Access&#xa;• Email Verification&#xa;• Password Security" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#E8F5E8;strokeColor=#4CAF50;fontSize=10;align=left;" parent="1" vertex="1">
+          <mxGeometry x="530" y="150" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="note2" value="Security Features:&#xa;• Encrypted Passwords&#xa;• Session Tokens&#xa;• Role Validation&#xa;• Access Control&#xa;• Audit Logging&#xa;• Two-Factor Auth" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=10;align=left;" parent="1" vertex="1">
+          <mxGeometry x="530" y="300" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="legend" value="Legend:&#xa;→ Synchronous Call&#xa;← Return Response&#xa;🔹 Patient Operations&#xa;🔹 Doctor Operations&#xa;🔹 Billing Operations&#xa;🔹 Admin Operations" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#FFF3E0;strokeColor=#F57C00;fontSize=10;align=left;" parent="1" vertex="1">
+          <mxGeometry x="540" y="470" width="200" height="100" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

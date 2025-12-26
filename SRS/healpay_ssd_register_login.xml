@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-16T00:00:00.000Z" agent="5.0" version="24.7.17" etag="ssd_register_login" type="device">
+  <diagram name="SSD - Register/Login" id="ssd-register-login">
+    <mxGraphModel dx="1434" dy="796" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="System Sequence Diagram: Register/Login" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="30" width="500" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Actor -->
+        <mxCell id="actor" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="100" y="100" width="30" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- System -->
+        <mxCell id="system" value=":HealPay System" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontStyle=1;align=center;points=[[0.5,0,0],[0.5,1,0]];portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="1">
+          <mxGeometry x="470" y="90" width="140" height="680" as="geometry"/>
+        </mxCell>
+        
+        <!-- System Lifeline -->
+        <mxCell id="system-lifeline" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontStyle=0;fontColor=#000000;align=center;" vertex="1" parent="system">
+          <mxGeometry x="65" y="80" width="10" height="580" as="geometry"/>
+        </mxCell>
+        
+        <!-- Actor Lifeline -->
+        <mxCell id="actor-lifeline" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;dashed=1;dashPattern=1 4;" vertex="1" parent="1">
+          <mxGeometry x="110" y="170" width="10" height="600" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 1: Navigate to Login Page -->
+        <mxCell id="msg1" value="1: navigateToLogin()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;entryX=0;entryY=0;entryDx=0;entryDy=5;exitX=1;exitY=0.05;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="actor-lifeline" target="system-lifeline">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="200" as="sourcePoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 1: Display Login Form -->
+        <mxCell id="return1" value="displayLoginForm()" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;exitX=0;exitY=0.05;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="system-lifeline">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="230" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ALT Fragment -->
+        <mxCell id="alt-frame" value="alt" style="shape=umlFrame;whiteSpace=wrap;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontStyle=1;align=left;verticalAlign=top;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="60" y="260" width="600" height="440" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="alt-label" value="[Existing User - Login]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="70" y="280" width="180" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 2: Enter Credentials -->
+        <mxCell id="msg2" value="2: enterCredentials(username, password)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="320" as="sourcePoint"/>
+            <mxPoint x="535" y="320" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 3: Authenticate -->
+        <mxCell id="msg3" value="3: authenticate()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="350" as="sourcePoint"/>
+            <mxPoint x="545" y="380" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="350"/>
+              <mxPoint x="590" y="380"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- OPT Fragment for Success -->
+        <mxCell id="opt-success" value="opt" style="shape=umlFrame;whiteSpace=wrap;html=1;rounded=0;shadow=0;strokeWidth=1;fontStyle=1;align=left;verticalAlign=top;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="80" y="400" width="560" height="100" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="opt-success-label" value="[Authentication Successful]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="90" y="420" width="180" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 4: Generate Session Token -->
+        <mxCell id="msg4" value="4: generateSessionToken()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="450" as="sourcePoint"/>
+            <mxPoint x="545" y="470" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="450"/>
+              <mxPoint x="590" y="470"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 4: Login Success -->
+        <mxCell id="return4" value="loginSuccess(sessionToken, userRole)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="480" as="sourcePoint"/>
+            <mxPoint x="120" y="480" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ALT Separator Line -->
+        <mxCell id="alt-separator" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="510" width="600" height="8" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="alt-label2" value="[New User - Registration]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="70" y="525" width="180" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 5: Click Register -->
+        <mxCell id="msg5" value="5: clickRegister()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="560" as="sourcePoint"/>
+            <mxPoint x="535" y="560" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 5: Display Registration Form -->
+        <mxCell id="return5" value="displayRegistrationForm()" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="585" as="sourcePoint"/>
+            <mxPoint x="120" y="585" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 6: Submit Registration Details -->
+        <mxCell id="msg6" value="6: submitRegistration(userDetails, role)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="620" as="sourcePoint"/>
+            <mxPoint x="535" y="620" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 7: Create User Account -->
+        <mxCell id="msg7" value="7: createUserAccount()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="650" as="sourcePoint"/>
+            <mxPoint x="545" y="670" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="650"/>
+              <mxPoint x="590" y="670"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 7: Registration Success -->
+        <mxCell id="return7" value="registrationSuccess(message)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="685" as="sourcePoint"/>
+            <mxPoint x="120" y="685" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Note -->
+        <mxCell id="note1" value="Note:&#xa;- Alt fragment shows two paths:&#xa;  Login for existing users&#xa;  Registration for new users&#xa;- Opt fragment handles&#xa;  successful authentication" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;verticalAlign=top;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="700" y="300" width="180" height="120" as="geometry"/>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

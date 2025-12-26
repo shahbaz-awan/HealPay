@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-15T16:00:00.000Z" agent="5.0" version="24.7.17" etag="assign_codes_ssd" type="device">
+  <diagram name="HealPay Assign ICD & CPT Codes SSD" id="assign-codes-ssd">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="HealPay Assign ICD & CPT Codes - System Sequence Diagram" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1A237E;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="500" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Actors -->
+        <mxCell id="doctor-actor" value="Doctor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#E8F5E8;strokeColor=#4CAF50;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="100" y="100" width="40" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="coder-actor" value="Medical Coder" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#F3E5F5;strokeColor=#9C27B0;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="100" y="250" width="40" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ai-system" value="AI System" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#F1F8E9;strokeColor=#689F38;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="100" y="400" width="40" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- System -->
+        <mxCell id="healpay-system" value="HealPay System" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=14;fontStyle=1;fillColor=#E3F2FD;strokeColor=#1976D2;" parent="1" vertex="1">
+          <mxGeometry x="300" y="100" width="200" height="500" as="geometry" />
+        </mxCell>
+        
+        <!-- Doctor Diagnosis Messages -->
+        <mxCell id="msg1" value="1. addDiagnosis(encounterId, diagnosis)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#4CAF50;" edge="1" parent="1" source="doctor-actor" target="healpay-system">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="150" as="sourcePoint" />
+            <mxPoint x="400" y="130" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="msg1-response" value="1.1. diagnosisAdded()" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#4CAF50;dashed=1;" edge="1" parent="1" source="healpay-system" target="doctor-actor">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="150" as="sourcePoint" />
+            <mxPoint x="140" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="msg2" value="2. addProcedures(encounterId, procedures)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#4CAF50;" edge="1" parent="1" source="doctor-actor" target="healpay-system">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="190" as="sourcePoint" />
+            <mxPoint x="400" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="msg2-response" value="2.1. proceduresAdded()" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#4CAF50;dashed=1;" edge="1" parent="1" source="healpay-system" target="doctor-actor">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="190" as="sourcePoint" />
+            <mxPoint x="140" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Medical Coder Assignment Messages -->
+        <mxCell id="msg3" value="3. assignICD10Codes(encounterId)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#9C27B0;" edge="1" parent="1" source="coder-actor" target="healpay-system">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="300" as="sourcePoint" />
+            <mxPoint x="400" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="msg3-response" value="3.1. icd10CodesAssigned(codes)" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#9C27B0;dashed=1;" edge="1" parent="1" source="healpay-system" target="coder-actor">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="230" as="sourcePoint" />
+            <mxPoint x="140" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="msg4" value="4. assignCPTCodes(encounterId)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#9C27B0;" edge="1" parent="1" source="coder-actor" target="healpay-system">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="340" as="sourcePoint" />
+            <mxPoint x="400" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="msg4-response" value="4.1. cptCodesAssigned(codes)" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#9C27B0;dashed=1;" edge="1" parent="1" source="healpay-system" target="coder-actor">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="270" as="sourcePoint" />
+            <mxPoint x="140" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="msg5" value="5. addModifiers(encounterId, modifiers)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#9C27B0;" edge="1" parent="1" source="coder-actor" target="healpay-system">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="380" as="sourcePoint" />
+            <mxPoint x="400" y="290" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="msg5-response" value="5.1. modifiersAdded()" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#9C27B0;dashed=1;" edge="1" parent="1" source="healpay-system" target="coder-actor">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="310" as="sourcePoint" />
+            <mxPoint x="140" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- AI System Processing Messages -->
+        <mxCell id="msg6" value="6. generateCodeRecommendations(encounterId)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#689F38;" edge="1" parent="1" source="ai-system" target="healpay-system">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="450" as="sourcePoint" />
+            <mxPoint x="400" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="msg6-response" value="6.1. recommendationsGenerated(suggestions)" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#689F38;dashed=1;" edge="1" parent="1" source="healpay-system" target="ai-system">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="350" as="sourcePoint" />
+            <mxPoint x="140" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="msg7" value="7. validateCodeAssignments(encounterId)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#689F38;" edge="1" parent="1" source="ai-system" target="healpay-system">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="490" as="sourcePoint" />
+            <mxPoint x="400" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="msg7-response" value="7.1. validationResults(valid, errors)" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#689F38;dashed=1;" edge="1" parent="1" source="healpay-system" target="ai-system">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="390" as="sourcePoint" />
+            <mxPoint x="140" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="msg8" value="8. predictRejectionRisk(encounterId)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#689F38;" edge="1" parent="1" source="ai-system" target="healpay-system">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="530" as="sourcePoint" />
+            <mxPoint x="400" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="msg8-response" value="8.1. rejectionRiskPredicted(riskScore)" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#689F38;dashed=1;" edge="1" parent="1" source="healpay-system" target="ai-system">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="430" as="sourcePoint" />
+            <mxPoint x="140" y="550" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Finalize Coding -->
+        <mxCell id="msg9" value="9. finalizeCoding(encounterId)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#1976D2;" edge="1" parent="1" source="coder-actor" target="healpay-system">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="140" y="420" as="sourcePoint" />
+            <mxPoint x="400" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="msg9-response" value="9.1. codingFinalized()" style="html=1;verticalAlign=bottom;endArrow=open;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;strokeWidth=2;fontSize=11;fontColor=#1976D2;dashed=1;" edge="1" parent="1" source="healpay-system" target="coder-actor">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="400" y="470" as="sourcePoint" />
+            <mxPoint x="140" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Notes -->
+        <mxCell id="note1" value="Key Features:&#xa;• ICD-10 Code Assignment&#xa;• CPT Code Assignment&#xa;• Modifier Application&#xa;• AI Recommendations&#xa;• Code Validation&#xa;• Rejection Prediction" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#E8F5E8;strokeColor=#4CAF50;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="600" y="150" width="200" height="120" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="note2" value="Code Types:&#xa;• ICD-10-CM (Diagnosis)&#xa;• CPT (Procedures)&#xa;• HCPCS (Services)&#xa;• Modifiers (25, 59, etc.)&#xa;• Place of Service&#xa;• Provider NPI" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="600" y="300" width="200" height="120" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend" value="Legend:&#xa;→ Synchronous Call&#xa;← Return Response&#xa;🔹 Doctor Operations&#xa;🔹 Coder Operations&#xa;🔹 AI Operations&#xa;🔹 System Operations" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#FFF3E0;strokeColor=#F57C00;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="600" y="450" width="200" height="100" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-16T00:00:00.000Z" agent="5.0" version="24.7.17" etag="healpay_deployment" type="device">
+  <diagram name="HealPay Deployment Diagram" id="healpay-deployment-diagram">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="HealPay Medical Billing System - Deployment Diagram" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="20" width="700" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- On-Prem Clinic (Left) -->
+        <mxCell id="onprem" value="&lt;&lt;node&gt;&gt; On-Prem Clinic" style="swimlane;fontStyle=1;align=center;verticalAlign=top;startSize=28;horizontal=1;collapsible=0;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="120" width="360" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="client-browsers" value="&lt;&lt;device&gt;&gt; Client Browsers (Patient / Doctor / Coder / Billing)" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="onprem">
+          <mxGeometry x="20" y="60" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="clinic-network" value="&lt;&lt;artifact&gt;&gt; Secure Clinic Network (HTTPS)" style="shape=rectangle;rounded=1;dashed=1;whiteSpace=wrap;html=1;" vertex="1" parent="onprem">
+          <mxGeometry x="20" y="140" width="320" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="office-scanner" value="&lt;&lt;device&gt;&gt; Document Scanner / Uploader" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="onprem">
+          <mxGeometry x="20" y="210" width="320" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="email-sms" value="&lt;&lt;device&gt;&gt; Email / SMS Clients" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="onprem">
+          <mxGeometry x="20" y="280" width="320" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Internet / Edge (Center-Top) -->
+        <mxCell id="internet" value="&lt;&lt;network&gt;&gt; Internet / Edge" style="shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="120" width="240" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="cdn" value="&lt;&lt;node&gt;&gt; CDN (Static Assets)" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="780" y="120" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="waf" value="&lt;&lt;node&gt;&gt; WAF / Firewall" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="780" y="190" width="220" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Cloud VPC (Right) -->
+        <mxCell id="vpc" value="&lt;&lt;node&gt;&gt; Cloud VPC (HealPay Production)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;startSize=28;horizontal=1;collapsible=0;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="120" width="500" height="820" as="geometry" />
+        </mxCell>
+        
+        <!-- Public Subnet -->
+        <mxCell id="public-subnet" value="&lt;&lt;node&gt;&gt; Public Subnet" style="swimlane;fontStyle=1;align=left;verticalAlign=top;startSize=24;horizontal=1;collapsible=0;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="vpc">
+          <mxGeometry x="20" y="50" width="460" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="alb" value="&lt;&lt;node&gt;&gt; Application Load Balancer" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="public-subnet">
+          <mxGeometry x="20" y="60" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="frontend" value="&lt;&lt;node&gt;&gt; Frontend (React / Nginx)" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="public-subnet">
+          <mxGeometry x="240" y="60" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="api-gateway" value="&lt;&lt;node&gt;&gt; API Gateway (HTTPS)" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="public-subnet">
+          <mxGeometry x="130" y="140" width="220" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Private Subnet -->
+        <mxCell id="private-subnet" value="&lt;&lt;node&gt;&gt; Private Subnet" style="swimlane;fontStyle=1;align=left;verticalAlign=top;startSize=24;horizontal=1;collapsible=0;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="vpc">
+          <mxGeometry x="20" y="270" width="460" height="530" as="geometry" />
+        </mxCell>
+        <mxCell id="app-server" value="&lt;&lt;node&gt;&gt; App Server (Python)" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="private-subnet">
+          <mxGeometry x="20" y="60" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-service" value="&lt;&lt;node&gt;&gt; Auth Service" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="private-subnet">
+          <mxGeometry x="240" y="60" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ocr-nlp" value="&lt;&lt;node&gt;&gt; OCR / NLP Service" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="private-subnet">
+          <mxGeometry x="20" y="130" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="code-mapping" value="&lt;&lt;node&gt;&gt; Code Mapping Service" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="private-subnet">
+          <mxGeometry x="240" y="130" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="billing-engine" value="&lt;&lt;node&gt;&gt; Billing Engine" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="private-subnet">
+          <mxGeometry x="20" y="200" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="insurance-verification" value="&lt;&lt;node&gt;&gt; Insurance Verification" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="private-subnet">
+          <mxGeometry x="240" y="200" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ml-service" value="&lt;&lt;node&gt;&gt; ML Service (Recommendations &amp; Prediction)" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="private-subnet">
+          <mxGeometry x="20" y="270" width="420" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="redis" value="&lt;&lt;node&gt;&gt; Cache (Redis)" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="private-subnet">
+          <mxGeometry x="20" y="340" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mq" value="&lt;&lt;node&gt;&gt; Message Queue" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="private-subnet">
+          <mxGeometry x="240" y="340" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="postgres" value="&lt;&lt;node&gt;&gt; Database (PostgreSQL)" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="private-subnet">
+          <mxGeometry x="20" y="410" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="object-storage" value="&lt;&lt;node&gt;&gt; Object Storage (Documents)" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="private-subnet">
+          <mxGeometry x="240" y="410" width="200" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Observability / Ops (Bottom) -->
+        <mxCell id="observability" value="&lt;&lt;node&gt;&gt; Monitoring &amp; Logging" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="vpc">
+          <mxGeometry x="20" y="820" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="backup" value="&lt;&lt;node&gt;&gt; Backup &amp; Recovery" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="vpc">
+          <mxGeometry x="260" y="820" width="220" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- External Services (Bottom-Left) -->
+        <mxCell id="payment-gateway" value="&lt;&lt;external&gt;&gt; Payment Gateway" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="520" width="360" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="insurance-payer" value="&lt;&lt;external&gt;&gt; Insurance Payer API" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="590" width="360" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Connections (Left to Edge) -->
+        <mxCell id="edge1" value="HTTPS" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="client-browsers" target="internet">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge2" value="Uploads" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="office-scanner" target="internet">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Edge/CND/WAF to VPC Public -->
+        <mxCell id="edge3" value="Static Assets" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="cdn" target="frontend">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge4" value="HTTPS" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="internet" target="waf">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge5" value="HTTPS" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="waf" target="alb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge6" value="HTTP/2" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="alb" target="api-gateway">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge7" value="SPA" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="alb" target="frontend">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- API Gateway to Private Services -->
+        <mxCell id="edge8" value="gRPC/REST" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="api-gateway" target="app-server">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge9" value="AuthN/AuthZ" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="app-server" target="auth-service">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge10" value="Process Text" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="app-server" target="ocr-nlp">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge11" value="Map Codes" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="app-server" target="code-mapping">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge12" value="Generate Invoice" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="app-server" target="billing-engine">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge13" value="Verify Coverage" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="app-server" target="insurance-verification">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge14" value="ML Inference" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="app-server" target="ml-service">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Data Layer Connections -->
+        <mxCell id="edge15" value="Cache" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;dashed=1;" edge="1" parent="1" source="app-server" target="redis">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge16" value="Publish Events" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;dashed=1;" edge="1" parent="1" source="app-server" target="mq">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge17" value="JDBC/SSL" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;dashed=1;" edge="1" parent="1" source="app-server" target="postgres">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge18" value="S3 API" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;dashed=1;" edge="1" parent="1" source="ocr-nlp" target="object-storage">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Observability / Backup Connections -->
+        <mxCell id="edge19" value="Metrics/Logs" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;dashed=1;" edge="1" parent="1" source="app-server" target="observability">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge20" value="Snapshots" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;dashed=1;" edge="1" parent="1" source="postgres" target="backup">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- External Service Connections -->
+        <mxCell id="edge21" value="PCI-DSS" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="billing-engine" target="payment-gateway">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge22" value="EDI / API" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1" source="insurance-verification" target="insurance-payer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend" value="Legend:&#xa;Rounded Rectangle = Node/Device&#xa;Cloud = Internet/Edge&#xa;Solid line = Direct call&#xa;Dashed line = Infra/Data ops&#xa;Subnets inside Cloud VPC&#xa;All connections use secure protocols" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fontSize=11;align=left;" vertex="1" parent="1">
+          <mxGeometry x="60" y="670" width="360" height="140" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

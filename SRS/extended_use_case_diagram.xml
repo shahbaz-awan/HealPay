@@ -1,0 +1,49 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="domainModelHealPay" name="HealPay Domain Model">
+    <mxGraphModel dx="1000" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Entities -->
+        <mxCell id="Patient" value="Patient" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="100" y="60" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="Doctor" value="Doctor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="300" y="60" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="MedicalRecord" value="MedicalRecord" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="200" y="160" width="140" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="MedicalCoder" value="MedicalCoder" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="450" y="160" width="140" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="Claim" value="Claim" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="650" y="160" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="Invoice" value="Invoice" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="850" y="160" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="BillingStaff" value="BillingStaff" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#3399ff;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="160" width="130" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="InsuranceProvider" value="InsuranceProvider" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1250" y="160" width="140" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="Admin" value="Admin" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ddd9c3;strokeColor=#a6a6a6;" vertex="1" parent="1">
+          <mxGeometry x="650" y="300" width="100" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Relationships -->
+        <mxCell id="rel1" edge="1" parent="1" source="Patient" target="MedicalRecord" style="endArrow=classic;strokeColor=#000000;"/>
+        <mxCell id="rel2" edge="1" parent="1" source="Doctor" target="MedicalRecord" style="endArrow=classic;strokeColor=#000000;"/>
+        <mxCell id="rel3" edge="1" parent="1" source="MedicalCoder" target="Claim" style="endArrow=classic;strokeColor=#000000;"/>
+        <mxCell id="rel4" edge="1" parent="1" source="Claim" target="Invoice" style="endArrow=classic;strokeColor=#000000;"/>
+        <mxCell id="rel5" edge="1" parent="1" source="BillingStaff" target="Invoice" style="endArrow=classic;strokeColor=#000000;"/>
+        <mxCell id="rel6" edge="1" parent="1" source="Invoice" target="InsuranceProvider" style="endArrow=classic;strokeColor=#000000;"/>
+        <mxCell id="rel7" edge="1" parent="1" source="Admin" target="MedicalCoder" style="endArrow=open;dashed=1;strokeColor=#000000;"/>
+        <mxCell id="rel8" edge="1" parent="1" source="Admin" target="BillingStaff" style="endArrow=open;dashed=1;strokeColor=#000000;"/>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

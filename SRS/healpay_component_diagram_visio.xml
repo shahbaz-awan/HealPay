@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-15T23:00:00.000Z" agent="5.0" version="24.7.17" etag="component_diagram_template" type="device">
+  <diagram name="HealPay Component Diagram" id="component-diagram">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="HealPay Medical Billing System - Component Diagram" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="500" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- HealPay Subsystem -->
+        <mxCell id="healpay-subsystem" value="&lt;&lt;subsystem&gt;&gt; HealPay Medical Billing System" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="100" y="100" width="800" height="600" as="geometry" />
+        </mxCell>
+        
+        <!-- External Entities -->
+        <mxCell id="patient-external" value="Patient" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="50" y="200" width="60" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="doctor-external" value="Doctor" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="50" y="280" width="60" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="billing-staff-external" value="Billing Staff" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="50" y="360" width="60" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="medical-coder-external" value="Medical Coder" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="50" y="440" width="60" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="insurance-external" value="Insurance Company" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="50" y="520" width="60" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="payment-gateway-external" value="Payment Gateway" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="50" y="600" width="60" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Subsystem Boundary Ports -->
+        <mxCell id="port-patient" value="" style="shape=rect;whiteSpace=wrap;html=1;fontSize=12;fillColor=#000000;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="0" y="100" width="20" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="port-doctor" value="" style="shape=rect;whiteSpace=wrap;html=1;fontSize=12;fillColor=#000000;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="0" y="180" width="20" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="port-billing" value="" style="shape=rect;whiteSpace=wrap;html=1;fontSize=12;fillColor=#000000;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="0" y="260" width="20" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="port-coder" value="" style="shape=rect;whiteSpace=wrap;html=1;fontSize=12;fillColor=#000000;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="0" y="340" width="20" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="port-insurance" value="" style="shape=rect;whiteSpace=wrap;html=1;fontSize=12;fillColor=#000000;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="0" y="420" width="20" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="port-payment" value="" style="shape=rect;whiteSpace=wrap;html=1;fontSize=12;fillColor=#000000;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="0" y="500" width="20" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Internal Components -->
+        <mxCell id="patient-portal" value="&lt;&lt;component&gt;&gt; Patient Portal" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="50" y="50" width="150" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="doctor-portal" value="&lt;&lt;component&gt;&gt; Doctor Portal" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="250" y="50" width="150" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="billing-portal" value="&lt;&lt;component&gt;&gt; Billing Portal" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="450" y="50" width="150" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="coding-system" value="&lt;&lt;component&gt;&gt; Coding System" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="650" y="50" width="150" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ocr-nlp-module" value="&lt;&lt;component&gt;&gt; OCR/NLP Module" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="50" y="200" width="150" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="claim-generator" value="&lt;&lt;component&gt;&gt; Claim Generator" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="250" y="200" width="150" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="validation-engine" value="&lt;&lt;component&gt;&gt; Validation Engine" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="450" y="200" width="150" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ml-prediction" value="&lt;&lt;component&gt;&gt; ML Prediction" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="650" y="200" width="150" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="database" value="&lt;&lt;component&gt;&gt; Database" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="50" y="350" width="150" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="notification-system" value="&lt;&lt;component&gt;&gt; Notification System" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="250" y="350" width="150" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="payment-processor" value="&lt;&lt;component&gt;&gt; Payment Processor" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="450" y="350" width="150" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="admin-portal" value="&lt;&lt;component&gt;&gt; Admin Portal" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="healpay-subsystem" vertex="1">
+          <mxGeometry x="650" y="350" width="150" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Provided Interfaces (Lollipops) -->
+        <mxCell id="lollipop-patient" value="Patient" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=#000000;" parent="patient-portal" vertex="1">
+          <mxGeometry x="60" y="30" width="30" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="lollipop-doctor" value="Doctor" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=#000000;" parent="doctor-portal" vertex="1">
+          <mxGeometry x="60" y="30" width="30" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="lollipop-billing" value="Billing Staff" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=#000000;" parent="billing-portal" vertex="1">
+          <mxGeometry x="60" y="30" width="30" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="lollipop-coder" value="Medical Coder" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=#000000;" parent="coding-system" vertex="1">
+          <mxGeometry x="60" y="30" width="30" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="lollipop-insurance" value="Insurance" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=#000000;" parent="validation-engine" vertex="1">
+          <mxGeometry x="60" y="30" width="30" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="lollipop-payment" value="Payment" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=#000000;" parent="payment-processor" vertex="1">
+          <mxGeometry x="60" y="30" width="30" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Required Interfaces (Sockets) -->
+        <mxCell id="socket-db" value="" style="shape=rect;whiteSpace=wrap;html=1;fontSize=10;fillColor=#000000;" parent="patient-portal" vertex="1">
+          <mxGeometry x="60" y="70" width="30" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="socket-ocr" value="" style="shape=rect;whiteSpace=wrap;html=1;fontSize=10;fillColor=#000000;" parent="patient-portal" vertex="1">
+          <mxGeometry x="100" y="70" width="30" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="socket-coding" value="" style="shape=rect;whiteSpace=wrap;html=1;fontSize=10;fillColor=#000000;" parent="doctor-portal" vertex="1">
+          <mxGeometry x="60" y="70" width="30" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="socket-claim" value="" style="shape=rect;whiteSpace=wrap;html=1;fontSize=10;fillColor=#000000;" parent="billing-portal" vertex="1">
+          <mxGeometry x="60" y="70" width="30" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="socket-validation" value="" style="shape=rect;whiteSpace=wrap;html=1;fontSize=10;fillColor=#000000;" parent="claim-generator" vertex="1">
+          <mxGeometry x="60" y="70" width="30" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="socket-ml" value="" style="shape=rect;whiteSpace=wrap;html=1;fontSize=10;fillColor=#000000;" parent="validation-engine" vertex="1">
+          <mxGeometry x="60" y="70" width="30" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Connections -->
+        <mxCell id="conn1" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" parent="1" source="patient-external" target="port-patient" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="110" y="220" as="sourcePoint" />
+            <mxPoint x="100" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="conn2" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" parent="1" source="doctor-external" target="port-doctor" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="110" y="300" as="sourcePoint" />
+            <mxPoint x="100" y="290" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="conn3" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" parent="1" source="billing-staff-external" target="port-billing" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="110" y="380" as="sourcePoint" />
+            <mxPoint x="100" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="conn4" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" parent="1" source="medical-coder-external" target="port-coder" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="110" y="460" as="sourcePoint" />
+            <mxPoint x="100" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="conn5" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" parent="1" source="insurance-external" target="port-insurance" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="110" y="540" as="sourcePoint" />
+            <mxPoint x="100" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="conn6" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" parent="1" source="payment-gateway-external" target="port-payment" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="110" y="620" as="sourcePoint" />
+            <mxPoint x="100" y="610" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Internal Connections -->
+        <mxCell id="int-conn1" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" parent="healpay-subsystem" source="patient-portal" target="database" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="200" y="100" as="sourcePoint" />
+            <mxPoint x="50" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="int-conn2" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" parent="healpay-subsystem" source="patient-portal" target="ocr-nlp-module" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="200" y="100" as="sourcePoint" />
+            <mxPoint x="50" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="int-conn3" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" parent="healpay-subsystem" source="doctor-portal" target="coding-system" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="100" as="sourcePoint" />
+            <mxPoint x="650" y="100" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="int-conn4" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" parent="healpay-subsystem" source="billing-portal" target="claim-generator" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="100" as="sourcePoint" />
+            <mxPoint x="250" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="int-conn5" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" parent="healpay-subsystem" source="claim-generator" target="validation-engine" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="250" as="sourcePoint" />
+            <mxPoint x="450" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="int-conn6" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" parent="healpay-subsystem" source="validation-engine" target="ml-prediction" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="250" as="sourcePoint" />
+            <mxPoint x="650" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="int-conn7" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" parent="healpay-subsystem" source="payment-processor" target="notification-system" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="400" as="sourcePoint" />
+            <mxPoint x="250" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Notes -->
+        <mxCell id="note1" value="Key Components:&#xa;• Patient Portal - Patient intake and management&#xa;• Doctor Portal - Medical review and validation&#xa;• Billing Portal - Billing operations and tracking&#xa;• Coding System - ICD-10/CPT code assignment&#xa;• OCR/NLP Module - Text extraction and processing&#xa;• Claim Generator - Automated form generation&#xa;• Validation Engine - Insurance rule validation&#xa;• ML Prediction - Claim rejection prediction" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="50" y="750" width="400" height="160" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="note2" value="External Interfaces:&#xa;• Patient - Patient intake and billing access&#xa;• Doctor - Medical review and coding&#xa;• Billing Staff - Billing operations&#xa;• Medical Coder - Code assignment&#xa;• Insurance Company - Claim processing&#xa;• Payment Gateway - Payment processing" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="500" y="750" width="300" height="120" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

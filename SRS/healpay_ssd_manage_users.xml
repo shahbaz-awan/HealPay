@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-16T00:00:00.000Z" agent="5.0" version="24.7.17" etag="ssd_manage_users" type="device">
+  <diagram name="SSD - Manage Users" id="ssd-manage-users">
+    <mxGraphModel dx="1434" dy="796" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="System Sequence Diagram: Manage Users" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="30" width="500" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Actor -->
+        <mxCell id="actor" value="System Administrator" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="100" width="30" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- System -->
+        <mxCell id="system" value=":HealPay System" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontStyle=1;align=center;points=[[0.5,0,0],[0.5,1,0]];portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="1">
+          <mxGeometry x="470" y="90" width="140" height="750" as="geometry"/>
+        </mxCell>
+        
+        <!-- System Lifeline -->
+        <mxCell id="system-lifeline" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontStyle=0;fontColor=#000000;align=center;" vertex="1" parent="system">
+          <mxGeometry x="65" y="80" width="10" height="650" as="geometry"/>
+        </mxCell>
+        
+        <!-- Actor Lifeline -->
+        <mxCell id="actor-lifeline" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;dashed=1;dashPattern=1 4;" vertex="1" parent="1">
+          <mxGeometry x="90" y="170" width="10" height="670" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 1: Access User Management -->
+        <mxCell id="msg1" value="1: accessUserManagement()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="200" as="sourcePoint"/>
+            <mxPoint x="535" y="200" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 1: Display User List -->
+        <mxCell id="return1" value="displayUserList(users[])" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="230" as="sourcePoint"/>
+            <mxPoint x="100" y="230" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ALT Fragment for Different Actions -->
+        <mxCell id="alt-frame" value="alt" style="shape=umlFrame;whiteSpace=wrap;html=1;rounded=0;shadow=0;strokeWidth=1;fontStyle=1;align=left;verticalAlign=top;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="40" y="260" width="620" height="560" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="alt-label" value="[Create New User]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="280" width="150" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 2: Create User -->
+        <mxCell id="msg2" value="2: createNewUser()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="320" as="sourcePoint"/>
+            <mxPoint x="535" y="320" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 2: Display User Form -->
+        <mxCell id="return2" value="displayUserForm()" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="350" as="sourcePoint"/>
+            <mxPoint x="100" y="350" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 3: Submit User Details -->
+        <mxCell id="msg3" value="3: submitUserDetails(name, email, role, permissions)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="390" as="sourcePoint"/>
+            <mxPoint x="535" y="390" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 4: Validate User Data -->
+        <mxCell id="msg4" value="4: validateUserData()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="420" as="sourcePoint"/>
+            <mxPoint x="545" y="440" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="420"/>
+              <mxPoint x="590" y="440"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 5: Create User Account -->
+        <mxCell id="msg5" value="5: createUserAccount()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="470" as="sourcePoint"/>
+            <mxPoint x="545" y="490" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="470"/>
+              <mxPoint x="590" y="490"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 5: User Created -->
+        <mxCell id="return5" value="userCreatedSuccess(userId, credentials)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="515" as="sourcePoint"/>
+            <mxPoint x="100" y="515" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ALT Separator 1 -->
+        <mxCell id="alt-separator1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="535" width="620" height="8" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="alt-label2" value="[Modify Existing User]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="550" width="160" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 6: Select User -->
+        <mxCell id="msg6" value="6: selectUser(userId)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="590" as="sourcePoint"/>
+            <mxPoint x="535" y="590" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 6: Display User Details -->
+        <mxCell id="return6" value="displayUserDetails(userData)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="620" as="sourcePoint"/>
+            <mxPoint x="100" y="620" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 7: Update User Info -->
+        <mxCell id="msg7" value="7: updateUserInfo(userId, updatedFields)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="660" as="sourcePoint"/>
+            <mxPoint x="535" y="660" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 8: Save Changes -->
+        <mxCell id="msg8" value="8: saveChanges()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="690" as="sourcePoint"/>
+            <mxPoint x="545" y="710" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="690"/>
+              <mxPoint x="590" y="710"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 8: Update Success -->
+        <mxCell id="return8" value="updateSuccess(message)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="735" as="sourcePoint"/>
+            <mxPoint x="100" y="735" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ALT Separator 2 -->
+        <mxCell id="alt-separator2" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="752" width="620" height="8" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="alt-label3" value="[Deactivate User]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="767" width="140" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 9: Deactivate User -->
+        <mxCell id="msg9" value="9: deactivateUser(userId, reason)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="800" as="sourcePoint"/>
+            <mxPoint x="535" y="800" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 9: User Deactivated -->
+        <mxCell id="return9" value="userDeactivated(confirmationMessage)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="825" as="sourcePoint"/>
+            <mxPoint x="100" y="825" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Note -->
+        <mxCell id="note1" value="Note:&#xa;- Alt fragment shows three&#xa;  main user management&#xa;  actions:&#xa;  * Create new user&#xa;  * Modify existing user&#xa;  * Deactivate user&#xa;- Role-based access control&#xa;- Audit trail maintained&#xa;- Password policies enforced&#xa;- User data validated" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;verticalAlign=top;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="700" y="350" width="180" height="190" as="geometry"/>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

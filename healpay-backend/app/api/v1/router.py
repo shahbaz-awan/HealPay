@@ -1,0 +1,12 @@
+from fastapi import APIRouter
+from app.api.v1.endpoints import auth, admin, patient_intake, clinical, appointments
+
+api_router = APIRouter()
+
+# Include all endpoint routers
+api_router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+api_router.include_router(admin.router, prefix="/admin", tags=["Admin"])
+api_router.include_router(patient_intake.router, prefix="/patient-intake", tags=["Patient Intake"])
+api_router.include_router(clinical.router, prefix="/clinical", tags=["Clinical Encounters"])
+api_router.include_router(appointments.router, prefix="/appointments", tags=["Appointments"])
+

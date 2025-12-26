@@ -1,0 +1,172 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 Edg/141.0.0.0" version="28.2.7">
+  <diagram name="HealPay Component Diagram" id="component-diagram">
+    <mxGraphModel dx="1200" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Lanes / Grouping boundaries -->
+        <mxCell id="lane-client" value="Client (Frontend)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="20" y="20" width="340" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="lane-backend" value="Backend Services (Flask/Python)" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="20" y="190" width="760" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="lane-infra" value="Infrastructure & Data" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="800" y="190" width="340" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="lane-external" value="External Systems" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="1160" y="190" width="320" height="360" as="geometry" />
+        </mxCell>
+
+        <!-- Client components -->
+        <mxCell id="comp-webapp" value="React Web App\n(Patients, Doctors, Billing)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;" parent="lane-client" vertex="1">
+          <mxGeometry x="20" y="40" width="300" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Backend - API Gateway / BFF -->
+        <mxCell id="comp-api" value="API Gateway / BFF\n(REST, Auth, Routing)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" parent="lane-backend" vertex="1">
+          <mxGeometry x="20" y="40" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-auth" value="Auth Service\n(Login, RBAC, 2FA)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" parent="lane-backend" vertex="1">
+          <mxGeometry x="240" y="40" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-intake" value="Patient Intake Service\n(Intake, Attachments)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" parent="lane-backend" vertex="1">
+          <mxGeometry x="440" y="40" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Backend - Clinical/Coding -->
+        <mxCell id="comp-ocr" value="OCR Service\n(Tesseract / Vision API)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" parent="lane-backend" vertex="1">
+          <mxGeometry x="20" y="130" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-nlp" value="NLP & Coding Service\n(spaCy + ICD/CPT mapping)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" parent="lane-backend" vertex="1">
+          <mxGeometry x="240" y="130" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-rules" value="Rule Validation Service\n(Payer edits, field checks)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" parent="lane-backend" vertex="1">
+          <mxGeometry x="480" y="130" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Backend - Claims -->
+        <mxCell id="comp-claimgen" value="Claim Generator\n(CMS-1500 / UB-04 / 837P)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" parent="lane-backend" vertex="1">
+          <mxGeometry x="20" y="220" width="240" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-submission" value="Submission Adapter\n(Clearinghouse / Payer API)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" parent="lane-backend" vertex="1">
+          <mxGeometry x="280" y="220" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-ml" value="ML Prediction Service\n(Denial risk scoring)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" parent="lane-backend" vertex="1">
+          <mxGeometry x="520" y="220" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-notify" value="Notification Service\n(Email/SMS/Web push)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" parent="lane-backend" vertex="1">
+          <mxGeometry x="20" y="310" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Infrastructure -->
+        <mxCell id="comp-db" value="PostgreSQL DB\n(Users, Patients, Claims, Codes)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;" parent="lane-infra" vertex="1">
+          <mxGeometry x="20" y="40" width="280" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-storage" value="Object Storage\n(Scans, Attachments)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;" parent="lane-infra" vertex="1">
+          <mxGeometry x="20" y="130" width="280" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="comp-broker" value="Message Broker\n(Queue jobs, async processing)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;" parent="lane-infra" vertex="1">
+          <mxGeometry x="20" y="220" width="280" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- External Systems -->
+        <mxCell id="ext-ocr" value="External OCR API\n(Google Vision, optional)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;" parent="lane-external" vertex="1">
+          <mxGeometry x="20" y="40" width="260" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ext-clearing" value="Clearinghouse / Payer\n(EDI 837/835)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;" parent="lane-external" vertex="1">
+          <mxGeometry x="20" y="130" width="260" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ext-messaging" value="Email/SMS Gateway" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;" parent="lane-external" vertex="1">
+          <mxGeometry x="20" y="220" width="260" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ext-idp" value="Identity Provider\n(OTP / 2FA)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;" parent="lane-external" vertex="1">
+          <mxGeometry x="20" y="310" width="260" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Connections (orthogonal, properly docked) -->
+        <!-- Client to API -->
+        <mxCell id="edge-webapp-api" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="comp-webapp" target="comp-api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- API to backend services -->
+        <mxCell id="edge-api-auth" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-api" target="comp-auth">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-api-intake" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-api" target="comp-intake">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-api-ocr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-api" target="comp-ocr">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-api-nlp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-api" target="comp-nlp">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-api-rules" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-api" target="comp-rules">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-api-claimgen" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-api" target="comp-claimgen">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-api-submission" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-api" target="comp-submission">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-api-ml" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-api" target="comp-ml">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-api-notify" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-api" target="comp-notify">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Services to Infra -->
+        <mxCell id="edge-auth-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-auth" target="comp-db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-intake-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-intake" target="comp-db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-intake-storage" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-intake" target="comp-storage">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-ocr-storage" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-ocr" target="comp-storage">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-nlp-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-nlp" target="comp-db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-rules-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-rules" target="comp-db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-claimgen-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-claimgen" target="comp-db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-submission-broker" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-submission" target="comp-broker">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-ml-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-ml" target="comp-db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-notify-broker" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="comp-notify" target="comp-broker">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Infra to Externals -->
+        <mxCell id="edge-ocr-ext" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=block;" edge="1" parent="1" source="comp-ocr" target="ext-ocr">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-submission-clearing" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=block;" edge="1" parent="1" source="comp-submission" target="ext-clearing">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-notify-gateway" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=block;" edge="1" parent="1" source="comp-notify" target="ext-messaging">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-auth-idp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=block;" edge="1" parent="1" source="comp-auth" target="ext-idp">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

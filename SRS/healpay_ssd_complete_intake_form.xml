@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-16T00:00:00.000Z" agent="5.0" version="24.7.17" etag="ssd_intake_form" type="device">
+  <diagram name="SSD - Complete Intake Form" id="ssd-intake-form">
+    <mxGraphModel dx="1434" dy="796" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="System Sequence Diagram: Complete Intake Form" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="30" width="500" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Actor -->
+        <mxCell id="actor" value="Patient" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="100" y="100" width="30" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- System -->
+        <mxCell id="system" value=":HealPay System" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontStyle=1;align=center;points=[[0.5,0,0],[0.5,1,0]];portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="1">
+          <mxGeometry x="470" y="90" width="140" height="680" as="geometry"/>
+        </mxCell>
+        
+        <!-- System Lifeline -->
+        <mxCell id="system-lifeline" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontStyle=0;fontColor=#000000;align=center;" vertex="1" parent="system">
+          <mxGeometry x="65" y="80" width="10" height="580" as="geometry"/>
+        </mxCell>
+        
+        <!-- Actor Lifeline -->
+        <mxCell id="actor-lifeline" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;dashed=1;dashPattern=1 4;" vertex="1" parent="1">
+          <mxGeometry x="110" y="170" width="10" height="600" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 1: Request Intake Form -->
+        <mxCell id="msg1" value="1: requestIntakeForm()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="200" as="sourcePoint"/>
+            <mxPoint x="535" y="200" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 1: Display Intake Form -->
+        <mxCell id="return1" value="displayIntakeForm(formTemplate)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="230" as="sourcePoint"/>
+            <mxPoint x="120" y="230" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- LOOP Fragment -->
+        <mxCell id="loop-frame" value="loop" style="shape=umlFrame;whiteSpace=wrap;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontStyle=1;align=left;verticalAlign=top;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="60" y="260" width="600" height="200" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="loop-label" value="[For Each Form Section]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="70" y="280" width="180" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 2: Enter Personal Info -->
+        <mxCell id="msg2" value="2: enterPersonalInfo(name, dob, address, contact)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="320" as="sourcePoint"/>
+            <mxPoint x="535" y="320" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 3: Enter Medical History -->
+        <mxCell id="msg3" value="3: enterMedicalHistory(conditions, allergies, medications)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="360" as="sourcePoint"/>
+            <mxPoint x="535" y="360" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 4: Enter Insurance Info -->
+        <mxCell id="msg4" value="4: enterInsuranceInfo(provider, policyNumber, groupNumber)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="400" as="sourcePoint"/>
+            <mxPoint x="535" y="400" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 5: Validate Section -->
+        <mxCell id="msg5" value="5: validateSection()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="430" as="sourcePoint"/>
+            <mxPoint x="545" y="450" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="430"/>
+              <mxPoint x="590" y="450"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 6: Validate Fields -->
+        <mxCell id="msg6" value="6: validateFields(requiredFields)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="490" as="sourcePoint"/>
+            <mxPoint x="535" y="490" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ALT Fragment for Validation -->
+        <mxCell id="alt-frame" value="alt" style="shape=umlFrame;whiteSpace=wrap;html=1;rounded=0;shadow=0;strokeWidth=1;fontStyle=1;align=left;verticalAlign=top;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="60" y="520" width="600" height="180" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="alt-label" value="[All Fields Valid]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="70" y="540" width="150" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 7: Save Form Data -->
+        <mxCell id="msg7" value="7: saveFormData()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="570" as="sourcePoint"/>
+            <mxPoint x="545" y="590" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="570"/>
+              <mxPoint x="590" y="590"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 7: Form Submitted Success -->
+        <mxCell id="return7" value="formSubmittedSuccess(confirmationNumber)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="610" as="sourcePoint"/>
+            <mxPoint x="120" y="610" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ALT Separator -->
+        <mxCell id="alt-separator" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="625" width="600" height="8" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="alt-label2" value="[Validation Errors]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="70" y="640" width="150" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Return 8: Display Validation Errors -->
+        <mxCell id="return8" value="displayValidationErrors(errorList)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="670" as="sourcePoint"/>
+            <mxPoint x="120" y="670" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Note -->
+        <mxCell id="note1" value="Note:&#xa;- Loop processes each form section&#xa;- Alt fragment validates all fields&#xa;- System saves data only if valid&#xa;- HIPAA compliant data handling" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;verticalAlign=top;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="700" y="300" width="190" height="110" as="geometry"/>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

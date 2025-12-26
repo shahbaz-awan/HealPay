@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-16T00:00:00.000Z" agent="5.0" version="24.7.17" etag="ssd_payment" type="device">
+  <diagram name="SSD - Process Payment" id="ssd-payment">
+    <mxGraphModel dx="1434" dy="796" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="System Sequence Diagram: Process Payment" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="30" width="500" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Actor 1 -->
+        <mxCell id="actor1" value="Patient" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="100" y="100" width="30" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- System -->
+        <mxCell id="system" value=":HealPay System" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontStyle=1;align=center;points=[[0.5,0,0],[0.5,1,0]];portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="1">
+          <mxGeometry x="470" y="90" width="140" height="680" as="geometry"/>
+        </mxCell>
+        
+        <!-- System Lifeline -->
+        <mxCell id="system-lifeline" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontStyle=0;fontColor=#000000;align=center;" vertex="1" parent="system">
+          <mxGeometry x="65" y="80" width="10" height="580" as="geometry"/>
+        </mxCell>
+        
+        <!-- Actor 1 Lifeline -->
+        <mxCell id="actor1-lifeline" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;dashed=1;dashPattern=1 4;" vertex="1" parent="1">
+          <mxGeometry x="110" y="170" width="10" height="600" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 1: View Billing Statement -->
+        <mxCell id="msg1" value="1: viewBillingStatement()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="200" as="sourcePoint"/>
+            <mxPoint x="535" y="200" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 2: Calculate Patient Balance -->
+        <mxCell id="msg2" value="2: calculatePatientBalance()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="230" as="sourcePoint"/>
+            <mxPoint x="545" y="250" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="230"/>
+              <mxPoint x="590" y="250"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 2: Display Balance -->
+        <mxCell id="return2" value="displayBalance(totalAmount, insurancePaid, patientResponsibility)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="280" as="sourcePoint"/>
+            <mxPoint x="120" y="280" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 3: Initiate Payment -->
+        <mxCell id="msg3" value="3: initiatePayment(amount)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="320" as="sourcePoint"/>
+            <mxPoint x="535" y="320" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 3: Display Payment Options -->
+        <mxCell id="return3" value="displayPaymentOptions(creditCard, debitCard, bankTransfer)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="350" as="sourcePoint"/>
+            <mxPoint x="120" y="350" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 4: Select Payment Method -->
+        <mxCell id="msg4" value="4: selectPaymentMethod(methodType)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="390" as="sourcePoint"/>
+            <mxPoint x="535" y="390" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 5: Enter Payment Details -->
+        <mxCell id="msg5" value="5: enterPaymentDetails(cardNumber, cvv, expiry)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="430" as="sourcePoint"/>
+            <mxPoint x="535" y="430" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 6: Confirm Payment -->
+        <mxCell id="msg6" value="6: confirmPayment()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="470" as="sourcePoint"/>
+            <mxPoint x="535" y="470" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 7: Validate Payment Info -->
+        <mxCell id="msg7" value="7: validatePaymentInfo()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="500" as="sourcePoint"/>
+            <mxPoint x="545" y="520" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="500"/>
+              <mxPoint x="590" y="520"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ALT Fragment -->
+        <mxCell id="alt-frame" value="alt" style="shape=umlFrame;whiteSpace=wrap;html=1;rounded=0;shadow=0;strokeWidth=1;fontStyle=1;align=left;verticalAlign=top;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="60" y="540" width="600" height="210" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="alt-label" value="[Payment Valid]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="70" y="560" width="130" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 8: Process Payment Gateway -->
+        <mxCell id="msg8" value="8: processPaymentGateway()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="590" as="sourcePoint"/>
+            <mxPoint x="545" y="610" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="590"/>
+              <mxPoint x="590" y="610"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 9: Update Patient Account -->
+        <mxCell id="msg9" value="9: updatePatientAccount()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="640" as="sourcePoint"/>
+            <mxPoint x="545" y="660" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="640"/>
+              <mxPoint x="590" y="660"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 9: Payment Success -->
+        <mxCell id="return9" value="paymentSuccess(transactionId, receipt)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="685" as="sourcePoint"/>
+            <mxPoint x="120" y="685" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ALT Separator -->
+        <mxCell id="alt-separator" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="700" width="600" height="8" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="alt-label2" value="[Payment Invalid/Failed]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="70" y="715" width="170" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Return 10: Payment Error -->
+        <mxCell id="return10" value="paymentError(errorMessage)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="735" as="sourcePoint"/>
+            <mxPoint x="120" y="735" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Note -->
+        <mxCell id="note1" value="Note:&#xa;- Patient views balance due&#xa;- Multiple payment methods&#xa;  supported&#xa;- PCI-DSS compliant&#xa;  payment processing&#xa;- Alt fragment handles&#xa;  success and failure&#xa;- Receipt generated on&#xa;  successful payment&#xa;- Patient account updated" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;verticalAlign=top;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="700" y="350" width="180" height="180" as="geometry"/>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-15T23:00:00.000Z" agent="5.0" version="24.7.17" etag="dfd_level2" type="device">
+  <diagram name="HealPay DFD Level 2" id="dfd-level2-diagram">
+    <mxGraphModel dx="1197" dy="662" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="HealPay Medical Billing System - Data Flow Diagram (Level 2)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="600" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Section 1: Patient Data Intake (Process 1) -->
+        <mxCell id="section1-title" value="Process 1.0: Patient Data Intake (Detailed)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="80" width="400" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- External Entities -->
+        <mxCell id="doctor1" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;Doctor&lt;/b&gt;&lt;/font&gt;" style="html=1;dashed=0;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="50" y="130" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Sub-processes for Patient Data Intake -->
+        <mxCell id="process-1-1" value="&lt;b&gt;1.1&lt;/b&gt;&lt;div&gt;&lt;b&gt;Capture Patient Info&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="220" y="120" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-1-2" value="&lt;b&gt;1.2&lt;/b&gt;&lt;div&gt;&lt;b&gt;OCR Extraction&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="380" y="120" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-1-3" value="&lt;b&gt;1.3&lt;/b&gt;&lt;div&gt;&lt;b&gt;Validate Data&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="540" y="120" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <!-- Data Stores -->
+        <mxCell id="d1-section1" value="&lt;b&gt;D1&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/b&gt;Patient Records" style="html=1;dashed=0;whiteSpace=wrap;shape=mxgraph.dfd.dataStoreID;align=left;spacingLeft=3;points=[[0,0],[0.5,0],[1,0],[0,0.5],[1,0.5],[0,1],[0.5,1],[1,1]];" vertex="1" parent="1">
+          <mxGeometry x="700" y="140" width="130" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Connections for Section 1 -->
+        <mxCell id="conn1-1" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="doctor1" target="process-1-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="150" y="165" as="sourcePoint" />
+            <mxPoint x="220" y="165" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label1-1" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Patient Details&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="150" y="135" width="70" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn1-2" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-1-1" target="process-1-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="310" y="165" as="sourcePoint" />
+            <mxPoint x="380" y="165" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label1-2" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Raw Data&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="320" y="140" width="60" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn1-3" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-1-2" target="process-1-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="470" y="165" as="sourcePoint" />
+            <mxPoint x="540" y="165" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label1-3" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Extracted Text&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="473" y="140" width="65" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn1-4" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-1-3" target="d1-section1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="630" y="165" as="sourcePoint" />
+            <mxPoint x="700" y="165" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label1-4" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Valid Records&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="633" y="135" width="65" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Section 2: Code Mapping (Process 2) -->
+        <mxCell id="section2-title" value="Process 2.0: Code Mapping (Detailed)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="260" width="400" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="medical-coder2" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;Medical Coder&lt;/b&gt;&lt;/font&gt;" style="html=1;dashed=0;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="50" y="310" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Sub-processes for Code Mapping -->
+        <mxCell id="process-2-1" value="&lt;b&gt;2.1&lt;/b&gt;&lt;div&gt;&lt;b&gt;Extract Medical Terms&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="220" y="300" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-2-2" value="&lt;b&gt;2.2&lt;/b&gt;&lt;div&gt;&lt;b&gt;Map to ICD/CPT&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="380" y="300" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-2-3" value="&lt;b&gt;2.3&lt;/b&gt;&lt;div&gt;&lt;b&gt;Verify Codes&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="540" y="300" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <!-- Data Stores -->
+        <mxCell id="d2-section2" value="&lt;b&gt;D2&amp;nbsp; &amp;nbsp; &lt;/b&gt;Medical Records" style="html=1;dashed=0;whiteSpace=wrap;shape=mxgraph.dfd.dataStoreID;align=left;spacingLeft=3;points=[[0,0],[0.5,0],[1,0],[0,0.5],[1,0.5],[0,1],[0.5,1],[1,1]];" vertex="1" parent="1">
+          <mxGeometry x="700" y="275" width="130" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="d3-section2" value="&lt;b&gt;D3&amp;nbsp; &amp;nbsp; &lt;/b&gt;ICD/CPT Coding" style="html=1;dashed=0;whiteSpace=wrap;shape=mxgraph.dfd.dataStoreID;align=left;spacingLeft=3;points=[[0,0],[0.5,0],[1,0],[0,0.5],[1,0.5],[0,1],[0.5,1],[1,1]];" vertex="1" parent="1">
+          <mxGeometry x="700" y="365" width="130" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Connections for Section 2 -->
+        <mxCell id="conn2-1" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="medical-coder2" target="process-2-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="150" y="345" as="sourcePoint" />
+            <mxPoint x="220" y="345" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label2-1" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Review Request&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="145" y="315" width="80" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn2-2" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-2-1" target="process-2-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="310" y="345" as="sourcePoint" />
+            <mxPoint x="380" y="345" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label2-2" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Medical Terms&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="315" y="320" width="70" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn2-3" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-2-2" target="process-2-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="470" y="345" as="sourcePoint" />
+            <mxPoint x="540" y="345" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label2-3" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Mapped Codes&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="470" y="320" width="70" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn2-4" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-2-3" target="d2-section2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="630" y="320" as="sourcePoint" />
+            <mxPoint x="700" y="290" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label2-4" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Update Records&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="630" y="265" width="65" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn2-5" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-2-3" target="d3-section2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="630" y="370" as="sourcePoint" />
+            <mxPoint x="700" y="380" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label2-5" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Store Codes&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="633" y="355" width="65" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Section 3: Billing & Invoice Generation (Process 3) -->
+        <mxCell id="section3-title" value="Process 3.0: Billing &amp; Invoice Generation (Detailed)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="450" width="450" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="billing-staff3" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;Billing Staff&lt;/b&gt;&lt;/font&gt;" style="html=1;dashed=0;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="50" y="500" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Sub-processes for Billing -->
+        <mxCell id="process-3-1" value="&lt;b&gt;3.1&lt;/b&gt;&lt;div&gt;&lt;b&gt;Calculate Charges&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="220" y="490" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-3-2" value="&lt;b&gt;3.2&lt;/b&gt;&lt;div&gt;&lt;b&gt;Generate Invoice&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="380" y="490" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-3-3" value="&lt;b&gt;3.3&lt;/b&gt;&lt;div&gt;&lt;b&gt;Review &amp;amp; Approve&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="540" y="490" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <!-- Data Stores -->
+        <mxCell id="d3-section3" value="&lt;b&gt;D3&amp;nbsp; &amp;nbsp; &lt;/b&gt;ICD/CPT Coding" style="html=1;dashed=0;whiteSpace=wrap;shape=mxgraph.dfd.dataStoreID;align=left;spacingLeft=3;points=[[0,0],[0.5,0],[1,0],[0,0.5],[1,0.5],[0,1],[0.5,1],[1,1]];" vertex="1" parent="1">
+          <mxGeometry x="700" y="465" width="130" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="d4-section3" value="&lt;b&gt;D4&amp;nbsp; &amp;nbsp; &lt;/b&gt;Invoices" style="html=1;dashed=0;whiteSpace=wrap;shape=mxgraph.dfd.dataStoreID;align=left;spacingLeft=3;points=[[0,0],[0.5,0],[1,0],[0,0.5],[1,0.5],[0,1],[0.5,1],[1,1]];" vertex="1" parent="1">
+          <mxGeometry x="700" y="555" width="130" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Connections for Section 3 -->
+        <mxCell id="conn3-1" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="billing-staff3" target="process-3-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="150" y="535" as="sourcePoint" />
+            <mxPoint x="220" y="535" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label3-1" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Billing Request&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="150" y="505" width="70" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn3-2" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-3-1" target="process-3-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="310" y="535" as="sourcePoint" />
+            <mxPoint x="380" y="535" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label3-2" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Charge Data&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="320" y="510" width="60" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn3-3" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-3-2" target="process-3-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="470" y="535" as="sourcePoint" />
+            <mxPoint x="540" y="535" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label3-3" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Draft Invoice&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="475" y="510" width="65" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn3-4" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.25;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;dashed=1;" edge="1" parent="1" source="process-3-1" target="d3-section3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="243" y="490" as="sourcePoint" />
+            <mxPoint x="700" y="480" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="243" y="450" />
+              <mxPoint x="650" y="450" />
+              <mxPoint x="650" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label3-4" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Read Codes&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="600" y="425" width="60" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn3-5" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-3-3" target="d4-section3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="630" y="535" as="sourcePoint" />
+            <mxPoint x="700" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label3-5" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Approved Invoice&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="630" y="515" width="65" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Section 4: Insurance Verification (Process 4) -->
+        <mxCell id="section4-title" value="Process 4.0: Insurance Verification (Detailed)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="640" width="450" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="insurance4" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;Insurance Provider&lt;/b&gt;&lt;/font&gt;" style="html=1;dashed=0;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="50" y="690" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Sub-processes for Insurance Verification -->
+        <mxCell id="process-4-1" value="&lt;b&gt;4.1&lt;/b&gt;&lt;div&gt;&lt;b&gt;Check Eligibility&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="220" y="680" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-4-2" value="&lt;b&gt;4.2&lt;/b&gt;&lt;div&gt;&lt;b&gt;Verify Coverage&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="380" y="680" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-4-3" value="&lt;b&gt;4.3&lt;/b&gt;&lt;div&gt;&lt;b&gt;Submit Claim&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="540" y="680" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <!-- Data Stores -->
+        <mxCell id="d4-section4" value="&lt;b&gt;D4&amp;nbsp; &amp;nbsp; &lt;/b&gt;Invoices" style="html=1;dashed=0;whiteSpace=wrap;shape=mxgraph.dfd.dataStoreID;align=left;spacingLeft=3;points=[[0,0],[0.5,0],[1,0],[0,0.5],[1,0.5],[0,1],[0.5,1],[1,1]];" vertex="1" parent="1">
+          <mxGeometry x="700" y="710" width="130" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Connections for Section 4 -->
+        <mxCell id="conn4-1" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="insurance4" target="process-4-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="150" y="725" as="sourcePoint" />
+            <mxPoint x="220" y="725" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label4-1" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Policy Data&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="155" y="695" width="60" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn4-2" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-4-1" target="process-4-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="310" y="725" as="sourcePoint" />
+            <mxPoint x="380" y="725" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label4-2" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Eligibility Status&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="315" y="700" width="65" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn4-3" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-4-2" target="process-4-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="470" y="725" as="sourcePoint" />
+            <mxPoint x="540" y="725" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label4-3" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Coverage Details&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="470" y="700" width="70" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn4-4" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-4-3" target="d4-section4">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="630" y="725" as="sourcePoint" />
+            <mxPoint x="700" y="725" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label4-4" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Claim Response&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="633" y="700" width="65" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Section 5: Payment Processing (Process 5) -->
+        <mxCell id="section5-title" value="Process 5.0: Payment Processing (Detailed)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="830" width="450" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="patient5" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;Patient&lt;/b&gt;&lt;/font&gt;" style="html=1;dashed=0;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="50" y="880" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Sub-processes for Payment Processing -->
+        <mxCell id="process-5-1" value="&lt;b&gt;5.1&lt;/b&gt;&lt;div&gt;&lt;b&gt;Receive Payment&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="220" y="870" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-5-2" value="&lt;b&gt;5.2&lt;/b&gt;&lt;div&gt;&lt;b&gt;Validate Payment&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="380" y="870" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-5-3" value="&lt;b&gt;5.3&lt;/b&gt;&lt;div&gt;&lt;b&gt;Update Records&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="540" y="870" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <!-- Data Stores -->
+        <mxCell id="d5-section5" value="&lt;b&gt;D5&amp;nbsp; &amp;nbsp; &lt;/b&gt;Payment" style="html=1;dashed=0;whiteSpace=wrap;shape=mxgraph.dfd.dataStoreID;align=left;spacingLeft=3;points=[[0,0],[0.5,0],[1,0],[0,0.5],[1,0.5],[0,1],[0.5,1],[1,1]];" vertex="1" parent="1">
+          <mxGeometry x="700" y="900" width="100" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Connections for Section 5 -->
+        <mxCell id="conn5-1" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="patient5" target="process-5-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="150" y="915" as="sourcePoint" />
+            <mxPoint x="220" y="915" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label5-1" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Payment Info&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="155" y="885" width="65" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn5-2" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-5-1" target="process-5-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="310" y="915" as="sourcePoint" />
+            <mxPoint x="380" y="915" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label5-2" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Payment Data&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="315" y="890" width="70" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn5-3" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-5-2" target="process-5-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="470" y="915" as="sourcePoint" />
+            <mxPoint x="540" y="915" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label5-3" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Valid Payment&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="475" y="890" width="65" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn5-4" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-5-3" target="d5-section5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="630" y="915" as="sourcePoint" />
+            <mxPoint x="700" y="915" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label5-4" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Payment Record&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="633" y="890" width="65" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Section 6: Anomaly Detection (Process 6) -->
+        <mxCell id="section6-title" value="Process 6.0: Anomaly Detection (Detailed)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1020" width="450" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="admin6" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;Admin&lt;/b&gt;&lt;/font&gt;" style="html=1;dashed=0;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1070" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Sub-processes for Anomaly Detection -->
+        <mxCell id="process-6-1" value="&lt;b&gt;6.1&lt;/b&gt;&lt;div&gt;&lt;b&gt;Collect Data&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="220" y="1060" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-6-2" value="&lt;b&gt;6.2&lt;/b&gt;&lt;div&gt;&lt;b&gt;Analyze Patterns&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="380" y="1060" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-6-3" value="&lt;b&gt;6.3&lt;/b&gt;&lt;div&gt;&lt;b&gt;Generate Report&lt;/b&gt;&lt;/div&gt;" style="shape=ellipse;html=1;dashed=0;whiteSpace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="540" y="1060" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <!-- Data Stores -->
+        <mxCell id="d5-section6" value="&lt;b&gt;D5&amp;nbsp; &amp;nbsp; &lt;/b&gt;Payment" style="html=1;dashed=0;whiteSpace=wrap;shape=mxgraph.dfd.dataStoreID;align=left;spacingLeft=3;points=[[0,0],[0.5,0],[1,0],[0,0.5],[1,0.5],[0,1],[0.5,1],[1,1]];" vertex="1" parent="1">
+          <mxGeometry x="700" y="1035" width="100" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="d6-section6" value="&lt;b&gt;D6&amp;nbsp; &amp;nbsp; &lt;/b&gt;Audit Log" style="html=1;dashed=0;whiteSpace=wrap;shape=mxgraph.dfd.dataStoreID;align=left;spacingLeft=3;points=[[0,0],[0.5,0],[1,0],[0,0.5],[1,0.5],[0,1],[0.5,1],[1,1]];" vertex="1" parent="1">
+          <mxGeometry x="700" y="1125" width="100" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Connections for Section 6 -->
+        <mxCell id="conn6-1" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="admin6" target="process-6-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="150" y="1105" as="sourcePoint" />
+            <mxPoint x="220" y="1105" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label6-1" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Audit Request&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="150" y="1075" width="70" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn6-2" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-6-1" target="process-6-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="310" y="1105" as="sourcePoint" />
+            <mxPoint x="380" y="1105" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label6-2" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Transaction Data&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="313" y="1080" width="70" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn6-3" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-6-2" target="process-6-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="470" y="1105" as="sourcePoint" />
+            <mxPoint x="540" y="1105" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label6-3" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Anomaly Findings&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="470" y="1080" width="70" height="25" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn6-4" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;dashed=1;" edge="1" parent="1" source="process-6-1" target="d5-section6">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="265" y="1060" as="sourcePoint" />
+            <mxPoint x="700" y="1050" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="265" y="1020" />
+              <mxPoint x="650" y="1020" />
+              <mxPoint x="650" y="1050" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label6-4" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Read Data&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="600" y="995" width="60" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn6-5" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" parent="1" source="process-6-3" target="d6-section6">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="630" y="1105" as="sourcePoint" />
+            <mxPoint x="700" y="1140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label6-5" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Audit Report&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="635" y="1115" width="65" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend" value="Legend:&#xa;Process Number.Subprocessnumber&#xa;Solid line = Direct data flow&#xa;Dashed line = Data read/query&#xa;Ellipse = Sub-process&#xa;Rectangle = External entity&#xa;Open rectangle = Data store" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1200" width="200" height="140" as="geometry" />
+        </mxCell>
+        
+        <!-- Notes -->
+        <mxCell id="note1" value="DFD Level 2 Breakdown:&#xa;Each major process from Level 1 is decomposed into 3 sub-processes showing detailed workflow. All processes maintain data consistency and follow proper DFD principles with clear inputs, outputs, and data store interactions." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="300" y="1200" width="350" height="100" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

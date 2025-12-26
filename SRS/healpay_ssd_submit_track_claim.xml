@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-16T00:00:00.000Z" agent="5.0" version="24.7.17" etag="ssd_submit_track" type="device">
+  <diagram name="SSD - Submit &amp; Track Claim" id="ssd-submit-track">
+    <mxGraphModel dx="1434" dy="796" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Title -->
+        <mxCell id="title" value="System Sequence Diagram: Submit &amp;amp; Track Claim Status" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="30" width="600" height="30" as="geometry"/>
+        </mxCell>
+        
+        <!-- Actor -->
+        <mxCell id="actor" value="Billing Staff" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="100" y="100" width="30" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- System -->
+        <mxCell id="system" value=":HealPay System" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontStyle=1;align=center;points=[[0.5,0,0],[0.5,1,0]];portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="1">
+          <mxGeometry x="470" y="90" width="140" height="680" as="geometry"/>
+        </mxCell>
+        
+        <!-- System Lifeline -->
+        <mxCell id="system-lifeline" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontStyle=0;fontColor=#000000;align=center;" vertex="1" parent="system">
+          <mxGeometry x="65" y="80" width="10" height="580" as="geometry"/>
+        </mxCell>
+        
+        <!-- Actor Lifeline -->
+        <mxCell id="actor-lifeline" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;dashed=1;dashPattern=1 4;" vertex="1" parent="1">
+          <mxGeometry x="110" y="170" width="10" height="600" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 1: Select Validated Claim -->
+        <mxCell id="msg1" value="1: selectValidatedClaim(claimId)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="200" as="sourcePoint"/>
+            <mxPoint x="535" y="200" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 1: Display Claim Details -->
+        <mxCell id="return1" value="displayClaimDetails(claimData)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="230" as="sourcePoint"/>
+            <mxPoint x="120" y="230" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 2: Submit Claim -->
+        <mxCell id="msg2" value="2: submitClaimToPayer()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="270" as="sourcePoint"/>
+            <mxPoint x="535" y="270" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 3: Format Claim -->
+        <mxCell id="msg3" value="3: formatClaimToEDI()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="300" as="sourcePoint"/>
+            <mxPoint x="545" y="320" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="300"/>
+              <mxPoint x="590" y="320"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 4: Transmit to Payer -->
+        <mxCell id="msg4" value="4: transmitToPayer()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="350" as="sourcePoint"/>
+            <mxPoint x="545" y="370" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="350"/>
+              <mxPoint x="590" y="370"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Return 4: Submission Confirmation -->
+        <mxCell id="return4" value="submissionConfirmation(trackingNumber, timestamp)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="400" as="sourcePoint"/>
+            <mxPoint x="120" y="400" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- LOOP Fragment for Status Tracking -->
+        <mxCell id="loop-frame" value="loop" style="shape=umlFrame;whiteSpace=wrap;html=1;rounded=0;shadow=0;strokeWidth=1;fontStyle=1;align=left;verticalAlign=top;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="60" y="430" width="600" height="320" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="loop-label" value="[Periodic Status Check Until Final Status]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="70" y="450" width="270" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Message 5: Check Claim Status -->
+        <mxCell id="msg5" value="5: checkClaimStatus(trackingNumber)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="490" as="sourcePoint"/>
+            <mxPoint x="535" y="490" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Message 6: Query Payer System -->
+        <mxCell id="msg6" value="6: queryPayerSystem()" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="545" y="520" as="sourcePoint"/>
+            <mxPoint x="545" y="540" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="590" y="520"/>
+              <mxPoint x="590" y="540"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ALT Fragment inside LOOP -->
+        <mxCell id="alt-frame" value="alt" style="shape=umlFrame;whiteSpace=wrap;html=1;rounded=0;shadow=0;strokeWidth=1;fontStyle=1;align=left;verticalAlign=top;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="80" y="560" width="560" height="170" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="alt-label" value="[Claim Accepted]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="90" y="580" width="130" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Return 7: Claim Accepted -->
+        <mxCell id="return7" value="claimAccepted(status, paymentDate, amount)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="610" as="sourcePoint"/>
+            <mxPoint x="120" y="610" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ALT Separator 1 -->
+        <mxCell id="alt-separator1" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="630" width="560" height="8" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="alt-label2" value="[Claim Rejected]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="90" y="645" width="130" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Return 8: Claim Rejected -->
+        <mxCell id="return8" value="claimRejected(rejectionCode, reason)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="675" as="sourcePoint"/>
+            <mxPoint x="120" y="675" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ALT Separator 2 -->
+        <mxCell id="alt-separator2" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="692" width="560" height="8" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="alt-label3" value="[Pending]" style="text;html=1;align=left;verticalAlign=top;rounded=0;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="90" y="707" width="100" height="20" as="geometry"/>
+        </mxCell>
+        
+        <!-- Return 9: Still Pending -->
+        <mxCell id="return9" value="claimPending(currentStatus)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="535" y="720" as="sourcePoint"/>
+            <mxPoint x="120" y="720" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Note -->
+        <mxCell id="note1" value="Note:&#xa;- Claim formatted to EDI&#xa;  standard for transmission&#xa;- Loop checks status&#xa;  periodically until final&#xa;- Alt fragment shows three&#xa;  possible outcomes:&#xa;  * Accepted&#xa;  * Rejected&#xa;  * Pending&#xa;- Tracking number used for&#xa;  status inquiries" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;verticalAlign=top;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="700" y="300" width="180" height="190" as="geometry"/>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

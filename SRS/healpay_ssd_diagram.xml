@@ -1,0 +1,64 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 Edg/141.0.0.0" version="28.2.7">
+  <diagram name="SSD - Generate Medical Codes" id="0">
+    <mxGraphModel dx="778" dy="430" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value=":MedicalCoder" style="shape=umlActor;verticalAlign=bottom;align=center;" parent="1" vertex="1">
+          <mxGeometry x="110" y="100" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="3" style="shape=umlLifeline;verticalAlign=top;align=center;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="80" y="180" width="2" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value=":System" style="shape=rect;whiteSpace=wrap;html=1;rounded=0;align=center;" parent="1" vertex="1">
+          <mxGeometry x="400" y="100" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5" style="shape=umlLifeline;verticalAlign=top;align=center;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="450" y="140" width="2" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="selectPatientRecord(patientID)" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;rounded=0;" parent="1" source="3" target="5" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="250" y="180" as="sourcePoint" />
+            <mxPoint x="450" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="7" value="retrieveDiagnosisAndProcedures()" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;rounded=0;" parent="1" source="3" target="5" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="250" y="220" as="sourcePoint" />
+            <mxPoint x="450" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8" value="enterMedicalCodes(ICD, CPT)" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;rounded=0;" parent="1" source="3" target="5" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="250" y="260" as="sourcePoint" />
+            <mxPoint x="450" y="260" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="9" value="alt [codes valid]" style="shape=umlFrame;dashed=0;rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;overflow=hidden;" parent="1" vertex="1">
+          <mxGeometry x="200" y="300" width="400" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="validateCodes()" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;rounded=0;" parent="1" source="3" target="5" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="250" y="320" as="sourcePoint" />
+            <mxPoint x="450" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="11" value="confirmationMessage(&#39;Codes validated successfully&#39;)" style="edgeStyle=elbowEdgeStyle;endArrow=open;html=1;rounded=0;dashed=1;" parent="1" source="5" target="3" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="450" y="350" as="sourcePoint" />
+            <mxPoint x="250" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12" value="[else]" style="text;align=left;verticalAlign=top;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="400" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="errorMessage(&#39;Invalid codes entered&#39;)" style="edgeStyle=elbowEdgeStyle;endArrow=open;html=1;rounded=0;dashed=1;" parent="1" source="5" target="3" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="450" y="430" as="sourcePoint" />
+            <mxPoint x="250" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

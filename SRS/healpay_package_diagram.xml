@@ -1,0 +1,106 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 Edg/141.0.0.0" version="28.2.8">
+  <diagram name="HealPay Package Diagram" id="package-diagram">
+    <mxGraphModel dx="1945" dy="1075" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="HealPay Medical Billing System - Package Diagram" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="590" y="20" width="400" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Uvwpw5KSekGv_jXUps4j-13" value="Package1" style="shape=folder;fontStyle=1;tabWidth=80;tabHeight=30;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="210" y="105" width="1190" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="Uvwpw5KSekGv_jXUps4j-21" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;&lt;b&gt;&amp;nbsp;UI Layer&lt;/b&gt;&lt;/span&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="200" y="152" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Uvwpw5KSekGv_jXUps4j-32" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;Patient Portal&lt;/span&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="260" y="210" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="Uvwpw5KSekGv_jXUps4j-33" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;Billing Staff Portal&lt;/span&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="1180" y="210" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="Uvwpw5KSekGv_jXUps4j-34" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;Doctor Portal&lt;/span&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="490" y="210" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="Uvwpw5KSekGv_jXUps4j-35" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;Medical Coder Portal&lt;/span&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="950" y="210" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="Uvwpw5KSekGv_jXUps4j-36" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;Admin Portal&lt;/span&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="720" y="210" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-2" value="Package1" style="shape=folder;fontStyle=1;tabWidth=80;tabHeight=30;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="210" y="390" width="1200" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-3" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Core Logic&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1;fontSize=14;" parent="1" vertex="1">
+          <mxGeometry x="220" y="420" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-5" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;Notifications&lt;/span&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="250" y="450" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-6" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;Anamoly Detection&lt;/span&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="500" y="450" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-7" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;Billing &amp;amp; Invoicing&lt;/span&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="730" y="450" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-8" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;OCR &amp;amp; NLP Processing&lt;/span&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="960" y="450" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-9" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;Authentication &amp;amp; Role&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 18px;&quot;&gt;Management&lt;/span&gt;&lt;/div&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="1180" y="450" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-10" value="Package1" style="shape=folder;fontStyle=1;tabWidth=80;tabHeight=30;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="210" y="720" width="730" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-11" value="Package1" style="shape=folder;fontStyle=1;tabWidth=80;tabHeight=30;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="1140" y="710" width="540" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-12" value="&lt;b&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;Data Management&lt;/font&gt;&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="210" y="760" width="170" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-13" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;Model Repository&lt;/span&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="220" y="810" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-14" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;Document Storage&lt;/span&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="450" y="810" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-15" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;Database Service&lt;/span&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="700" y="810" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-16" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;Access Control&amp;nbsp;&lt;/span&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="1160" y="800" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-17" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;Admin Management&lt;/span&gt;" style="shape=folder;fontStyle=1;tabWidth=50;tabHeight=20;tabPosition=left;html=1;boundedLbl=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="1380" y="800" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="9Z3eS-Ts-cIGp_SUzZOc-18" value="System Configuration" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1;fontSize=18;" parent="1" vertex="1">
+          <mxGeometry x="1150" y="740" width="190" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="zwgnP3wOCKLznD85AsyT-3" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;&amp;lt;&amp;lt;Access&amp;gt;&amp;gt;&lt;/font&gt;" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;exitX=0;exitY=0;exitDx=0;exitDy=230;exitPerimeter=0;entryX=0.404;entryY=0.135;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="9Z3eS-Ts-cIGp_SUzZOc-2" target="9Z3eS-Ts-cIGp_SUzZOc-10">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="1400" y="990" as="sourcePoint" />
+            <mxPoint x="1560" y="990" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="zwgnP3wOCKLznD85AsyT-5" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;&amp;lt;&amp;lt;import&amp;gt;&amp;gt;&lt;/font&gt;" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;exitX=0;exitY=0;exitDx=1190;exitDy=240;exitPerimeter=0;entryX=0.846;entryY=0.135;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="Uvwpw5KSekGv_jXUps4j-13" target="9Z3eS-Ts-cIGp_SUzZOc-11">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="680" y="460" as="sourcePoint" />
+            <mxPoint x="840" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="zwgnP3wOCKLznD85AsyT-6" value="&lt;span style=&quot;font-size: 20px;&quot;&gt;&amp;lt;&amp;lt;Import&amp;gt;&amp;gt;&lt;/span&gt;" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;entryX=0.807;entryY=0.145;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="9Z3eS-Ts-cIGp_SUzZOc-2">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="950" y="350" as="sourcePoint" />
+            <mxPoint x="840" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="zwgnP3wOCKLznD85AsyT-7" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;&amp;lt;&amp;lt;Access&amp;gt;&amp;gt;&lt;/font&gt;" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;entryX=0.429;entryY=1.035;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.176;exitY=0.138;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="9Z3eS-Ts-cIGp_SUzZOc-2" target="Uvwpw5KSekGv_jXUps4j-13">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="680" y="450" as="sourcePoint" />
+            <mxPoint x="840" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

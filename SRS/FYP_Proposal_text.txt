@@ -1,0 +1,656 @@
+1 
+
+Final Year Project 
+
+pp 
+
+Defense Proposal 
+
+FYP Team 
+
+Muhammad Shoaib Haider 
+
+ Muhammad Shahbaz Sarwar 
+
+Muhammad Hussnain Kasana 
+
+Supervised by 
+
+Dr. Muhammad Fayyaz 
+
+Department of Artificial Intelligence 
+
+National University of Computer and Emerging Science 
+
+Chiniot-Faisalabad, Pakistan 
+
+2025 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+HealPay 
+
+2 
+
+Anti-Plagiarism Declaration 
+
+This is to declare that the above publication produced under the:  
+
+Title: _______MedEase_________________________  
+
+is the sole contribution of the author(s) and no part hereof has been reproduced on 
+
+as it is basis (cut and paste) which can be considered as Plagiarism. All referenced 
+
+parts have been used to argue the idea and have been cited properly. I/We will be 
+
+responsible  and  liable  for  any  consequence  if  violation  of  this  declaration  is 
+
+determined.  
+
+Date: ______________  
+
+Student 1 
+
+Name: _____________________  
+
+Signature:___________________  
+
+Student 2 
+
+Name: _____________________ 
+
+Signature:___________________  
+
+Student 3 
+
+Name: _____________________ 
+
+Signature:___________________  
+
+ 
+ 
+ 
+ 
+ 
+ 
+  
+  
+ 
+ 
+HealPay 
+
+Abstract 
+
+3 
+
+Medical Billing in the U.S. healthcare system is slow, complex, and prone to errors. 
+
+Small clinics and busy practices often rely on manual data entry and coding, which 
+
+leads  to  incorrect  ICD-10/CPT  assignments,  frequent  claim  denials,  and  delayed 
+
+payments. This project develops a web-based automated medical billing system that 
+
+streamlines the entire revenue cycle from patient intake to insurer submission. A key 
+
+feature is an interactive patient intake module where patients can describe their visit 
+
+(text  or  voice);  the  system  uses  this  input  to  auto-populate  demographic  and  visit 
+
+details, reducing initial data entry errors. Doctors then review the record and assign or 
+
+confirm ICD-10 and CPT codes. The platform applies OCR and NLP to extract clinical 
+
+information from notes, maps terms to standard codes, and generates CMS-1500/UB-
+
+04  claim  forms.  Before  submission,  an  automated  validation  engine  checks  claims 
+
+against payer rules and an ML model predicts the likelihood of rejection so staff can 
+
+fix issues proactively. Validated claims are then formatted for electronic submission to 
+
+insurers. So by combining automation, clinician oversight, and predictive analytics, the 
+
+system aims to reduce denials, speed reimbursements, and improve billing transparency 
+
+for providers and patients. 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+4 
+
+HealPay 
+
+Table of Contents 
+1.  5 
+
+1.1. 
+
+5 
+
+1.1.1. 
+
+1.1.2. 
+
+5 
+
+5 
+
+6 
+
+6 
+
+6 
+
+6 
+
+6 
+
+7 
+
+7 
+
+7 
+
+5 
+
+6 
+
+6 
+
+7 
+
+7 
+
+7 
+
+7 
+
+8 
+
+8 
+
+8 
+
+8 
+
+9 
+
+9 
+
+1.2. 
+
+1.3. 
+
+1.4. 
+
+1.4.1. 
+
+1.4.2. 
+
+1.4.3. 
+
+1.4.4. 
+
+1.4.5. 
+
+1.4.6. 
+
+1.4.7. 
+
+1.4.8. 
+
+2.  7 
+
+2.1. 
+
+2.2. 
+
+2.3. 
+
+2.4. 
+
+2.5. 
+
+2.6. 
+
+2.7. 
+
+2.8. 
+
+3.  9 
+
+3.1. 
+
+3.2. 
+
+4.  10 
+
+5.  10 
+
+6.  11 
+
+ 
+ 
+ 
+ 
+ 
+ 
+HealPay 
+
+5 
+
+1. Vision Document 
+
+1.1. 
+
+Introduction 
+
+1.1.1.  Problem Statement: 
+
+ Medical  billing  in  the  United  States is highly  complex  and  mostly  manual, 
+
+leading  to  frequent  coding  errors,  missing  patient  details,  and  high  claim 
+
+rejection  rates.  These  problems  cause  delays  in  payments  for  hospitals, 
+
+financial losses for clinics, and confusion for patients. There is a need for an 
+
+automated  system  that  can  capture  patient  information,  assist  doctors  in 
+
+assigning accurate ICD-10/CPT codes, validate claims before submission, and 
+
+improve transparency in the billing process. 
+
+1.1.2.  Objectives 
+
+●  To develop a web-based system that automates the medical billing process. 
+
+●  To capture patient details during intake and reduce manual entry errors. 
+
+●  To assist doctors in assigning accurate ICD-10 and CPT codes. 
+
+●  To  generate  and  validate  claim  forms  before  submission  to  insurance 
+
+companies. 
+
+●  To use machine learning for predicting claim acceptance or rejection. 
+
+●  To  provide  dashboards  for  billing  staff  and  patients  for  better  tracking  and 
+
+transparency. 
+
+1.2. 
+
+Motivation 
+
+The complex nature of medical billing system often overwhelms both healthcare staff 
+
+and patients. The errors in coding and claim submission cause unnecessary delays and 
+
+financial  stress.  Our  motivation  is  to  apply  modern  technologies  and  automation  to 
+
+simplify this process, reduce the burden on clinics, and make billing more transparent 
+
+for patients. 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+HealPay 
+
+6 
+
+1.3. 
+
+Overview 
+
+Our  proposed  system  is  a  web-based  medical  billing  platform  which  is  designed  to 
+
+handle  the  complete  process  from  the  intake  of  patient  details  to  claim  submission. 
+
+Patients  will  provide  their  details  during  intake,  which  are  recorded  in  the  system. 
+
+Doctors  then  confirm  and  assign  ICD-10  and  CPT  codes,  while  the  system 
+
+automatically  generates  claim  forms  and  validates  them  against  insurance  rules.  A 
+
+machine  learning  module  predicts  the  chances  of  rejection,  allowing  errors  to  be 
+
+corrected before submission. The platform also offers dashboards for staff and patients 
+
+to track claims and view billing details in a clear and structured way. 
+
+1.4. 
+
+Functionality  
+
+The proposed system provides end-to-end automation of the medical billing process, 
+
+covering  patient  intake,  coding,  claim  generation,  validation,  and  submission.  Each 
+
+module is designed to reduce manual effort, improve accuracy, and ensure transparency 
+
+for both healthcare providers and patients. 
+
+The main functionalities of the system are described below: 
+
+1.4.1.   Patient Intake Module 
+Patients will provide their personal and medical details through an easy-to-
+use interface. This reduces manual errors and ensures that all necessary data 
+is captured at the start of the billing process. 
+
+1.4.2.  OCR and NLP Processing 
+The system will process uploaded medical notes or reports using OCR and 
+NLP to extract key medical information. This feature helps in reducing 
+manual effort and improves coding accuracy. 
+
+1.4.3.  Coder’s Coding Support 
+Coders can directly assign or validate ICD-10 and CPT codes for each patient 
+record. This ensures  that coding  remains accurate and  aligned  with  medical 
+standards. 
+
+1.4.4.  Code Recommendation System 
+Based on the details entered by the patient, the system will recommend 
+suitable ICD-10 and CPT codes. The doctor will then review and confirm or 
+modify these recommendations before final submission. 
+
+1.4.5.  Claim Form Generator 
+The system will automatically generate claim forms such as CMS-1500 and 
+
+UB-04  with  all  the  required  patient,  provider,  and  coding  information. This 
+
+ensures standardization and saves time for billing staff. 
+
+ 
+ 
+ 
+HealPay 
+
+7 
+
+1.4.6.   Validation Engine and Claim Prediction 
+Before submission, the system will validate claims against insurance rules and 
+
+guidelines. Any missing or incorrect information will be flagged for correction. 
+
+Then we will use a machine learning model that will analyze claims and predict 
+
+the likelihood of acceptance or rejection. This allows staff to resolve potential 
+
+issues before claims are submitted. 
+
+1.4.7.   Dashboard 
+The dashboard will provide billing staff with tools to track submitted, pending, 
+
+and rejected claims. Patients will also have access to their bills in a clear and 
+
+transparent format. 
+
+1.4.8.  Notifications  
+The system will send alerts and updates to both staff and patients about claim 
+
+status changes, such as submission, approval, or rejection. 
+
+2. Tools and Technologies 
+
+2.1. 
+
+Backend (Python with Flask)  
+
+Python will be used as the core programming language due to its 
+
+simplicity and rich ecosystem. Flask will serve as the backend  
+
+framework for building REST APIs and managing business logic.  
+
+2.2. 
+
+Frontend(React.js) 
+
+The user interface will be built using React.js to ensure a responsive 
+
+and user-friendly experience. This will allow patients, doctors,  
+
+and billing staff to interact with the system through a web browser. 
+
+2.3. 
+
+Database (PostgreSQL) 
+A relational database such as PostgreSQL will store patient records, 
+
+billing data, and claim history. PostgreSQL is preferred for its  
+
+support of structured and semi-structured data formats. 
+
+2.4. 
+
+Optical  Character  Recognition 
+
+(Tesseract 
+
+/ 
+
+Google Vision API) 
+
+Tesseract OCR or Google Vision API will be used to extract text  
+
+ 
+ 
+ 
+ 
+ 
+ 
+HealPay 
+
+8 
+
+from scanned medical notes and reports. This feature will help in 
+
+automating the intake of handwritten or printed documents. 
+
+2.5. 
+
+Natural  Language  Processing  (Spacy/NLTK  with 
+
+Medical Libraries) 
+
+NLP tools such as SpaCy or NLTK, along with medical term  
+
+dictionaries, will be used to process text and identify relevant 
+
+diagnoses and procedures. This will improve accuracy in  
+
+mapping medical terms to ICD-10 and CPT codes. 
+
+2.6. 
+
+Machine Learning (Scikit-learn/PyTorch/Tensor) 
+
+ML frameworks will be used to build and train models for claim 
+
+rejection prediction. These models will analyze historical claim  
+
+data to identify risk factors and provide real-time feedback. 
+
+2.7. 
+
+Visual Studio Code  
+
+Visual Studio Code is used in our project for writing and managing  
+
+backend (Python/Django/Flask) and frontend (React.js) code. With 
+
+ built-in debugging, Git integration, and extensions, VS Code  
+
+streamlines the development process and improves productivity. 
+
+2.8. 
+
+Deployment (AWS) 
+
+The system will be deployed on a cloud platform such as AWS to  
+
+ensure scalability, availability, and security. Docker and Kubernetes  
+
+may also be used for containerization and efficient resource  
+
+management. 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+HealPay 
+
+9 
+
+3. Required hardware and Software resources 
+
+3.1. 
+
+Hardware 
+
+Following development PC is required to develop this project 
+
+Hardware 
+
+Specifications 
+
+Development PC 
+
+●  Processor:  Intel  Core  i7  /  Xeon  (multi-
+
+core) 
+
+●  RAM:  16  GB  minimum 
+
+(32  GB 
+
+recommended for ML models) 
+
+●  Storage:  500  GB  SSD  (expandable  for 
+
+patient data storage) 
+
+●  1280 x 800 minimum screen resolution. 
+
+3.2. 
+
+Software 
+
+Following softwares are required for the development of this project 
+
+Software 
+
+VS Code 
+
+Postman 
+
+Microsoft Visio  
+
+Python-Tesseract 
+
+Jupyter Notebook 
+
+Docker  
+
+pgAdmin 
+
+Purpose 
+
+Python Django/Flask,React.js 
+
+API Testing 
+
+UML Designing 
+
+OCR Tesseract 
+
+Spacy,  NLTK  ,NLP  processing,Scikit-
+
+learn ,PyTorch 
+
+AWS Deployment  
+
+PostgreSQL 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+HealPay 
+
+10 
+
+4. High Level Diagram 
+
+5. Timeline 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+11 
+
+HealPay 
+
+6. References 
+
+●  https://www.cms.gov/Regulations-and-Guidance/Guidance/Manuals 
+
+●  https://icd.who.int/browse10 
+
+●  https://github.com/tesseract-ocr/tesseract 
+
+●  https://spacy.io/ 
+
+●  https://www.tensorflow.org/ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
