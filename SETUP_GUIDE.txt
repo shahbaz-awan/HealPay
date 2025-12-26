@@ -1,0 +1,89 @@
+═══════════════════════════════════════════════════════════════
+   HEALPAY - SETUP GUIDE FOR COLLABORATORS
+═══════════════════════════════════════════════════════════════
+
+📋 QUICK START INSTRUCTIONS
+─────────────────────────────────────────────────────────────
+
+STEP 1: CLONE THE REPOSITORY
+─────────────────────────────
+Open terminal/command prompt and run:
+
+    git clone https://github.com/shahbaz-awan/HealPay.git
+    cd HealPay
+
+
+STEP 2: BACKEND SETUP
+─────────────────────────────
+Navigate to backend:
+    cd healpay-backend
+
+Create virtual environment:
+    Windows: python -m venv venv
+    Windows: venv\Scripts\activate
+    
+    Mac/Linux: python3 -m venv venv
+    Mac/Linux: source venv/bin/activate
+
+Install dependencies:
+    pip install -r requirements.txt
+
+Create .env file:
+    Windows: copy .env.example .env
+    Mac/Linux: cp .env.example .env
+
+Edit .env file with your email credentials:
+    - Use your Gmail and App Password
+    - Change SECRET_KEY to something secure
+
+Initialize database:
+    python create_fresh_db.py
+
+Start backend:
+    Windows: start_backend.bat
+    Mac/Linux: uvicorn main:app --reload
+
+
+STEP 3: FRONTEND SETUP (NEW TERMINAL)
+─────────────────────────────────────
+Navigate to frontend:
+    cd healpay-frontend
+
+Install dependencies:
+    npm install
+
+Start frontend:
+    npm run dev
+
+
+STEP 4: ACCESS THE APPLICATION
+─────────────────────────────────────
+Frontend: http://localhost:5173
+Backend API: http://localhost:8000
+API Docs: http://localhost:8000/docs
+
+
+TEST USERS
+─────────────────────────────────────
+Email: admin@healpay.com     Password: admin123
+Email: doctor@healpay.com    Password: doctor123
+Email: patient@healpay.com   Password: patient123
+
+
+IMPORTANT NOTES
+─────────────────────────────────────
+✓ Both backend AND frontend must be running
+✓ Backend must start BEFORE frontend
+✓ You need a Gmail App Password for email/OTP
+✓ Check README.md for detailed troubleshooting
+
+
+GETTING GMAIL APP PASSWORD
+─────────────────────────────────────
+1. Go to: https://myaccount.google.com/security
+2. Enable 2-Factor Authentication
+3. Go to App Passwords
+4. Generate password for "Mail"
+5. Copy password to .env file
+
+═══════════════════════════════════════════════════════════════
