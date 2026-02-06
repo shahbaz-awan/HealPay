@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   DollarSign,
@@ -7,13 +8,16 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  BarChart3
+  BarChart3,
+  ClipboardList
 } from 'lucide-react'
 import Card, { CardHeader } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 
 const BillingDashboard = () => {
+  const navigate = useNavigate()
+
   // Statistics
   const stats = [
     {
@@ -302,7 +306,19 @@ const BillingDashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="hover-card cursor-pointer group" onClick={() => navigate('/billing/cms1500')}>
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-red-50 rounded-lg group-hover:bg-red-100 transition-colors">
+              <ClipboardList className="w-6 h-6 text-red-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors">CMS-1500 Form</h3>
+              <p className="text-sm text-secondary-600">Generate claim forms</p>
+            </div>
+          </div>
+        </Card>
+
         <Card className="hover-card cursor-pointer group">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">

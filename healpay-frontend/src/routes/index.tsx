@@ -14,6 +14,7 @@ import PatientDetailPage from '@/pages/doctor/PatientDetailPage'
 import CoderDashboard from '@/pages/coder/Dashboard'
 import ClaimDetailPage from '@/pages/coder/ClaimDetailPage'
 import BillingDashboard from '@/pages/billing/Dashboard'
+import CMS1500Form from '@/pages/billing/CMS1500Form'
 import AdminDashboard from '@/pages/admin/Dashboard'
 import AdminUsers from '@/pages/admin/Users'
 import UserProfile from '@/pages/shared/UserProfile'
@@ -91,6 +92,7 @@ const AppRoutes = () => {
             <DashboardLayout>
               <Routes>
                 <Route path="dashboard" element={<BillingDashboard />} />
+                <Route path="cms1500" element={<CMS1500Form />} />
                 <Route path="profile" element={<UserProfile />} />
                 <Route path="*" element={<Navigate to="/billing/dashboard" replace />} />
               </Routes>
