@@ -5,17 +5,17 @@ import {
   FileText,
   User,
   Calendar,
-  Clock,
-  AlertCircle,
   ChevronRight,
   Stethoscope,
   CheckCircle,
-  TrendingUp
+  TrendingUp,
+  Send,
+  Eye
 } from 'lucide-react'
 import Card, { CardHeader } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
-import { getPendingEncounters } from '@/services/clinicalService'
+import { getPendingEncounters, getCompletedEncounters, sendEncounterTo } from '@/services/clinicalService'
 
 interface PendingEncounter {
   id: number
@@ -35,22 +35,42 @@ interface PendingEncounter {
 const CoderDashboard = () => {
   const navigate = useNavigate()
   const [encounters, setEncounters] = useState<PendingEncounter[]>([])
+  const [completedEncounters, setCompletedEncounters] = useState<PendingEncounter[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [selectedEncounter, setSelectedEncounter] = useState<PendingEncounter | null>(null)
+  const [activeTab, setActiveTab] = useState<'pending' | 'completed'>('pending')
+  const [sendingTo, setSendingTo] = useState<number | null>(null)
 
   useEffect(() => {
-    fetchPendingEncounters()
+    fetchAllEncounters()
   }, [])
 
-  const fetchPendingEncounters = async () => {
+  const fetchAllEncounters = async () => {
     try {
       setIsLoading(true)
-      const data = await getPendingEncounters()
-      setEncounters(data)
+      const [pendingData, completedData] = await Promise.all([
+        getPendingEncounters(),
+        getCompletedEncounters()
+      ])
+      setEncounters(pendingData)
+      setCompletedEncounters(completedData)
     } catch (error) {
-      console.error('Error fetching pending encounters:', error)
+      console.error('Error fetching encounters:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleSendTo = async (encounterId: number, target: 'biller' | 'doctor') => {
+    try {
+      setSendingTo(encounterId)
+      await sendEncounterTo(encounterId, target)
+      const completedData = await getCompletedEncounters()
+      setCompletedEncounters(completedData)
+    } catch (error) {
+      console.error('Error sending encounter:', error)
+    } finally {
+      setSendingTo(null)
     }
   }
 
@@ -70,7 +90,7 @@ const CoderDashboard = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-secondary-600">Loading pending encounters...</p>
+          <p className="text-secondary-600">Loading encounters...</p>
         </div>
       </div>
     )
@@ -108,8 +128,8 @@ const CoderDashboard = () => {
               <CheckCircle className="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-secondary-600">Coded Today</p>
-              <p className="text-2xl font-bold text-secondary-900">0</p>
+              <p className="text-sm text-secondary-600">Completed</p>
+              <p className="text-2xl font-bold text-secondary-900">{completedEncounters.length}</p>
             </div>
           </div>
         </Card>
@@ -126,88 +146,211 @@ const CoderDashboard = () => {
         </Card>
       </div>
 
-      {/* Encounters List */}
-      <Card>
-        <CardHeader
-          title="Pending Encounters"
-          subtitle="Clinical encounters waiting for code assignment"
-          icon={<FileText className="w-5 h-5 text-blue-600" />}
-        />
+      {/* Tab Navigation */}
+      <div className="flex gap-2 border-b border-gray-200">
+        <button
+          onClick={() => setActiveTab('pending')}
+          className={`px-6 py-3 font-medium text-sm transition-colors border-b-2 -mb-px ${activeTab === 'pending'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+        >
+          <FileText className="w-4 h-4 inline mr-2" />
+          Pending ({encounters.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('completed')}
+          className={`px-6 py-3 font-medium text-sm transition-colors border-b-2 -mb-px ${activeTab === 'completed'
+              ? 'border-green-600 text-green-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+        >
+          <CheckCircle className="w-4 h-4 inline mr-2" />
+          Completed ({completedEncounters.length})
+        </button>
+      </div>
 
-        {encounters.length === 0 ? (
-          <div className="text-center py-12">
-            <FileText className="w-16 h-16 text-secondary-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-secondary-900 mb-2">No Pending Encounters</h3>
-            <p className="text-secondary-600">All clinical encounters have been coded</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {encounters.map((encounter) => (
-              <motion.div
-                key={encounter.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-4 border border-secondary-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
-                onClick={() => setSelectedEncounter(encounter)}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-secondary-900">
-                        {encounter.patient_name}
-                      </h3>
-                      <Badge variant="warning">Pending Coding</Badge>
-                    </div>
+      {/* Pending Encounters List */}
+      {activeTab === 'pending' && (
+        <Card>
+          <CardHeader
+            title="Pending Encounters"
+            subtitle="Clinical encounters waiting for code assignment"
+          />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-secondary-600">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        <span>Age: {encounter.patient_age} years</span>
+          {encounters.length === 0 ? (
+            <div className="text-center py-12">
+              <FileText className="w-16 h-16 text-secondary-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-secondary-900 mb-2">No Pending Encounters</h3>
+              <p className="text-secondary-600">All clinical encounters have been coded</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {encounters.map((encounter) => (
+                <motion.div
+                  key={encounter.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 border border-secondary-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() => setSelectedEncounter(encounter)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-semibold text-secondary-900">
+                          {encounter.patient_name}
+                        </h3>
+                        <Badge variant="warning">Pending</Badge>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>{formatDate(encounter.encounter_date)}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Stethoscope className="w-4 h-4" />
-                        <span>{encounter.doctor_name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4" />
-                        <span>{encounter.encounter_type}</span>
-                      </div>
-                    </div>
 
-                    <div className="mt-3 p-3 bg-yellow-50 border-l-4 border-yellow-500 rounded">
-                      <p className="text-sm font-medium text-yellow-900">
-                        <strong>Chief Complaint:</strong> {encounter.chief_complaint}
-                      </p>
-                      {encounter.assessment && (
-                        <p className="text-sm text-yellow-900 mt-1">
-                          <strong>Assessment:</strong> {encounter.assessment}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-secondary-600">
+                        <div className="flex items-center gap-2">
+                          <User className="w-4 h-4" />
+                          <span>Age: {encounter.patient_age} years</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(encounter.encounter_date)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Stethoscope className="w-4 h-4" />
+                          <span>{encounter.doctor_name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4" />
+                          <span>{encounter.encounter_type}</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 p-3 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+                        <p className="text-sm font-medium text-yellow-900">
+                          <strong>Chief Complaint:</strong> {encounter.chief_complaint}
                         </p>
+                        {encounter.assessment && (
+                          <p className="text-sm text-yellow-900 mt-1">
+                            <strong>Assessment:</strong> {encounter.assessment}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="ml-4"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        navigate(`/coder/claims/${encounter.id}`)
+                      }}
+                    >
+                      Assign Codes
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Completed Encounters List */}
+      {activeTab === 'completed' && (
+        <Card>
+          <CardHeader
+            title="Completed Encounters"
+            subtitle="Coded encounters ready for billing"
+          />
+
+          {completedEncounters.length === 0 ? (
+            <div className="text-center py-12">
+              <CheckCircle className="w-16 h-16 text-secondary-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-secondary-900 mb-2">No Completed Encounters</h3>
+              <p className="text-secondary-600">Complete coding on pending encounters to see them here</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {completedEncounters.map((encounter) => (
+                <motion.div
+                  key={encounter.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 border border-secondary-200 rounded-lg hover:border-green-300 hover:shadow-md transition-all"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-semibold text-secondary-900">
+                          {encounter.patient_name}
+                        </h3>
+                        <Badge variant={
+                          encounter.status === 'sent_to_biller' ? 'success' :
+                            encounter.status === 'sent_to_doctor' ? 'info' : 'warning'
+                        }>
+                          {encounter.status === 'sent_to_biller' ? 'Sent to Biller' :
+                            encounter.status === 'sent_to_doctor' ? 'Sent to Doctor' : 'Coded'}
+                        </Badge>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-secondary-600">
+                        <div className="flex items-center gap-2">
+                          <User className="w-4 h-4" />
+                          <span>Age: {encounter.patient_age} years</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(encounter.encounter_date)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Stethoscope className="w-4 h-4" />
+                          <span>{encounter.doctor_name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4" />
+                          <span>{encounter.encounter_type}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2 ml-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(`/coder/claims/${encounter.id}`)}
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        View
+                      </Button>
+                      {encounter.status === 'coded' && (
+                        <>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            disabled={sendingTo === encounter.id}
+                            onClick={() => handleSendTo(encounter.id, 'biller')}
+                          >
+                            <Send className="w-4 h-4 mr-1" />
+                            To Biller
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            disabled={sendingTo === encounter.id}
+                            onClick={() => handleSendTo(encounter.id, 'doctor')}
+                          >
+                            <Send className="w-4 h-4 mr-1" />
+                            To Doctor
+                          </Button>
+                        </>
                       )}
                     </div>
                   </div>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="ml-4"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      navigate(`/coder/claims/${encounter.id}`)
-                    }}
-                  >
-                    Assign Codes
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
-      </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
 
       {/* Clinical Notes Modal */}
       {selectedEncounter && (
@@ -232,66 +375,52 @@ const CoderDashboard = () => {
               </div>
               <button
                 onClick={() => setSelectedEncounter(null)}
-                className="p-2 hover:bg-gray-100 rounded-lg text-2xl"
+                className="text-secondary-400 hover:text-secondary-600"
               >
-                ×
+                ✕
               </button>
             </div>
 
             <div className="space-y-4">
-              <div className="p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
-                <h3 className="font-semibold text-blue-900 mb-2">Chief Complaint</h3>
-                <p className="text-blue-900">{selectedEncounter.chief_complaint}</p>
-              </div>
-
+              {selectedEncounter.chief_complaint && (
+                <div className="bg-red-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-red-800 mb-1">Chief Complaint</h4>
+                  <p className="text-red-700">{selectedEncounter.chief_complaint}</p>
+                </div>
+              )}
               {selectedEncounter.subjective_notes && (
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <h3 className="font-semibold text-secondary-900 mb-2">Subjective (S)</h3>
-                  <p className="text-secondary-700 whitespace-pre-wrap">
-                    {selectedEncounter.subjective_notes}
-                  </p>
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-blue-800 mb-1">Subjective</h4>
+                  <p className="text-blue-700">{selectedEncounter.subjective_notes}</p>
                 </div>
               )}
-
               {selectedEncounter.objective_findings && (
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <h3 className="font-semibold text-secondary-900 mb-2">Objective (O)</h3>
-                  <p className="text-secondary-700 whitespace-pre-wrap">
-                    {selectedEncounter.objective_findings}
-                  </p>
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-green-800 mb-1">Objective Findings</h4>
+                  <p className="text-green-700">{selectedEncounter.objective_findings}</p>
                 </div>
               )}
-
               {selectedEncounter.assessment && (
-                <div className="p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
-                  <h3 className="font-semibold text-yellow-900 mb-2">Assessment (A)</h3>
-                  <p className="text-yellow-900 whitespace-pre-wrap">
-                    {selectedEncounter.assessment}
-                  </p>
+                <div className="bg-yellow-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-yellow-800 mb-1">Assessment</h4>
+                  <p className="text-yellow-700">{selectedEncounter.assessment}</p>
                 </div>
               )}
-
               {selectedEncounter.plan && (
-                <div className="p-4 bg-green-50 rounded-lg">
-                  <h3 className="font-semibold text-green-900 mb-2">Plan (P)</h3>
-                  <p className="text-green-900 whitespace-pre-wrap">
-                    {selectedEncounter.plan}
-                  </p>
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-purple-800 mb-1">Plan</h4>
+                  <p className="text-purple-700">{selectedEncounter.plan}</p>
                 </div>
               )}
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setSelectedEncounter(null)}
-              >
+            <div className="flex justify-end gap-3 mt-6">
+              <Button variant="outline" onClick={() => setSelectedEncounter(null)}>
                 Close
               </Button>
-              <Button
-                onClick={() => navigate(`/coder/claims/${selectedEncounter.id}`)}
-              >
-                Assign Medical Codes
+              <Button onClick={() => navigate(`/coder/claims/${selectedEncounter.id}`)}>
+                Start Coding
+                <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
           </motion.div>

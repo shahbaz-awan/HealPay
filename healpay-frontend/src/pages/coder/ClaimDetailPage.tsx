@@ -1,22 +1,24 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import {
     ArrowLeft,
     User,
     Calendar,
     FileText,
-    Code,
     CheckCircle,
     Search,
     Sparkles,
-    Plus
+    Plus,
+    Trash2,
+    Pencil,
+    Send,
+    X
 } from 'lucide-react'
 import Card, { CardHeader } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { getEncounterDetails, assignMedicalCode, getEncounterCodes, completeCoding } from '@/services/clinicalService'
+import { getEncounterDetails, assignMedicalCode, getEncounterCodes, completeCoding, getCodeRecommendations, searchCodes, deleteMedicalCode, updateMedicalCode, sendEncounterTo } from '@/services/clinicalService'
 import { toast } from 'react-toastify'
 
 const ClaimDetailPage = () => {
@@ -25,27 +27,23 @@ const ClaimDetailPage = () => {
     const [isLoading, setIsLoading] = useState(true)
     const [encounter, setEncounter] = useState<any>(null)
     const [assignedCodes, setAssignedCodes] = useState<any[]>([])
-    const [showCodeSearch, setShowCodeSearch] = useState(false)
+    const [aiRecommendations, setAiRecommendations] = useState<any>(null)
+    const [loadingRecommendations, setLoadingRecommendations] = useState(false)
+    const [showRecommendations, setShowRecommendations] = useState(false)
+    const [recommendationError, setRecommendationError] = useState<string | null>(null)
     const [codeSearchQuery, setCodeSearchQuery] = useState('')
     const [selectedCodeType, setSelectedCodeType] = useState<'ICD-10' | 'CPT'>('ICD-10')
+    const [searchResults, setSearchResults] = useState<any[]>([])
+    const [searchLoading, setSearchLoading] = useState(false)
+    const [quickCodeEntry, setQuickCodeEntry] = useState('')
+    const [quickCodeLoading, setQuickCodeLoading] = useState(false)
 
-    // Mock ICD-10 and CPT codes for demo
-    const icd10Codes = [
-        { code: 'E11.9', description: 'Type 2 diabetes mellitus without complications' },
-        { code: 'I10', description: 'Essential (primary) hypertension' },
-        { code: 'J06.9', description: 'Acute upper respiratory infection, unspecified' },
-        { code: 'M79.3', description: 'Panniculitis, unspecified' },
-        { code: 'R07.9', description: 'Chest pain, unspecified' },
-        { code: 'G43.909', description: 'Migraine, unspecified, not intractable, without status migrainosus' },
-    ]
-
-    const cptCodes = [
-        { code: '99213', description: 'Office visit, established patient, 20-29 minutes' },
-        { code: '99214', description: 'Office visit, established patient, 30-39 minutes' },
-        { code: '93000', description: 'Electrocardiogram, routine ECG with interpretation' },
-        { code: '70450', description: 'CT scan, head or brain' },
-        { code: '99203', description: 'Office visit, new patient, 30-44 minutes' },
-    ]
+    // Edit/Delete state
+    const [editingCode, setEditingCode] = useState<any>(null)
+    const [editCodeValue, setEditCodeValue] = useState('')
+    const [editDescriptionValue, setEditDescriptionValue] = useState('')
+    const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null)
+    const [sendingTo, setSendingTo] = useState<string | null>(null)
 
     useEffect(() => {
         loadEncounterData()
@@ -54,65 +52,118 @@ const ClaimDetailPage = () => {
     const loadEncounterData = async () => {
         try {
             setIsLoading(true)
-            // In real app, fetch from API
-            // const data = await getEncounterDetails(Number(id))
-
-            // Mock data for demo
-            const mockEncounter = {
-                id: Number(id),
-                encounter_date: '2024-12-08T09:00:00',
-                patient_name: 'Sarah Mitchell',
-                patient_age: 45,
-                encounter_type: 'Office Visit',
-                chief_complaint: 'Annual checkup, discussion of diabetes management',
-                subjective_notes: 'Patient reports feeling well overall. Has been compliant with medications. Checking blood sugar regularly at home, averaging 110-130 mg/dL. No episodes of hypoglycemia. Diet compliance good.',
-                objective_findings: 'BP: 128/82, HR: 72, Temp: 98.6°F, Weight: 145 lbs, BMI: 23.4. Physical exam unremarkable. No peripheral edema. Cardiovascular: Regular rate and rhythm.',
-                assessment: 'Type 2 Diabetes Mellitus - well controlled. Hypertension - stable. Hyperlipidemia - on statin therapy.',
-                plan: 'Continue current medications (Lisinopril 10mg daily, Metformin 500mg BID, Aspirin 81mg daily). HbA1c ordered. Follow-up in 3 months. Patient educated on foot care.',
-                doctor_name: 'Dr. Emily Chen',
-                status: 'pending_coding'
-            }
-
-            setEncounter(mockEncounter)
+            // Fetch from API
+            const data = await getEncounterDetails(Number(id))
+            setEncounter(data)
 
             // Load assigned codes
-            // const codes = await getEncounterCodes(Number(id))
-            setAssignedCodes([])
+            const codes = await getEncounterCodes(Number(id))
+            setAssignedCodes(codes || [])
+
+            // Don't load AI recommendations automatically - let user request them
         } catch (error) {
             console.error('Error loading encounter:', error)
-            toast.error('Failed to load encounter details')
+            toast.error('Failed to load encounter details. Make sure you are logged in.')
         } finally {
             setIsLoading(false)
         }
     }
 
-    const handleAssignCode = async (code: string, description: string, isAiSuggested: boolean = false) => {
+    const loadRecommendations = async () => {
         try {
-            const newCode = {
+            setLoadingRecommendations(true)
+            setRecommendationError(null)
+            const recommendations = await getCodeRecommendations(Number(id))
+            setAiRecommendations(recommendations)
+            setShowRecommendations(true)
+            toast.success('AI recommendations loaded successfully!')
+        } catch (error: any) {
+            console.error('Error loading recommendations:', error)
+            const errorMsg = error?.response?.data?.detail || 'Failed to load AI recommendations. The AI service may need initialization.'
+            setRecommendationError(errorMsg)
+            toast.error(errorMsg)
+        } finally {
+            setLoadingRecommendations(false)
+        }
+    }
+
+    const handleCodeSearch = async (query: string) => {
+        if (!query || query.length < 2) {
+            setSearchResults([])
+            return
+        }
+
+        try {
+            setSearchLoading(true)
+            const codeTypeParam = selectedCodeType === 'ICD-10' ? 'ICD10_CM' : 'CPT'
+            const response = await searchCodes(query, codeTypeParam, 50)
+            setSearchResults(response.results || [])
+        } catch (error) {
+            console.error('Error searching codes:', error)
+            setSearchResults([])
+        } finally {
+            setSearchLoading(false)
+        }
+    }
+
+    // Debounce search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            handleCodeSearch(codeSearchQuery)
+        }, 300)
+        return () => clearTimeout(timer)
+    }, [codeSearchQuery, selectedCodeType])
+
+    const handleAssignCode = async (code: string, description: string, isAiSuggested: boolean = false, overrideCodeType?: string) => {
+        try {
+            const finalCodeType = overrideCodeType || (isAiSuggested ? (selectedCodeType === 'ICD-10' ? 'ICD10_CM' : 'CPT') : (selectedCodeType === 'ICD-10' ? 'ICD10_CM' : 'CPT'))
+
+            const newCodeData = {
                 encounter_id: Number(id),
-                code_type: selectedCodeType,
+                code_type: finalCodeType,
                 code,
                 description,
                 is_ai_suggested: isAiSuggested,
                 confidence_score: isAiSuggested ? 0.92 : undefined
             }
 
-            // In real app: await assignMedicalCode(Number(id), newCode)
+            await assignMedicalCode(Number(id), newCodeData)
 
-            // Add to local state for demo
-            setAssignedCodes([...assignedCodes, {
-                ...newCode,
-                id: assignedCodes.length + 1,
-                coder_id: 1,
-                created_at: new Date().toISOString()
-            }])
+            // Refresh codes from server
+            const codes = await getEncounterCodes(Number(id))
+            setAssignedCodes(codes || [])
 
             toast.success(`Code ${code} assigned successfully`)
-            setShowCodeSearch(false)
             setCodeSearchQuery('')
         } catch (error) {
             console.error('Error assigning code:', error)
             toast.error('Failed to assign code')
+        }
+    }
+
+    const handleQuickCodeEntry = async () => {
+        if (!quickCodeEntry.trim()) {
+            toast.error('Please enter a code')
+            return
+        }
+
+        try {
+            setQuickCodeLoading(true)
+            const codeTypeParam = selectedCodeType === 'ICD-10' ? 'ICD10_CM' : 'CPT'
+            const response = await searchCodes(quickCodeEntry.trim(), codeTypeParam, 1)
+
+            if (response.results && response.results.length > 0) {
+                const code = response.results[0]
+                await handleAssignCode(code.code, code.description, false, code.code_type)
+                setQuickCodeEntry('')
+            } else {
+                toast.error(`Code "${quickCodeEntry}" not found in ${selectedCodeType} library`)
+            }
+        } catch (error) {
+            console.error('Error adding quick code:', error)
+            toast.error('Failed to add code')
+        } finally {
+            setQuickCodeLoading(false)
         }
     }
 
@@ -123,7 +174,7 @@ const ClaimDetailPage = () => {
         }
 
         try {
-            // await completeCoding(Number(id))
+            await completeCoding(Number(id))
             toast.success('Coding completed! Claim ready for billing.')
             setTimeout(() => {
                 navigate('/coder/dashboard')
@@ -134,35 +185,68 @@ const ClaimDetailPage = () => {
         }
     }
 
-    const getAISuggestions = () => {
-        if (!encounter) return []
-
-        // Simple AI suggestion logic based on keywords in assessment
-        const suggestions = []
-        const assessment = encounter.assessment?.toLowerCase() || ''
-
-        if (assessment.includes('diabetes')) {
-            suggestions.push({ ...icd10Codes[0], confidence: 0.95, isAi: true })
+    // Handle delete code
+    const handleDeleteCode = async (codeId: number) => {
+        try {
+            await deleteMedicalCode(Number(id), codeId)
+            const codes = await getEncounterCodes(Number(id))
+            setAssignedCodes(codes || [])
+            toast.success('Code deleted successfully')
+            setDeleteConfirmId(null)
+        } catch (error) {
+            console.error('Error deleting code:', error)
+            toast.error('Failed to delete code')
         }
-        if (assessment.includes('hypertension')) {
-            suggestions.push({ ...icd10Codes[1], confidence: 0.92, isAi: true })
-        }
-
-        // Suggest CPT based on encounter type
-        if (encounter.encounter_type === 'Office Visit') {
-            suggestions.push({ ...cptCodes[0], confidence: 0.88, isAi: true, code_type: 'CPT' })
-        }
-
-        return suggestions
     }
 
-    const filteredCodes = selectedCodeType === 'ICD-10' ? icd10Codes : cptCodes
-    const searchResults = codeSearchQuery
-        ? filteredCodes.filter(c =>
-            c.code.toLowerCase().includes(codeSearchQuery.toLowerCase()) ||
-            c.description.toLowerCase().includes(codeSearchQuery.toLowerCase())
-        )
-        : filteredCodes
+    // Handle edit code
+    const handleEditCode = async () => {
+        if (!editingCode) return
+
+        try {
+            await updateMedicalCode(Number(id), editingCode.id, {
+                encounter_id: Number(id),
+                code_type: editingCode.code_type,
+                code: editCodeValue,
+                description: editDescriptionValue,
+                is_ai_suggested: false,
+                confidence_score: undefined
+            })
+            const codes = await getEncounterCodes(Number(id))
+            setAssignedCodes(codes || [])
+            toast.success('Code updated successfully')
+            setEditingCode(null)
+        } catch (error) {
+            console.error('Error updating code:', error)
+            toast.error('Failed to update code')
+        }
+    }
+
+    // Handle send to biller/doctor
+    const handleSendTo = async (target: 'biller' | 'doctor') => {
+        try {
+            setSendingTo(target)
+            await sendEncounterTo(Number(id), target)
+            toast.success(`Encounter sent to ${target} successfully!`)
+            // Reload encounter to update status
+            const data = await getEncounterDetails(Number(id))
+            setEncounter(data)
+        } catch (error) {
+            console.error('Error sending encounter:', error)
+            toast.error(`Failed to send to ${target}`)
+        } finally {
+            setSendingTo(null)
+        }
+    }
+
+    // Open edit modal
+    const openEditModal = (code: any) => {
+        setEditingCode(code)
+        setEditCodeValue(code.code)
+        setEditDescriptionValue(code.description)
+    }
+
+
 
     if (isLoading) {
         return <div className="flex items-center justify-center min-h-screen">Loading...</div>
@@ -171,8 +255,6 @@ const ClaimDetailPage = () => {
     if (!encounter) {
         return <div className="flex items-center justify-center min-h-screen">Encounter not found</div>
     }
-
-    const aiSuggestions = getAISuggestions()
 
     return (
         <div className="space-y-6">
@@ -228,45 +310,185 @@ const ClaimDetailPage = () => {
                 </div>
             </Card>
 
-            {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Clinical Notes - 2 columns */}
                 <div className="lg:col-span-2 space-y-6">
-                    {/* AI Suggestions */}
-                    {aiSuggestions.length > 0 && (
+                    {/* Optional AI Recommendations Button */}
+                    {!showRecommendations && !loadingRecommendations && !recommendationError && (
+                        <Card className="border-2 border-dashed border-blue-300">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-secondary-900 mb-1">
+                                        AI-Powered Code Recommendations (Optional)
+                                    </h3>
+                                    <p className="text-sm text-secondary-600">
+                                        Get intelligent code suggestions based on clinical documentation
+                                    </p>
+                                </div>
+                                <Button
+                                    onClick={loadRecommendations}
+                                    className="flex items-center gap-2"
+                                    variant="outline"
+                                >
+                                    <Sparkles className="w-4 h-4" />
+                                    Get AI Recommendations
+                                </Button>
+                            </div>
+                        </Card>
+                    )}
+
+                    {/* Recommendation Error State */}
+                    {recommendationError && (
+                        <Card className="border-2 border-red-200 bg-red-50">
+                            <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-semibold text-red-900 mb-1">
+                                        ❌ Recommendation Error
+                                    </h3>
+                                    <p className="text-sm text-red-700 mb-3">
+                                        {recommendationError}
+                                    </p>
+                                </div>
+                                <Button
+                                    onClick={loadRecommendations}
+                                    className="flex items-center gap-2"
+                                    variant="outline"
+                                    size="sm"
+                                >
+                                    Retry
+                                </Button>
+                            </div>
+                        </Card>
+                    )}
+
+                    {/* Loading state for recommendations */}
+                    {loadingRecommendations && (
+                        <Card className="border-2 border-blue-200">
+                            <div className="flex items-center gap-3 text-blue-600">
+                                <Sparkles className="w-5 h-5 animate-pulse" />
+                                <span>AI is analyzing clinical notes...</span>
+                            </div>
+                        </Card>
+                    )}
+
+                    {/* AI Recommendations - ICD-10 */}
+                    {showRecommendations && aiRecommendations && aiRecommendations.icd10_recommendations?.length > 0 && (
                         <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
                             <CardHeader
-                                title="AI Code Suggestions"
-                                subtitle="Based on clinical documentation"
+                                title="AI Diagnosis Code Recommendations (ICD-10)"
+                                subtitle={`${aiRecommendations.icd10_recommendations.length} codes recommended by Medical AI`}
                             />
                             <div className="space-y-2">
-                                {aiSuggestions.map((suggestion, index) => (
+                                {aiRecommendations.icd10_recommendations.map((rec: any, index: number) => (
                                     <div
                                         key={index}
-                                        className="p-3 bg-white rounded-lg border border-blue-200 flex items-center justify-between"
+                                        className="p-4 bg-white rounded-lg border border-blue-200 hover:border-blue-300 transition-colors"
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <Sparkles className="w-5 h-5 text-blue-600" />
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-mono font-semibold text-secondary-900">
-                                                        {suggestion.code}
-                                                    </span>
-                                                    <Badge variant="info">
-                                                        {Math.round((suggestion.confidence || 0) * 100)}% confidence
-                                                    </Badge>
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex items-start gap-3 flex-1">
+                                                <Sparkles className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                                        <span className="font-mono font-bold text-lg text-secondary-900">
+                                                            {rec.code}
+                                                        </span>
+                                                        <Badge variant="info">
+                                                            {Math.round(rec.confidence_score * 100)}% confidence
+                                                        </Badge>
+                                                        <Badge variant="secondary">ICD-10</Badge>
+                                                    </div>
+                                                    <p className="text-sm text-secondary-700 font-medium mb-2">{rec.description}</p>
+                                                    <div className="text-xs text-secondary-600 space-y-1">
+                                                        <p>📊 {rec.explanation}</p>
+                                                        {rec.matched_keywords?.length > 0 && (
+                                                            <div className="flex items-center gap-2 flex-wrap">
+                                                                <span>🔍 Keywords:</span>
+                                                                {rec.matched_keywords.map((kw: string, i: number) => (
+                                                                    <span key={i} className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                                                                        {kw}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                                <p className="text-sm text-secondary-600">{suggestion.description}</p>
                                             </div>
+                                            <Button
+                                                size="sm"
+                                                onClick={() => handleAssignCode(rec.code, rec.description, true)}
+                                                className="ml-3 flex-shrink-0"
+                                            >
+                                                Assign
+                                            </Button>
                                         </div>
-                                        <Button
-                                            size="sm"
-                                            onClick={() => handleAssignCode(suggestion.code, suggestion.description, true)}
-                                        >
-                                            Assign
-                                        </Button>
                                     </div>
                                 ))}
+                            </div>
+                        </Card>
+                    )}
+
+                    {/* AI Recommendations - CPT */}
+                    {showRecommendations && aiRecommendations && aiRecommendations.cpt_recommendations?.length > 0 && (
+                        <Card className="border-2 border-green-200 bg-gradient-to-r from-green-50 to-teal-50">
+                            <CardHeader
+                                title="AI Procedure Code Recommendations (CPT)"
+                                subtitle={`${aiRecommendations.cpt_recommendations.length} codes recommended by Medical AI`}
+                            />
+                            <div className="space-y-2">
+                                {aiRecommendations.cpt_recommendations.map((rec: any, index: number) => (
+                                    <div
+                                        key={index}
+                                        className="p-4 bg-white rounded-lg border border-green-200 hover:border-green-300 transition-colors"
+                                    >
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex items-start gap-3 flex-1">
+                                                <Sparkles className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" />
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                                        <span className="font-mono font-bold text-lg text-secondary-900">
+                                                            {rec.code}
+                                                        </span>
+                                                        <Badge variant="success">
+                                                            {Math.round(rec.confidence_score * 100)}% confidence
+                                                        </Badge>
+                                                        <Badge variant="secondary">CPT</Badge>
+                                                    </div>
+                                                    <p className="text-sm text-secondary-700 font-medium mb-2">{rec.description}</p>
+                                                    <div className="text-xs text-secondary-600 space-y-1">
+                                                        <p>📊 {rec.explanation}</p>
+                                                        {rec.matched_keywords?.length > 0 && (
+                                                            <div className="flex items-center gap-2 flex-wrap">
+                                                                <span>🔍 Keywords:</span>
+                                                                {rec.matched_keywords.map((kw: string, i: number) => (
+                                                                    <span key={i} className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                                                        {kw}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <Button
+                                                size="sm"
+                                                onClick={() => handleAssignCode(rec.code, rec.description, true)}
+                                                className="ml-3 flex-shrink-0"
+                                            >
+                                                Assign
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </Card>
+                    )}
+
+                    {/* Loading state for recommendations */}
+                    {loadingRecommendations && (
+                        <Card className="border-2 border-blue-200">
+                            <div className="flex items-center gap-3 text-blue-600">
+                                <Sparkles className="w-5 h-5 animate-pulse" />
+                                <span>AI is analyzing clinical notes...</span>
                             </div>
                         </Card>
                     )}
@@ -303,6 +525,36 @@ const ClaimDetailPage = () => {
 
                 {/* Code Assignment - 1 column */}
                 <div className="space-y-6">
+                    {/* Send To Actions (after coding complete) */}
+                    {(encounter.status === 'coded' || encounter.status === 'sent_to_biller' || encounter.status === 'sent_to_doctor') && (
+                        <Card className="bg-gradient-to-r from-green-50 to-teal-50 border-2 border-green-200">
+                            <CardHeader
+                                title="Send Completed Encounter"
+                                subtitle="Route to biller or doctor for review"
+                            />
+                            <div className="flex gap-3">
+                                <Button
+                                    onClick={() => handleSendTo('biller')}
+                                    disabled={sendingTo !== null || encounter.status === 'sent_to_biller'}
+                                    className="flex-1 flex items-center justify-center gap-2"
+                                    variant={encounter.status === 'sent_to_biller' ? 'secondary' : 'primary'}
+                                >
+                                    <Send className="w-4 h-4" />
+                                    {encounter.status === 'sent_to_biller' ? 'Sent to Biller ✓' : 'Send to Biller'}
+                                </Button>
+                                <Button
+                                    onClick={() => handleSendTo('doctor')}
+                                    disabled={sendingTo !== null || encounter.status === 'sent_to_doctor'}
+                                    variant={encounter.status === 'sent_to_doctor' ? 'secondary' : 'outline'}
+                                    className="flex-1 flex items-center justify-center gap-2"
+                                >
+                                    <Send className="w-4 h-4" />
+                                    {encounter.status === 'sent_to_doctor' ? 'Sent to Doctor ✓' : 'Send to Doctor'}
+                                </Button>
+                            </div>
+                        </Card>
+                    )}
+
                     {/* Assigned Codes */}
                     <Card>
                         <CardHeader
@@ -318,15 +570,53 @@ const ClaimDetailPage = () => {
                                 assignedCodes.map((code) => (
                                     <div
                                         key={code.id}
-                                        className="p-3 bg-green-50 rounded-lg border border-green-200"
+                                        className="p-3 bg-green-50 rounded-lg border border-green-200 relative"
                                     >
+                                        {/* Delete Confirmation Overlay */}
+                                        {deleteConfirmId === code.id && (
+                                            <div className="absolute inset-0 bg-red-50 bg-opacity-95 rounded-lg flex items-center justify-center gap-3 z-10">
+                                                <span className="text-sm font-medium text-red-700">Delete this code?</span>
+                                                <Button
+                                                    size="sm"
+                                                    variant="danger"
+                                                    onClick={() => handleDeleteCode(code.id)}
+                                                >
+                                                    Yes, Delete
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => setDeleteConfirmId(null)}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                            </div>
+                                        )}
+
                                         <div className="flex items-start justify-between mb-1">
                                             <span className="font-mono font-semibold text-green-900">
                                                 {code.code}
                                             </span>
-                                            <Badge variant={code.code_type === 'ICD-10' ? 'info' : 'success'}>
-                                                {code.code_type}
-                                            </Badge>
+                                            <div className="flex items-center gap-2">
+                                                <Badge variant={code.code_type === 'ICD-10' || code.code_type === 'ICD10_CM' ? 'info' : 'success'}>
+                                                    {code.code_type === 'ICD10_CM' ? 'ICD-10' : code.code_type}
+                                                </Badge>
+                                                {/* Action Buttons */}
+                                                <button
+                                                    onClick={() => openEditModal(code)}
+                                                    className="p-1 hover:bg-blue-100 rounded text-blue-600 transition-colors"
+                                                    title="Edit code"
+                                                >
+                                                    <Pencil className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={() => setDeleteConfirmId(code.id)}
+                                                    className="p-1 hover:bg-red-100 rounded text-red-600 transition-colors"
+                                                    title="Delete code"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </div>
                                         <p className="text-xs text-secondary-600">{code.description}</p>
                                         {code.is_ai_suggested && (
@@ -341,16 +631,16 @@ const ClaimDetailPage = () => {
                         </div>
                     </Card>
 
-                    {/* Code Search */}
-                    <Card>
-                        <CardHeader title="Assign Codes" />
+                    {/* Quick Code Entry */}
+                    <Card className="bg-gradient-to-r from-purple-50 to-pink-50">
+                        <CardHeader title="Quick Add Code" subtitle="Enter code directly" />
                         <div className="space-y-3">
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setSelectedCodeType('ICD-10')}
                                     className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCodeType === 'ICD-10'
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                         }`}
                                 >
                                     ICD-10
@@ -358,45 +648,160 @@ const ClaimDetailPage = () => {
                                 <button
                                     onClick={() => setSelectedCodeType('CPT')}
                                     className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCodeType === 'CPT'
-                                            ? 'bg-green-600 text-white'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'bg-green-600 text-white'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                         }`}
                                 >
                                     CPT
                                 </button>
                             </div>
 
+                            <div className="flex gap-2">
+                                <Input
+                                    value={quickCodeEntry}
+                                    onChange={(e) => setQuickCodeEntry(e.target.value)}
+                                    onKeyPress={(e) => e.key === 'Enter' && handleQuickCodeEntry()}
+                                    placeholder={selectedCodeType === 'ICD-10' ? 'e.g., E11.9' : 'e.g., 99213'}
+                                    className="flex-1"
+                                />
+                                <Button
+                                    onClick={handleQuickCodeEntry}
+                                    disabled={quickCodeLoading || !quickCodeEntry.trim()}
+                                    className="flex items-center gap-2"
+                                >
+                                    {quickCodeLoading ? (
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                        <Plus className="w-4 h-4" />
+                                    )}
+                                    Add
+                                </Button>
+                            </div>
+                            <p className="text-xs text-secondary-600">
+                                💡 Tip: Type the exact code and press Enter or click Add
+                            </p>
+                        </div>
+                    </Card>
+
+                    {/* Code Search */}
+                    <Card>
+                        <CardHeader title="Search Code Library" subtitle="Find codes by description" />
+                        <div className="space-y-3">
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <Input
                                     value={codeSearchQuery}
                                     onChange={(e) => setCodeSearchQuery(e.target.value)}
-                                    placeholder={`Search ${selectedCodeType} codes...`}
+                                    placeholder={`Search ${selectedCodeType} codes by description...`}
                                     className="pl-10"
                                 />
                             </div>
 
                             <div className="max-h-64 overflow-y-auto space-y-2">
-                                {searchResults.map((code, index) => (
-                                    <div
-                                        key={index}
-                                        className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer border border-gray-200"
-                                        onClick={() => handleAssignCode(code.code, code.description)}
-                                    >
-                                        <div className="flex items-center justify-between mb-1">
-                                            <span className="font-mono font-semibold text-secondary-900">
-                                                {code.code}
-                                            </span>
-                                            <Plus className="w-4 h-4 text-primary-600" />
-                                        </div>
-                                        <p className="text-xs text-secondary-600">{code.description}</p>
+                                {searchLoading ? (
+                                    <div className="text-center py-8 text-secondary-500">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
+                                        <p className="text-sm">Searching code library...</p>
                                     </div>
-                                ))}
+                                ) : searchResults.length === 0 && codeSearchQuery.length >= 2 ? (
+                                    <div className="text-center py-8 text-secondary-500">
+                                        <p className="text-sm">No codes found for "{codeSearchQuery}"</p>
+                                    </div>
+                                ) : searchResults.length === 0 ? (
+                                    <div className="text-center py-8 text-secondary-500">
+                                        <p className="text-sm font-medium mb-1">Search full code library</p>
+                                        <p className="text-xs">Type to search from thousands of medical codes</p>
+                                    </div>
+                                ) : (
+                                    searchResults.map((code, index) => (
+                                        <div
+                                            key={index}
+                                            className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer border border-gray-200"
+                                            onClick={() => handleAssignCode(code.code, code.description, false, code.code_type)}
+                                        >
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="font-mono font-semibold text-secondary-900">
+                                                    {code.code}
+                                                </span>
+                                                <Plus className="w-4 h-4 text-primary-600" />
+                                            </div>
+                                            <p className="text-xs text-secondary-600">{code.description}</p>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
                     </Card>
                 </div>
             </div>
+
+            {/* Edit Code Modal */}
+            {editingCode && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-secondary-900">Edit Medical Code</h3>
+                            <button
+                                onClick={() => setEditingCode(null)}
+                                className="p-1 hover:bg-gray-100 rounded"
+                            >
+                                <X className="w-5 h-5 text-gray-500" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-secondary-700 mb-1">
+                                    Code Type
+                                </label>
+                                <Badge variant={editingCode.code_type === 'ICD10_CM' || editingCode.code_type === 'ICD-10' ? 'info' : 'success'}>
+                                    {editingCode.code_type === 'ICD10_CM' ? 'ICD-10' : editingCode.code_type}
+                                </Badge>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-secondary-700 mb-1">
+                                    Code
+                                </label>
+                                <Input
+                                    value={editCodeValue}
+                                    onChange={(e) => setEditCodeValue(e.target.value)}
+                                    placeholder="e.g., E11.9"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-secondary-700 mb-1">
+                                    Description
+                                </label>
+                                <textarea
+                                    value={editDescriptionValue}
+                                    onChange={(e) => setEditDescriptionValue(e.target.value)}
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    rows={3}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 mt-6">
+                            <Button
+                                variant="outline"
+                                onClick={() => setEditingCode(null)}
+                                className="flex-1"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={handleEditCode}
+                                className="flex-1"
+                                disabled={!editCodeValue.trim() || !editDescriptionValue.trim()}
+                            >
+                                Save Changes
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
