@@ -91,3 +91,21 @@ class EncounterForCoding(BaseModel):
     
     class Config:
         from_attributes = True
+
+
+# AI Recommendation Schemas
+class CodeRecommendation(BaseModel):
+    code: str
+    code_type: str
+    description: str
+    confidence_score: float
+    explanation: str
+    matched_keywords: list
+
+
+class RecommendationResponse(BaseModel):
+    encounter_id: int
+    icd10_recommendations: list[CodeRecommendation]
+    cpt_recommendations: list[CodeRecommendation]
+    total_recommendations: int
+

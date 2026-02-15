@@ -26,7 +26,7 @@ const DoctorDashboard = () => {
     useEffect(() => {
         const fetchAppointments = async () => {
             try {
-                const data = await apiGet('/appointments')
+                const data = await apiGet('/v1/appointments')
                 setAppointments(data || [])
             } catch (error) {
                 console.error('Error fetching appointments:', error)

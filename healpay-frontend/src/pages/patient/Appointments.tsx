@@ -69,7 +69,7 @@ const PatientAppointments = () => {
     useEffect(() => {
         const fetchDoctors = async () => {
             try {
-                const allUsers = await apiGet<any[]>('/admin/users')
+                const allUsers = await apiGet<any[]>('/v1/admin/users')
                 const doctorUsers = allUsers.filter(u => u.role === 'DOCTOR')
                 setDoctors(doctorUsers)
             } catch (error) {
@@ -85,7 +85,7 @@ const PatientAppointments = () => {
         const fetchPatientData = async () => {
             try {
                 // Try to fetch patient intake data
-                const intakeData = await apiGet('/patient-intake/my-intake')
+                const intakeData = await apiGet('/v1/patient-intake/my-intake')
                 if (intakeData && intakeData.date_of_birth) {
                     setPatientDOB(intakeData.date_of_birth)
                 }
@@ -109,7 +109,7 @@ const PatientAppointments = () => {
                 patient_dob: data.patientDOB || patientDOB,
             }
 
-            await apiPost('/appointments', appointmentData)
+            await apiPost('/v1/appointments', appointmentData)
 
             toast.success('Appointment booked successfully!')
             setShowBookingModal(false)
@@ -128,7 +128,7 @@ const PatientAppointments = () => {
 
     const fetchAppointments = async () => {
         try {
-            const data = await apiGet('/appointments/my')
+            const data = await apiGet('/v1/appointments/my')
             setAppointments(data)
         } catch (error) {
             console.error('Error fetching appointments:', error)

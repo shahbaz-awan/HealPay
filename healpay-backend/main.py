@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.v1.router import api_router
@@ -29,16 +30,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API router
-app.include_router(api_router, prefix="/api")
+# Include API router with v1 prefix
+app.include_router(api_router, prefix="/api/v1")
 
 # DEBUG: Print all registered routes
-print("\n" + "="*60)
-print("REGISTERED ROUTES:")
-for route in app.routes:
-    if hasattr(route, 'path'):
-        print(f"  {route.path}")
-print("="*60 + "\n")
+with open("routes.log", "w") as f:
+    f.write("REGISTERED ROUTES:\n")
+    for route in app.routes:
+        if hasattr(route, 'path'):
+            f.write(f"{route.path}\n")
+            print(f"  {route.path}")
 
 @app.get("/")
 async def root():
@@ -56,12 +57,42 @@ async def health_check():
         "version": settings.APP_VERSION
     }
 
+# EMERGENCY ROUTE FOR BILLING
+from fastapi import Depends
+from app.core.security import get_current_user
+from app.db.database import get_db
+from sqlalchemy.orm import Session
+from app.db.models import ClinicalEncounter, User
+
+@app.get("/api/v1/billing/encounters/ready")
+def get_ready_to_bill_encounters_direct(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    print("DIRECT ENDPOINT HIT")
+    encounters = db.query(ClinicalEncounter).filter(
+        ClinicalEncounter.status.in_(['coded', 'sent_to_biller'])
+    ).all()
+    results = []
+    for enc in encounters:
+        patient = db.query(User).filter(User.id == enc.patient_id).first()
+        doctor = db.query(User).filter(User.id == enc.doctor_id).first()
+        results.append({
+            "id": enc.id,
+            "encounter_date": enc.encounter_date,
+            "patient_name": f"{patient.first_name} {patient.last_name}" if patient else "Unknown",
+            "doctor_name": f"{doctor.first_name} {doctor.last_name}" if doctor else "Unknown",
+            "type": enc.encounter_type,
+            "status": enc.status
+        })
+    return results
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8000,
+        port=8001,
         reload=True
     )
 

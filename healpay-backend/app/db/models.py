@@ -196,4 +196,73 @@ class Appointment(Base):
         return f"<Appointment {self.id} - Patient:{self.user_id} Doctor:{self.doctor_id} on {self.appointment_date}>"
 
 
+# Code Library for AI-powered medical code recommendations
+class CodeLibrary(Base):
+    __tablename__ = "code_library"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String, nullable=False, index=True)  # e.g., "I10", "99213"
+    code_type = Column(String, nullable=False, index=True)  # "ICD10_CM", "CPT", "HCPCS"
+    short_description = Column(String, nullable=False)
+    long_description = Column(Text, nullable=True)
+    category = Column(String, nullable=True)
+    
+    # Searchable text combining code and descriptions for embedding/matching
+    search_text = Column(Text, nullable=False)
+    
+    # Metadata
+    is_active = Column(Boolean, default=True)
+    billable = Column(Boolean, default=True, nullable=True)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    def __repr__(self):
+        return f"<CodeLibrary {self.code}: {self.short_description}>"
 
+# Invoices for Patients
+class Invoice(Base):
+    __tablename__ = "invoices"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    patient_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    
+    # Link to claim if applicable, or just specific encounter
+    claim_id = Column(Integer, ForeignKey("claims.id"), nullable=True)
+    encounter_id = Column(Integer, ForeignKey("clinical_encounters.id"), nullable=True)
+    
+    invoice_number = Column(String, unique=True, nullable=False)
+    issue_date = Column(String, nullable=False)  # YYYY-MM-DD
+    due_date = Column(String, nullable=False)    # YYYY-MM-DD
+    
+    total_amount = Column(Float, nullable=False)
+    amount_paid = Column(Float, default=0.0)
+    balance_due = Column(Float, nullable=False)
+    
+    status = Column(String, default="issued")  # issued, paid, overdue, cancelled
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    def __repr__(self):
+        return f"<Invoice {self.invoice_number}>"
+
+
+# Payments tracked
+class Payment(Base):
+    __tablename__ = "payments"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    invoice_id = Column(Integer, ForeignKey("invoices.id"), nullable=False)
+    
+    amount = Column(Float, nullable=False)
+    payment_date = Column(DateTime(timezone=True), server_default=func.now())
+    payment_method = Column(String, nullable=False)  # Credit Card, Cash, Insurance, Bank Transfer
+    transaction_id = Column(String, nullable=True)
+    
+    notes = Column(Text, nullable=True)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    def __repr__(self):
+        return f"<Payment {self.id} - {self.amount}>"

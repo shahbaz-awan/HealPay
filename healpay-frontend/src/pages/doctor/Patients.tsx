@@ -35,18 +35,18 @@ const DoctorPatients = () => {
     setIsLoading(true)
     try {
       // Get all appointments for this doctor
-      const appointments = await apiGet<any[]>('/appointments')
-      
+      const appointments = await apiGet<any[]>('/v1/appointments')
+
       // Extract unique patients and aggregate data
       const patientMap = new Map<number, Patient>()
-      
+
       appointments.forEach((apt: any) => {
         const patientId = apt.user_id
-        
+
         if (patientMap.has(patientId)) {
           const existing = patientMap.get(patientId)!
           existing.appointmentCount++
-          
+
           // Update last appointment if this one is more recent
           if (!existing.lastAppointment || apt.appointment_date > existing.lastAppointment) {
             existing.lastAppointment = apt.appointment_date
@@ -63,7 +63,7 @@ const DoctorPatients = () => {
           })
         }
       })
-      
+
       setPatients(Array.from(patientMap.values()))
     } catch (error) {
       console.error('Error fetching patients:', error)

@@ -11,7 +11,7 @@ export const createClinicalEncounter = async (encounterData: {
     plan?: string
 }) => {
     try {
-        const response = await api.post('/clinical/encounters', encounterData)
+        const response = await api.post('/v1/clinical/encounters', encounterData)
         return response.data
     } catch (error) {
         console.error('Error creating encounter:', error)
@@ -21,7 +21,7 @@ export const createClinicalEncounter = async (encounterData: {
 
 export const getPatientEncounters = async (patientId: number) => {
     try {
-        const response = await api.get(`/clinical/encounters/patient/${patientId}`)
+        const response = await api.get(`/v1/clinical/encounters/patient/${patientId}`)
         return response.data
     } catch (error) {
         console.error('Error fetching patient encounters:', error)
@@ -29,10 +29,10 @@ export const getPatientEncounters = async (patientId: number) => {
     }
 }
 
-// Medical Coder APIs
+//Medical Coder APIs
 export const getPendingEncounters = async () => {
     try {
-        const response = await api.get('/clinical/encounters/pending-coding')
+        const response = await api.get('/v1/clinical/encounters/pending-coding')
         return response.data
     } catch (error) {
         console.error('Error fetching pending encounters:', error)
@@ -42,7 +42,7 @@ export const getPendingEncounters = async () => {
 
 export const getEncounterDetails = async (encounterId: number) => {
     try {
-        const response = await api.get(`/clinical/encounters/${encounterId}`)
+        const response = await api.get(`/v1/clinical/encounters/${encounterId}`)
         return response.data
     } catch (error) {
         console.error('Error fetching encounter details:', error)
@@ -62,7 +62,7 @@ export const assignMedicalCode = async (
     }
 ) => {
     try {
-        const response = await api.post(`/clinical/encounters/${encounterId}/codes`, codeData)
+        const response = await api.post(`/v1/clinical/encounters/${encounterId}/codes`, codeData)
         return response.data
     } catch (error) {
         console.error('Error assigning medical code:', error)
@@ -72,7 +72,7 @@ export const assignMedicalCode = async (
 
 export const getEncounterCodes = async (encounterId: number) => {
     try {
-        const response = await api.get(`/clinical/encounters/${encounterId}/codes`)
+        const response = await api.get(`/v1/clinical/encounters/${encounterId}/codes`)
         return response.data
     } catch (error) {
         console.error('Error fetching encounter codes:', error)
@@ -82,7 +82,7 @@ export const getEncounterCodes = async (encounterId: number) => {
 
 export const completeCoding = async (encounterId: number) => {
     try {
-        const response = await api.put(`/clinical/encounters/${encounterId}/complete-coding`)
+        const response = await api.put(`/v1/clinical/encounters/${encounterId}/complete-coding`)
         return response.data
     } catch (error) {
         console.error('Error completing coding:', error)
@@ -93,7 +93,7 @@ export const completeCoding = async (encounterId: number) => {
 // Get AI-powered code recommendations for an encounter
 export const getCodeRecommendations = async (encounterId: number) => {
     try {
-        const response = await api.get(`/clinical/encounters/${encounterId}/recommendations`)
+        const response = await api.get(`/v1/clinical/encounters/${encounterId}/recommendations`)
         return response.data
     } catch (error) {
         console.error('Error fetching code recommendations:', error)
@@ -108,7 +108,7 @@ export const searchCodes = async (
     limit: number = 50
 ) => {
     try {
-        const response = await api.get('/clinical/codes/search', {
+        const response = await api.get('/v1/clinical/codes/search', {
             params: { query, code_type: codeType, limit }
         })
         return response.data
@@ -121,7 +121,7 @@ export const searchCodes = async (
 // Delete an assigned medical code
 export const deleteMedicalCode = async (encounterId: number, codeId: number) => {
     try {
-        const response = await api.delete(`/clinical/encounters/${encounterId}/codes/${codeId}`)
+        const response = await api.delete(`/v1/clinical/encounters/${encounterId}/codes/${codeId}`)
         return response.data
     } catch (error) {
         console.error('Error deleting medical code:', error)
@@ -143,7 +143,7 @@ export const updateMedicalCode = async (
     }
 ) => {
     try {
-        const response = await api.put(`/clinical/encounters/${encounterId}/codes/${codeId}`, codeData)
+        const response = await api.put(`/v1/clinical/encounters/${encounterId}/codes/${codeId}`, codeData)
         return response.data
     } catch (error) {
         console.error('Error updating medical code:', error)
@@ -154,7 +154,7 @@ export const updateMedicalCode = async (
 // Get completed encounters (coded, sent to biller/doctor)
 export const getCompletedEncounters = async () => {
     try {
-        const response = await api.get('/clinical/encounters/completed')
+        const response = await api.get('/v1/clinical/encounters/completed')
         return response.data
     } catch (error) {
         console.error('Error fetching completed encounters:', error)
@@ -165,7 +165,7 @@ export const getCompletedEncounters = async () => {
 // Send encounter to biller or doctor
 export const sendEncounterTo = async (encounterId: number, target: 'biller' | 'doctor') => {
     try {
-        const response = await api.put(`/clinical/encounters/${encounterId}/send-to`, null, {
+        const response = await api.put(`/v1/clinical/encounters/${encounterId}/send-to`, null, {
             params: { target }
         })
         return response.data

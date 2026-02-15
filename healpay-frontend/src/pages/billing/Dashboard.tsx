@@ -14,149 +14,110 @@ import {
 import Card, { CardHeader } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
+import { useEffect, useState } from 'react'
+import { getBillingStats, getRecentInvoices, getReadyToBillEncounters, BillingStats } from '@/services/billingService'
 
 const BillingDashboard = () => {
   const navigate = useNavigate()
+  const [stats, setStats] = useState<BillingStats | null>(null)
+  const [recentInvoices, setRecentInvoices] = useState<any[]>([])
+  const [readyEncounters, setReadyEncounters] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Statistics
-  const stats = [
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const statsData = await getBillingStats().catch(err => {
+          console.error('Failed to load stats', err)
+          return null
+        })
+        setStats(statsData)
+
+        const invoicesData = await getRecentInvoices().catch(err => {
+          console.error('Failed to load invoices', err)
+          return []
+        })
+        setRecentInvoices(invoicesData || [])
+
+        const readyEncountersData = await getReadyToBillEncounters().catch(err => {
+          console.error('Failed to load ready encounters', err)
+          return []
+        })
+        setReadyEncounters(readyEncountersData || [])
+
+      } catch (error) {
+        console.error('Unexpected error fetching billing data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // Statistics Display
+  const statCards = [
     {
       title: 'Total Revenue',
-      value: '$184,500',
+      value: stats ? `$${stats.total_revenue.toLocaleString()}` : '$0',
       icon: DollarSign,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
-      change: '+18% from last month',
+      change: 'Lifetime revenue',
       trend: 'up'
     },
     {
       title: 'Outstanding',
-      value: '$42,350',
+      value: stats ? `$${stats.outstanding.toLocaleString()}` : '$0',
       icon: Clock,
       color: 'text-yellow-600',
       bgColor: 'bg-yellow-50',
-      change: '156 pending invoices',
+      change: `${stats ? stats.pending_invoices_count : 0} pending invoices`,
       trend: 'neutral'
     },
     {
       title: 'Collected This Month',
-      value: '$142,150',
+      value: stats ? `$${stats.collected_month.toLocaleString()}` : '$0',
       icon: CheckCircle,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
-      change: '87% collection rate',
+      change: 'Current month',
       trend: 'up'
     },
     {
       title: 'Overdue',
-      value: '$12,840',
+      value: stats ? `$${stats.overdue.toLocaleString()}` : '$0',
       icon: AlertCircle,
       color: 'text-red-600',
       bgColor: 'bg-red-50',
-      change: '34 overdue invoices',
+      change: `${stats ? stats.overdue_invoices_count : 0} overdue invoices`,
       trend: 'neutral'
     }
   ]
 
-  // Recent invoices
-  const recentInvoices = [
-    {
-      id: 1,
-      invoiceNumber: 'INV-2024-1208-001',
-      patient: 'Sarah Mitchell',
-      service: 'ECG & Consultation',
-      issueDate: '2024-12-08',
-      dueDate: '2024-12-22',
-      amount: 450.00,
-      paid: 0,
-      status: 'pending',
-      insurance: 'Blue Cross'
-    },
-    {
-      id: 2,
-      invoiceNumber: 'INV-2024-1208-002',
-      patient: 'James Anderson',
-      service: 'Annual Physical',
-      issueDate: '2024-12-08',
-      dueDate: '2024-12-22',
-      amount: 320.00,
-      paid: 0,
-      status: 'pending',
-      insurance: 'Aetna'
-    },
-    {
-      id: 3,
-      invoiceNumber: 'INV-2024-1207-042',
-      patient: 'Emily Rodriguez',
-      service: 'X-Ray Imaging',
-      issueDate: '2024-12-07',
-      dueDate: '2024-12-21',
-      amount: 275.00,
-      paid: 275.00,
-      status: 'paid',
-      insurance: 'United Healthcare'
-    },
-    {
-      id: 4,
-      invoiceNumber: 'INV-2024-1128-015',
-      patient: 'Michael Chen',
-      service: 'Skin Examination',
-      issueDate: '2024-11-28',
-      dueDate: '2024-12-12',
-      amount: 200.00,
-      paid: 0,
-      status: 'overdue',
-      insurance: 'Cigna'
-    }
-  ]
-
-  // Payment activity
-  const paymentActivity = [
-    {
-      id: 1,
-      patient: 'Lisa Thompson',
-      amount: 280.00,
-      method: 'Credit Card',
-      time: '2 hours ago',
-      status: 'completed'
-    },
-    {
-      id: 2,
-      patient: 'Robert Williams',
-      amount: 520.00,
-      method: 'Insurance',
-      time: '5 hours ago',
-      status: 'completed'
-    },
-    {
-      id: 3,
-      patient: 'Jennifer Adams',
-      amount: 340.00,
-      method: 'Credit Card',
-      time: '1 day ago',
-      status: 'completed'
-    },
-    {
-      id: 4,
-      patient: 'David Martinez',
-      amount: 195.00,
-      method: 'Cash',
-      time: '1 day ago',
-      status: 'completed'
-    }
-  ]
+  // Payment activity (Placeholder for now, could be fetched via API later)
+  const paymentActivity: any[] = []
 
   const getStatusBadge = (status: string) => {
-    const badges = {
+    const badges: any = {
       paid: <Badge variant="success">Paid</Badge>,
-      pending: <Badge variant="warning">Pending</Badge>,
-      overdue: <Badge variant="danger">Overdue</Badge>
+      issued: <Badge variant="warning">Issued</Badge>,
+      overdue: <Badge variant="danger">Overdue</Badge>,
+      cancelled: <Badge variant="secondary">Cancelled</Badge>
     }
-    return badges[status as keyof typeof badges]
+    return badges[status] || <Badge variant="info">{status}</Badge>
   }
 
   const getPaymentMethodIcon = (method: string) => {
     return <CreditCard className="w-4 h-4 text-gray-400" />
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+      </div>
+    )
   }
 
   return (
@@ -175,7 +136,7 @@ const BillingDashboard = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
+        {statCards.map((stat, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 20 }}
@@ -204,8 +165,65 @@ const BillingDashboard = () => {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Invoices - 2 columns */}
-        <div className="lg:col-span-2">
+
+        {/* Ready to Bill - Full Width on Mobile, Col span 2 otherwise */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Encounters Ready for Billing */}
+          <Card>
+            <CardHeader
+              title="Ready to Bill"
+              subtitle="Encounters coded and waiting for claim generation"
+              action={
+                <Button variant="outline" size="sm">
+                  View All
+                </Button>
+              }
+            />
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-secondary-50">
+                  <tr>
+                    <th className="text-left p-4 text-sm font-semibold text-secondary-700">Date</th>
+                    <th className="text-left p-4 text-sm font-semibold text-secondary-700">Patient</th>
+                    <th className="text-left p-4 text-sm font-semibold text-secondary-700">Doctor</th>
+                    <th className="text-left p-4 text-sm font-semibold text-secondary-700">Type</th>
+                    <th className="text-center p-4 text-sm font-semibold text-secondary-700">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-secondary-100">
+                  {readyEncounters.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="p-8 text-center text-secondary-500">
+                        No encounters ready for billing.
+                      </td>
+                    </tr>
+                  ) : (
+                    readyEncounters.map((encounter) => (
+                      <motion.tr
+                        key={encounter.id}
+                        whileHover={{ backgroundColor: 'rgba(239, 246, 255, 0.5)' }}
+                        className="transition-colors"
+                      >
+                        <td className="p-4 text-sm text-secondary-900">
+                          {new Date(encounter.encounter_date).toLocaleDateString()}
+                        </td>
+                        <td className="p-4">
+                          <div className="text-sm font-medium text-secondary-900">{encounter.patient_name}</div>
+                        </td>
+                        <td className="p-4 text-sm text-secondary-600">{encounter.doctor_name}</td>
+                        <td className="p-4 text-sm text-secondary-600">{encounter.type}</td>
+                        <td className="p-4 text-center">
+                          <Button size="sm" variant="primary">Generate Claim</Button>
+                        </td>
+                      </motion.tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Recent Invoices */}
           <Card>
             <CardHeader
               title="Recent Invoices"
@@ -221,8 +239,7 @@ const BillingDashboard = () => {
                 <thead className="bg-secondary-50">
                   <tr>
                     <th className="text-left p-4 text-sm font-semibold text-secondary-700">Invoice #</th>
-                    <th className="text-left p-4 text-sm font-semibold text-secondary-700">Patient</th>
-                    <th className="text-left p-4 text-sm font-semibold text-secondary-700">Service</th>
+                    <th className="text-left p-4 text-sm font-semibold text-secondary-700">Patient ID</th>
                     <th className="text-right p-4 text-sm font-semibold text-secondary-700">Amount</th>
                     <th className="text-left p-4 text-sm font-semibold text-secondary-700">Due Date</th>
                     <th className="text-center p-4 text-sm font-semibold text-secondary-700">Status</th>
@@ -230,37 +247,43 @@ const BillingDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-secondary-100">
-                  {recentInvoices.map((invoice) => (
-                    <motion.tr
-                      key={invoice.id}
-                      whileHover={{ backgroundColor: 'rgba(239, 246, 255, 0.5)' }}
-                      className="transition-colors"
-                    >
-                      <td className="p-4">
-                        <div className="text-sm font-medium text-secondary-900">{invoice.invoiceNumber}</div>
-                        <div className="text-xs text-secondary-500">{invoice.insurance}</div>
+                  {recentInvoices.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-8 text-center text-secondary-500">
+                        No recent invoices found.
                       </td>
-                      <td className="p-4">
-                        <div className="text-sm text-secondary-900">{invoice.patient}</div>
-                      </td>
-                      <td className="p-4 text-sm text-secondary-900">{invoice.service}</td>
-                      <td className="p-4 text-right">
-                        <div className="text-sm font-semibold text-secondary-900">
-                          ${invoice.amount.toFixed(2)}
-                        </div>
-                        {invoice.paid > 0 && (
-                          <div className="text-xs text-green-600">
-                            Paid: ${invoice.paid.toFixed(2)}
+                    </tr>
+                  ) : (
+                    recentInvoices.map((invoice) => (
+                      <motion.tr
+                        key={invoice.id}
+                        whileHover={{ backgroundColor: 'rgba(239, 246, 255, 0.5)' }}
+                        className="transition-colors"
+                      >
+                        <td className="p-4">
+                          <div className="text-sm font-medium text-secondary-900">{invoice.invoice_number}</div>
+                        </td>
+                        <td className="p-4">
+                          <div className="text-sm text-secondary-900">#{invoice.patient_id}</div>
+                        </td>
+                        <td className="p-4 text-right">
+                          <div className="text-sm font-semibold text-secondary-900">
+                            ${invoice.total_amount?.toFixed(2)}
                           </div>
-                        )}
-                      </td>
-                      <td className="p-4 text-sm text-secondary-600">{invoice.dueDate}</td>
-                      <td className="p-4 text-center">{getStatusBadge(invoice.status)}</td>
-                      <td className="p-4 text-center">
-                        <Button size="sm" variant="ghost">View</Button>
-                      </td>
-                    </motion.tr>
-                  ))}
+                          {invoice.amount_paid > 0 && (
+                            <div className="text-xs text-green-600">
+                              Paid: ${invoice.amount_paid.toFixed(2)}
+                            </div>
+                          )}
+                        </td>
+                        <td className="p-4 text-sm text-secondary-600">{invoice.due_date}</td>
+                        <td className="p-4 text-center">{getStatusBadge(invoice.status)}</td>
+                        <td className="p-4 text-center">
+                          <Button size="sm" variant="ghost">View</Button>
+                        </td>
+                      </motion.tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -275,31 +298,37 @@ const BillingDashboard = () => {
               subtitle="Recent payments"
             />
             <div className="space-y-4">
-              {paymentActivity.map((payment) => (
-                <div
-                  key={payment.id}
-                  className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-100"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-white rounded-lg">
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-secondary-900 mb-1">{payment.patient}</h4>
-                      <div className="flex items-center gap-2 text-xs text-secondary-600 mb-2">
-                        {getPaymentMethodIcon(payment.method)}
-                        <span>{payment.method}</span>
+              {paymentActivity.length === 0 ? (
+                <div className="p-8 text-center text-secondary-500">
+                  No recent payment activity.
+                </div>
+              ) : (
+                paymentActivity.map((payment) => (
+                  <div
+                    key={payment.id}
+                    className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-100"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-white rounded-lg">
+                        <CheckCircle className="w-5 h-5 text-green-600" />
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-lg font-bold text-green-700">
-                          +${payment.amount.toFixed(2)}
-                        </span>
-                        <span className="text-xs text-secondary-500">{payment.time}</span>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-secondary-900 mb-1">{payment.patient}</h4>
+                        <div className="flex items-center gap-2 text-xs text-secondary-600 mb-2">
+                          {getPaymentMethodIcon(payment.method)}
+                          <span>{payment.method}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-lg font-bold text-green-700">
+                            +${payment.amount.toFixed(2)}
+                          </span>
+                          <span className="text-xs text-secondary-500">{payment.time}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </Card>
         </div>

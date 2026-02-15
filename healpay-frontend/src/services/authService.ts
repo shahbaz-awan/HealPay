@@ -3,7 +3,7 @@ import { LoginCredentials, RegisterData, AuthResponse } from '@/types'
 
 export const authService = {
     login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-        const response = await apiPost<AuthResponse>('/auth/login', credentials)
+        const response = await apiPost<AuthResponse>('/v1/auth/login', credentials)
 
         // Transform snake_case fields from backend to camelCase for frontend
         if (response.user) {
@@ -35,14 +35,14 @@ export const authService = {
         if (data.phone) {
             backendData.phone = data.phone
         }
-        return apiPost<{ message: string; email: string }>('/auth/register', backendData)
+        return apiPost<{ message: string; email: string }>('/v1/auth/register', backendData)
     },
 
     logout: async (): Promise<void> => {
-        return apiPost('/auth/logout')
+        return apiPost('/v1/auth/logout')
     },
 
     refreshToken: async (refreshToken: string): Promise<AuthResponse> => {
-        return apiPost<AuthResponse>('/auth/refresh', { refreshToken })
+        return apiPost<AuthResponse>('/v1/auth/refresh', { refreshToken })
     },
 }

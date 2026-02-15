@@ -41,7 +41,7 @@ const ScheduleFollowupModal = ({ patientId, patientName, onClose, onSuccess }: S
                 return
             }
 
-            await apiPost('/appointments', {
+            await apiPost('/v1/appointments', {
                 user_id: patientId,
                 doctor_id: currentUser.id,
                 appointment_date: formData.appointment_date,

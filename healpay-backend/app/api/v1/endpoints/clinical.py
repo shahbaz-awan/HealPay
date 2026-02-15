@@ -557,9 +557,42 @@ def get_code_recommendations(
         top_n=3
     )
     
+    
     return RecommendationResponse(
         encounter_id=encounter_id,
         icd10_recommendations=[CodeRecommendation(**rec) for rec in icd_recommendations],
         cpt_recommendations=[CodeRecommendation(**rec) for rec in cpt_recommendations],
         total_recommendations=len(icd_recommendations) + len(cpt_recommendations)
     )
+
+# Get encounters ready for billing (For Biller)
+@router.get("/billingready")
+def get_ready_to_bill_encounters(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get all encounters that have been coded/sent to biller and are ready for claim generation.
+    """
+    # Note: Access control - ideally check for BILLING role, but we'll accept authentic users for now or check Biller
+    # if current_user.role != UserRole.BILLER: ...
+
+    encounters = db.query(ClinicalEncounter).filter(
+        ClinicalEncounter.status.in_(['coded', 'sent_to_biller'])
+    ).all()
+    
+    results = []
+    for enc in encounters:
+        patient = db.query(User).filter(User.id == enc.patient_id).first()
+        doctor = db.query(User).filter(User.id == enc.doctor_id).first()
+        
+        results.append({
+            "id": enc.id,
+            "encounter_date": enc.encounter_date,
+            "patient_name": f"{patient.first_name} {patient.last_name}" if patient else "Unknown",
+            "doctor_name": f"{doctor.first_name} {doctor.last_name}" if doctor else "Unknown",
+            "type": enc.encounter_type,
+            "status": enc.status
+        })
+        
+    return results

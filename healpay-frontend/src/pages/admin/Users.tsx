@@ -93,7 +93,7 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     setIsLoading(true)
     try {
-      const data = await apiGet('/admin/users')
+      const data = await apiGet('/v1/admin/users')
       setUsers(data)
     } catch (error) {
       console.error('Error fetching users:', error)
@@ -128,7 +128,7 @@ const AdminUsers = () => {
       console.log('Creating user with data:', backendData)
 
       // Call admin endpoint
-      const response = await apiPost('/admin/create-user', backendData)
+      const response = await apiPost('/v1/admin/create-user', backendData)
 
       console.log('User created successfully:', response)
 
@@ -190,7 +190,7 @@ const AdminUsers = () => {
         updateData.password = data.password
       }
 
-      await apiPut(`/admin/users/${editingUser.id}`, updateData)
+      await apiPut(`/v1/admin/users/${editingUser.id}`, updateData)
 
       toast.success('User updated successfully!')
       reset()
@@ -224,7 +224,7 @@ const AdminUsers = () => {
     }
 
     try {
-      await apiDelete(`/admin/users/${userId}`)
+      await apiDelete(`/v1/admin/users/${userId}`)
       toast.success(`User ${userToDelete.first_name} ${userToDelete.last_name} deleted successfully`)
       fetchUsers()
     } catch (error: any) {

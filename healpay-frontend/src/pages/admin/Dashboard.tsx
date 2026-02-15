@@ -35,7 +35,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const data = await apiGet<User[]>('/admin/users')
+        const data = await apiGet<User[]>('/v1/admin/users')
         setUsers(data)
       } catch (error) {
         console.error('Error fetching users:', error)

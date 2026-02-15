@@ -58,31 +58,31 @@ export interface PatientIntakeResponse extends PatientIntakeData {
 export const patientIntakeService = {
     // Create new patient intake
     create: async (data: any): Promise<PatientIntakeResponse> => {
-        return apiPost<PatientIntakeResponse>('/patient-intake/', data)
+        return apiPost<PatientIntakeResponse>('/v1/patient-intake/', data)
     },
 
     // Get current user's intake
     getMyIntake: async (): Promise<PatientIntakeResponse> => {
-        return apiGet<PatientIntakeResponse>('/patient-intake/my-intake')
+        return apiGet<PatientIntakeResponse>('/v1/patient-intake/my-intake')
     },
 
     // Update current user's intake
     updateMyIntake: async (data: any): Promise<PatientIntakeResponse> => {
-        return apiPut<PatientIntakeResponse>('/patient-intake/my-intake', data)
+        return apiPut<PatientIntakeResponse>('/v1/patient-intake/my-intake', data)
     },
 
     // Get intake by user ID (Admin, Doctor, Coder only)
     getIntakeByUserId: async (userId: number): Promise<PatientIntakeResponse> => {
-        return apiGet<PatientIntakeResponse>(`/patient-intake/${userId}`)
+        return apiGet<PatientIntakeResponse>(`/v1/patient-intake/${userId}`)
     },
 
     // Get all patient intakes (Admin, Doctor, Coder only)
     getAllIntakes: async (skip: number = 0, limit: number = 100): Promise<PatientIntakeResponse[]> => {
-        return apiGet<PatientIntakeResponse[]>(`/patient-intake/?skip=${skip}&limit=${limit}`)
+        return apiGet<PatientIntakeResponse[]>(`/v1/patient-intake/?skip=${skip}&limit=${limit}`)
     },
 
     // Delete current user's intake
     deleteMyIntake: async (): Promise<void> => {
-        return apiDelete('/patient-intake/my-intake')
+        return apiDelete('/v1/patient-intake/my-intake')
     },
 }

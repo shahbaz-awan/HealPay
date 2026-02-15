@@ -168,7 +168,7 @@ const PatientIntakeForm = () => {
     useEffect(() => {
         const fetchExistingIntake = async () => {
             try {
-                const intakeData = await apiGet('/patient-intake/my-intake')
+                const intakeData = await apiGet('/v1/patient-intake/my-intake')
 
                 // If intake exists, switch to edit mode and populate form
                 setIsEditMode(true)
@@ -296,14 +296,14 @@ const PatientIntakeForm = () => {
             // Call appropriate endpoint based on edit mode
             if (isEditMode) {
                 // Update existing intake
-                await apiPut('/patient-intake/my-intake', backendData)
+                await apiPut('/v1/patient-intake/my-intake', backendData)
                 toast.success('Intake form updated successfully!', {
                     position: 'top-center',
                     autoClose: 3000,
                 })
             } else {
                 // Create new intake
-                await apiPost('/patient-intake', backendData)
+                await apiPost('/v1/patient-intake/', backendData)
                 toast.success('Intake form submitted successfully!', {
                     position: 'top-center',
                     autoClose: 3000,

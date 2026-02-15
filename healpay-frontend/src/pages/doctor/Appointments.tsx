@@ -45,7 +45,7 @@ const DoctorAppointments = () => {
     const fetchAppointments = async () => {
         setIsLoading(true)
         try {
-            const data = await apiGet<Appointment[]>('/appointments')
+            const data = await apiGet<Appointment[]>('/v1/appointments')
             setAppointments(data)
             setFilteredAppointments(data)
         } catch (error) {
@@ -98,7 +98,7 @@ const DoctorAppointments = () => {
 
     const updateAppointmentStatus = async (appointmentId: number, newStatus: string) => {
         try {
-            await apiPatch(`/appointments/${appointmentId}/status?status=${newStatus}`, {})
+            await apiPatch(`/v1/appointments/${appointmentId}/status?status=${newStatus}`, {})
             toast.success(`Appointment marked as ${newStatus}`)
             fetchAppointments()
             setSelectedAppointment(null)

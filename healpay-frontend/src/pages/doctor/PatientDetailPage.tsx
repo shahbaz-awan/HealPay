@@ -41,7 +41,7 @@ const PatientDetailPage = () => {
         const fetchPatientDetails = async () => {
             try {
                 // Fetch user basic info
-                const userResponse = await apiGet(`/admin/users`)
+                const userResponse = await apiGet(`/v1/admin/users`)
                 const patient = userResponse.find((u: any) => u.id === parseInt(userId || '0'))
 
                 if (!patient) {
@@ -54,7 +54,7 @@ const PatientDetailPage = () => {
 
                 // Fetch patient intake data
                 try {
-                    const intake = await apiGet(`/patient-intake/${userId}`)
+                    const intake = await apiGet(`/v1/patient-intake/${userId}`)
                     setIntakeData(intake)
                 } catch (intakeError: any) {
                     // Intake might not exist yet - that's okay
