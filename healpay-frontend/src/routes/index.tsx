@@ -3,6 +3,7 @@ import LandingPage from '@/pages/LandingPage'
 import LoginPage from '@/pages/auth/LoginPage'
 import RegisterPage from '@/pages/auth/RegisterPage'
 import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage'
+import GoogleCallback from '@/pages/auth/GoogleCallback'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import PatientDashboard from '@/pages/patient/Dashboard'
 import PatientIntakeForm from '@/pages/patient/PatientIntakeForm'
@@ -29,6 +30,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/auth/callback" element={<GoogleCallback />} />
 
       {/* Protected Routes - Patient */}
       <Route

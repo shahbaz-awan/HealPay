@@ -11,6 +11,11 @@ from app.core.security import (
     get_current_user
 )
 from datetime import datetime
+from fastapi import Request
+from fastapi.responses import RedirectResponse
+from fastapi_sso.sso.google import GoogleSSO
+from app.core.config import settings
+import secrets
 
 router = APIRouter()
 
@@ -176,6 +181,29 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
         refreshToken=refresh_token
     )
 
+@router.get("/me", response_model=UserResponse)
+async def read_users_me(current_user: User = Depends(get_current_user)):
+    """
+    Get current user profile
+    """
+    return UserResponse(
+        id=current_user.id,
+        email=current_user.email,
+        first_name=current_user.first_name,
+        last_name=current_user.last_name,
+        phone=current_user.phone,
+        address=None,
+        city=None,
+        state=None,
+        zip_code=None,
+        role=current_user.role,
+        is_active=True,
+        is_verified=True,
+        avatar=None,
+        created_at=current_user.created_at,
+        updated_at=current_user.updated_at
+    )
+
 @router.put("/me/update", response_model=UserResponse)
 async def update_my_profile(
     update_data: UserUpdate,
@@ -278,3 +306,65 @@ async def verify_and_reset(email: str, otp: str, new_password: str, db: Session 
     db.commit()
     
     return {"message": "Password reset successful"}
+
+# Google SSO Configuration
+google_sso = GoogleSSO(
+    client_id=settings.GOOGLE_CLIENT_ID,
+    client_secret=settings.GOOGLE_CLIENT_SECRET,
+    redirect_uri=f"http://localhost:8001/api/v1/auth/google/callback",
+    allow_insecure_http=True
+)
+
+@router.get("/google/login")
+async def google_login():
+    """Redirect user to Google Login"""
+    with google_sso:
+        return await google_sso.get_login_redirect()
+
+@router.get("/google/callback")
+async def google_callback(request: Request, db: Session = Depends(get_db)):
+    """Handle Google Login Callback"""
+    try:
+        with google_sso:
+            user_info = await google_sso.verify_and_process(request)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to login with Google: {str(e)}")
+    
+    if not user_info:
+        raise HTTPException(status_code=400, detail="Failed to login with Google")
+    
+    # Check if user exists
+    user = db.query(User).filter(User.email == user_info.email).first()
+    
+    if not user:
+        # Create new user
+        # Split display_name for first/last
+        names = (user_info.display_name or "").split(" ")
+        first_name = names[0]
+        last_name = " ".join(names[1:]) if len(names) > 1 else ""
+        
+        # Generate random password
+        random_password = secrets.token_urlsafe(32)
+        hashed_password = get_password_hash(random_password)
+        
+        user = User(
+            email=user_info.email,
+            hashed_password=hashed_password,
+            first_name=first_name,
+            last_name=last_name,
+            role=UserRole.PATIENT, # Default role
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    
+    # Generate tokens
+    token_data = {"sub": user.email, "role": user.role.value}
+    access_token = create_access_token(data=token_data)
+    
+    # Redirect to frontend with token
+    # Ensure FRONTEND_URL doesn't have trailing slash
+    frontend_url = settings.FRONTEND_URL.rstrip("/")
+    return RedirectResponse(
+        url=f"{frontend_url}/auth/callback?token={access_token}&role={user.role.value}"
+    )

@@ -62,6 +62,10 @@ const LoginPage = () => {
     }
   }
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google/login`
+  }
+
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Form */}
@@ -143,6 +147,8 @@ const LoginPage = () => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                onClick={handleGoogleLogin}
+                type="button"
                 className="w-full flex items-center justify-center px-4 py-2 border border-secondary-300 rounded-lg hover:bg-blue-50 transition-colors"
               >
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
