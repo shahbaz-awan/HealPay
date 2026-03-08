@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from './api'
+import { apiGet, apiPost, apiPatch } from './api'
 // Note: Frontend connects to backend. If backend port changes, api.ts needs update.
 
 export interface BillingStats {
@@ -168,6 +168,47 @@ export const analyzeClaimRisk = async (formData: Record<string, any>): Promise<C
         return response
     } catch (error) {
         console.error('Error analyzing claim risk:', error)
+        throw error
+    }
+}
+
+export interface Claim {
+    id: number
+    encounter_id: number
+    claim_number: string
+    insurance_provider: string
+    total_amount: number
+    patient_responsibility?: number
+    status: string
+    claim_type?: string
+    billing_provider_npi?: string
+    denial_reason_code?: string
+    adjudication_date?: string
+    cms1500_data?: Record<string, any>
+}
+
+export const getClaims = async (): Promise<Claim[]> => {
+    try {
+        const response = await apiGet<Claim[]>('/v1/billing/claims')
+        return response
+    } catch (error) {
+        console.error('Error fetching claims:', error)
+        throw error
+    }
+}
+
+export const updateClaimStatus = async (
+    claimId: number,
+    status: string,
+    denial_reason_code?: string
+): Promise<Claim> => {
+    try {
+        const payload: Record<string, any> = { status }
+        if (denial_reason_code) payload.denial_reason_code = denial_reason_code
+        const response = await apiPatch<Claim>(`/v1/billing/claims/${claimId}/status`, payload)
+        return response
+    } catch (error) {
+        console.error('Error updating claim status:', error)
         throw error
     }
 }

@@ -16,7 +16,7 @@ import Card, { CardHeader } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 import { useEffect, useState } from 'react'
-import { getBillingStats, getRecentInvoices, getReadyToBillEncounters, createInvoiceFromEncounter, getInvoiceDetail, BillingStats } from '@/services/billingService'
+import { getBillingStats, getRecentInvoices, getReadyToBillEncounters, createInvoiceFromEncounter, getInvoiceDetail, BillingStats, getClaims, updateClaimStatus, Claim } from '@/services/billingService'
 import RecordPaymentModal from '@/components/modals/RecordPaymentModal'
 import DashboardSkeleton from '@/components/ui/DashboardSkeleton'
 import { toast } from 'react-toastify'
@@ -30,6 +30,11 @@ const BillingDashboard = () => {
   const [generatingInvoiceId, setGeneratingInvoiceId] = useState<number | null>(null)
   const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [claims, setClaims] = useState<Claim[]>([])
+  const [updatingClaimId, setUpdatingClaimId] = useState<number | null>(null)
+  const [showDenialModal, setShowDenialModal] = useState(false)
+  const [denialTarget, setDenialTarget] = useState<{ id: number; number: string } | null>(null)
+  const [denialCode, setDenialCode] = useState('')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,6 +56,12 @@ const BillingDashboard = () => {
           return []
         })
         setReadyEncounters(readyEncountersData || [])
+
+        const claimsData = await getClaims().catch(err => {
+          console.error('Failed to load claims', err)
+          return []
+        })
+        setClaims(claimsData || [])
 
       } catch (error) {
         console.error('Unexpected error fetching billing data:', error)
@@ -155,6 +166,53 @@ const BillingDashboard = () => {
     } catch {
       toast.error('Could not load invoice details')
     }
+  }
+
+  const handleClaimStatusUpdate = async (claimId: number, newStatus: string) => {
+    if (newStatus === 'denied') {
+      const claim = claims.find(c => c.id === claimId)
+      setDenialTarget({ id: claimId, number: claim?.claim_number || '' })
+      setDenialCode('')
+      setShowDenialModal(true)
+      return
+    }
+    setUpdatingClaimId(claimId)
+    try {
+      const updated = await updateClaimStatus(claimId, newStatus)
+      setClaims(prev => prev.map(c => c.id === claimId ? { ...c, ...updated } : c))
+      toast.success(`Claim marked as ${newStatus}`)
+    } catch (err: any) {
+      toast.error(err?.response?.data?.detail || 'Failed to update claim status')
+    } finally {
+      setUpdatingClaimId(null)
+    }
+  }
+
+  const handleDenialConfirm = async () => {
+    if (!denialTarget) return
+    setUpdatingClaimId(denialTarget.id)
+    setShowDenialModal(false)
+    try {
+      const updated = await updateClaimStatus(denialTarget.id, 'denied', denialCode || undefined)
+      setClaims(prev => prev.map(c => c.id === denialTarget.id ? { ...c, ...updated } : c))
+      toast.success('Claim denied')
+    } catch (err: any) {
+      toast.error(err?.response?.data?.detail || 'Failed to deny claim')
+    } finally {
+      setUpdatingClaimId(null)
+      setDenialTarget(null)
+    }
+  }
+
+  const getClaimStatusBadge = (status: string) => {
+    const badges: Record<string, JSX.Element> = {
+      submitted: <Badge variant="info">Submitted</Badge>,
+      approved: <Badge variant="success">Approved</Badge>,
+      denied: <Badge variant="danger">Denied</Badge>,
+      paid: <Badge variant="success">Paid</Badge>,
+      pending: <Badge variant="warning">Pending</Badge>,
+    }
+    return badges[status] || <Badge variant="info">{status}</Badge>
   }
 
   if (isLoading) {
@@ -265,6 +323,89 @@ const BillingDashboard = () => {
                               {generatingInvoiceId === encounter.id ? 'Creating...' : 'Generate Invoice'}
                             </Button>
                           </div>
+                        </td>
+                      </motion.tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Claims Management */}
+          <Card>
+            <CardHeader
+              title="Claims Management"
+              subtitle="Review and update insurance claim statuses"
+            />
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-secondary-50">
+                  <tr>
+                    <th className="text-left p-4 text-sm font-semibold text-secondary-700">Claim #</th>
+                    <th className="text-left p-4 text-sm font-semibold text-secondary-700">Insurer</th>
+                    <th className="text-right p-4 text-sm font-semibold text-secondary-700">Amount</th>
+                    <th className="text-center p-4 text-sm font-semibold text-secondary-700">Status</th>
+                    <th className="text-center p-4 text-sm font-semibold text-secondary-700">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-secondary-100">
+                  {claims.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="p-8 text-center text-secondary-500">
+                        No claims found.
+                      </td>
+                    </tr>
+                  ) : (
+                    claims.slice(0, 8).map((claim) => (
+                      <motion.tr
+                        key={claim.id}
+                        whileHover={{ backgroundColor: 'rgba(239, 246, 255, 0.5)' }}
+                        className="transition-colors"
+                      >
+                        <td className="p-4 text-sm font-mono text-secondary-900">{claim.claim_number}</td>
+                        <td className="p-4 text-sm text-secondary-600">{claim.insurance_provider}</td>
+                        <td className="p-4 text-right text-sm font-semibold text-secondary-900">
+                          ${claim.total_amount?.toFixed(2)}
+                        </td>
+                        <td className="p-4 text-center">
+                          {getClaimStatusBadge(claim.status)}
+                          {claim.denial_reason_code && (
+                            <p className="text-xs text-red-600 mt-1">Code: {claim.denial_reason_code}</p>
+                          )}
+                        </td>
+                        <td className="p-4 text-center">
+                          {['submitted', 'pending'].includes(claim.status) ? (
+                            <div className="flex items-center justify-center gap-1">
+                              <Button
+                                size="sm"
+                                variant="primary"
+                                disabled={updatingClaimId === claim.id}
+                                onClick={() => handleClaimStatusUpdate(claim.id, 'approved')}
+                              >
+                                Approve
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                disabled={updatingClaimId === claim.id}
+                                onClick={() => handleClaimStatusUpdate(claim.id, 'denied')}
+                              >
+                                Deny
+                              </Button>
+                            </div>
+                          ) : claim.status === 'approved' ? (
+                            <Button
+                              size="sm"
+                              variant="primary"
+                              disabled={updatingClaimId === claim.id}
+                              onClick={() => handleClaimStatusUpdate(claim.id, 'paid')}
+                            >
+                              Mark Paid
+                            </Button>
+                          ) : (
+                            <span className="text-xs text-secondary-400 italic">No actions</span>
+                          )}
                         </td>
                       </motion.tr>
                     ))
@@ -466,6 +607,37 @@ const BillingDashboard = () => {
             setStats(statsData)
           }}
         />
+      )}
+
+      {/* Denial Reason Modal */}
+      {showDenialModal && denialTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-secondary-900 mb-1">Deny Claim</h3>
+            <p className="text-sm text-secondary-600 mb-4">
+              Claim <span className="font-mono font-semibold">{denialTarget.number}</span> will be marked as denied.
+            </p>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Denial Reason Code <span className="text-gray-400">(optional)</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. CO-4, PR-1, CO-97"
+              maxLength={10}
+              value={denialCode}
+              onChange={e => setDenialCode(e.target.value.toUpperCase())}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 mb-4"
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => { setShowDenialModal(false); setDenialTarget(null) }}>
+                Cancel
+              </Button>
+              <Button variant="primary" onClick={handleDenialConfirm}>
+                Confirm Denial
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

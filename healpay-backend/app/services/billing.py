@@ -71,26 +71,26 @@ class BillingService:
         # Generate Invoice Number (Simple logic: INV-YYYYMMDD-ID)
         today_str = datetime.now().strftime("%Y%m%d")
         
-        # Create object
+        # Create object — invoice_number gets a stable value after first flush gives us the PK
         db_invoice = Invoice(
             patient_id=data['patient_id'],
             encounter_id=data.get('encounter_id'),
             claim_id=data.get('claim_id'),
-            invoice_number=f"INV-{today_str}-{datetime.now().microsecond}", # Temporary ID generation
+            invoice_number=f"INV-{today_str}-TEMP",  # Temporary placeholder
             issue_date=datetime.now().strftime("%Y-%m-%d"),
-            due_date=(datetime.now() + timedelta(days=14)).strftime("%Y-%m-%d"), # Default 14 days due
+            due_date=(datetime.now() + timedelta(days=30)).strftime("%Y-%m-%d"),  # 30-day terms
             total_amount=data['amount'],
             balance_due=data['amount'],
             status='issued'
         )
         
         db.add(db_invoice)
+        db.flush()  # Gets the auto-incremented id without committing
+
+        # Now set collision-free invoice number using DB-assigned id
+        db_invoice.invoice_number = f"INV-{today_str}-{db_invoice.id:05d}"
         db.commit()
         db.refresh(db_invoice)
-        
-        # Update invoice number to be nice with ID
-        db_invoice.invoice_number = f"INV-{today_str}-{db_invoice.id:03d}"
-        db.commit()
         
         return db_invoice
 

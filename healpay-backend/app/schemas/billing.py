@@ -74,6 +74,13 @@ class ClaimResponse(BaseModel):
     total_amount: float
     patient_responsibility: Optional[float] = None
     status: str
+    claim_type: Optional[str] = None
+    billing_provider_npi: Optional[str] = None
+    rendering_provider_npi: Optional[str] = None
+    denial_reason_code: Optional[str] = None
+    adjudication_date: Optional[str] = None
+    payer_control_number: Optional[str] = None
+    cms1500_data: Optional[dict] = None
 
     class Config:
         from_attributes = True

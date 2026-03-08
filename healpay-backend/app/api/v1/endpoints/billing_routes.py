@@ -277,6 +277,36 @@ def get_ready_to_bill_encounters(
         for enc, pat, doc in rows
     ]
 
+@router.get("/claims")
+def list_claims(
+    skip: int = 0,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(_billing_staff)
+):
+    """List insurance claims with full detail (billing staff / admin only)."""
+    claims = db.query(Claim).order_by(Claim.submitted_at.desc()).offset(skip).limit(limit).all()
+    return [
+        {
+            "id": c.id,
+            "encounter_id": c.encounter_id,
+            "claim_number": c.claim_number,
+            "insurance_provider": c.insurance_provider,
+            "total_amount": c.total_amount,
+            "patient_responsibility": c.patient_responsibility,
+            "status": c.status,
+            "claim_type": c.claim_type,
+            "billing_provider_npi": c.billing_provider_npi,
+            "rendering_provider_npi": c.rendering_provider_npi,
+            "denial_reason_code": c.denial_reason_code,
+            "adjudication_date": c.adjudication_date.isoformat() if c.adjudication_date else None,
+            "payer_control_number": c.payer_control_number,
+            "submitted_at": c.submitted_at,
+        }
+        for c in claims
+    ]
+
+
 @router.get("/claims/recent")
 def get_recent_claims(
     skip: int = 0,
@@ -339,6 +369,7 @@ def create_claim(
         total_amount=claim_data.total_amount,
         patient_responsibility=patient_resp,
         status="submitted",
+        cms1500_data=claim_data.cms1500_data,  # Persist full CMS-1500 snapshot
     )
     db.add(new_claim)
 
@@ -413,7 +444,44 @@ def update_claim_status(
     if new_status not in allowed:
         raise HTTPException(status_code=400, detail=f"Invalid status. Allowed: {allowed}")
 
+    old_status = claim.status
     claim.status = new_status
+
+    # ── Denial reason code ──────────────────────────────────────────────────
+    if new_status == "denied" and body.get("denial_reason_code"):
+        claim.denial_reason_code = body["denial_reason_code"]
+
+    # ── Adjudication date on final decision ─────────────────────────────────
+    if new_status in ("approved", "denied", "paid"):
+        from datetime import datetime as _dt
+        claim.adjudication_date = _dt.utcnow()
+
+    # ── Invoice reconciliation when claim is paid ───────────────────────────
+    # When insurance marks a claim "paid", automatically reduce the patient's
+    # invoice balance by the insurer's portion (total - patient_responsibility).
+    if new_status == "paid" and old_status != "paid":
+        invoice = db.query(Invoice).filter(Invoice.claim_id == claim.id).first()
+        if not invoice and claim.encounter_id:
+            invoice = db.query(Invoice).filter(Invoice.encounter_id == claim.encounter_id).first()
+        if invoice and invoice.status not in ("paid", "cancelled"):
+            insurer_payment = round(
+                claim.total_amount - (claim.patient_responsibility or 0.0), 2
+            )
+            if insurer_payment > 0:
+                # Record an Insurance payment row
+                ins_payment = Payment(
+                    invoice_id=invoice.id,
+                    amount=insurer_payment,
+                    payment_method="Insurance",
+                    payer_type="primary_insurance",
+                    notes=f"Auto-posted from claim #{claim.claim_number}",
+                )
+                db.add(ins_payment)
+                invoice.amount_paid = round(invoice.amount_paid + insurer_payment, 2)
+                invoice.balance_due = max(round(invoice.total_amount - invoice.amount_paid, 2), 0.0)
+                if invoice.balance_due == 0.0:
+                    invoice.status = "paid"
+
     db.commit()
 
     # Notify patient of status change

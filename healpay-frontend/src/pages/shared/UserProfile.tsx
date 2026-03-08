@@ -23,7 +23,11 @@ const UserProfile = () => {
         city: '',
         state: '',
         zipCode: '',
-        specialization: ''
+        specialization: '',
+        npi_number: '',
+        taxonomy_code: '',
+        license_number: '',
+        license_state: ''
     })
 
     // Load user data when component mounts or user changes
@@ -38,7 +42,11 @@ const UserProfile = () => {
                 city: user.city || '',
                 state: user.state || '',
                 zipCode: user.zip_code || '',
-                specialization: user.specialization || ''
+                specialization: user.specialization || '',
+                npi_number: user.npi_number || '',
+                taxonomy_code: user.taxonomy_code || '',
+                license_number: user.license_number || '',
+                license_state: user.license_state || ''
             })
         }
     }, [user])
@@ -55,6 +63,12 @@ const UserProfile = () => {
             if (user?.role === 'DOCTOR') {
                 updateData.specialization = formData.specialization || null
             }
+            if (user?.role === 'DOCTOR' || user?.role === 'BILLING') {
+                updateData.npi_number = formData.npi_number || null
+                updateData.taxonomy_code = formData.taxonomy_code || null
+                updateData.license_number = formData.license_number || null
+                updateData.license_state = formData.license_state || null
+            }
 
             await apiPut(`/v1/auth/me/update`, updateData)
 
@@ -64,7 +78,11 @@ const UserProfile = () => {
                     firstName: formData.firstName,
                     lastName: formData.lastName,
                     phone: formData.phone,
-                    specialization: formData.specialization
+                    specialization: formData.specialization,
+                    npi_number: formData.npi_number,
+                    taxonomy_code: formData.taxonomy_code,
+                    license_number: formData.license_number,
+                    license_state: formData.license_state
                 })
             }
 
@@ -95,7 +113,11 @@ const UserProfile = () => {
             city: user?.city || '',
             state: user?.state || '',
             zipCode: user?.zipCode || user?.zip_code || '',
-            specialization: user?.specialization || ''
+            specialization: user?.specialization || '',
+            npi_number: user?.npi_number || '',
+            taxonomy_code: user?.taxonomy_code || '',
+            license_number: user?.license_number || '',
+            license_state: user?.license_state || ''
         })
         setIsEditing(false)
     }
@@ -273,6 +295,77 @@ const UserProfile = () => {
                         )}
                     </div>
                 </div>
+
+                {/* Provider Credentials — DOCTOR and BILLING only */}
+                {(user?.role === 'DOCTOR' || user?.role === 'BILLING') && (
+                    <div className="border-t pt-6 mt-6">
+                        <h3 className="text-lg font-semibold text-secondary-900 mb-4 flex items-center gap-2">
+                            <Shield className="w-5 h-5 text-primary-600" />
+                            Provider Credentials
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    NPI Number
+                                </label>
+                                {isEditing ? (
+                                    <Input
+                                        placeholder="10-digit NPI"
+                                        maxLength={10}
+                                        value={formData.npi_number}
+                                        onChange={(e) => setFormData({ ...formData, npi_number: e.target.value })}
+                                    />
+                                ) : (
+                                    <p className="text-gray-900 py-2 font-mono">{formData.npi_number || <span className="text-gray-400 italic">Not set</span>}</p>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Taxonomy Code
+                                </label>
+                                {isEditing ? (
+                                    <Input
+                                        placeholder="e.g. 207Q00000X"
+                                        maxLength={10}
+                                        value={formData.taxonomy_code}
+                                        onChange={(e) => setFormData({ ...formData, taxonomy_code: e.target.value })}
+                                    />
+                                ) : (
+                                    <p className="text-gray-900 py-2 font-mono">{formData.taxonomy_code || <span className="text-gray-400 italic">Not set</span>}</p>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    License Number
+                                </label>
+                                {isEditing ? (
+                                    <Input
+                                        placeholder="State medical license number"
+                                        value={formData.license_number}
+                                        onChange={(e) => setFormData({ ...formData, license_number: e.target.value })}
+                                    />
+                                ) : (
+                                    <p className="text-gray-900 py-2">{formData.license_number || <span className="text-gray-400 italic">Not set</span>}</p>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    License State
+                                </label>
+                                {isEditing ? (
+                                    <Input
+                                        placeholder="2-letter state (e.g. CA)"
+                                        maxLength={2}
+                                        value={formData.license_state}
+                                        onChange={(e) => setFormData({ ...formData, license_state: e.target.value.toUpperCase() })}
+                                    />
+                                ) : (
+                                    <p className="text-gray-900 py-2">{formData.license_state || <span className="text-gray-400 italic">Not set</span>}</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Address Information */}
                 <div className="border-t pt-6 mt-6">

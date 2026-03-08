@@ -7,7 +7,7 @@ from sqlalchemy import func as sql_func
 from typing import List, Any, Dict
 from datetime import date, timedelta
 from app.db.database import get_db
-from app.db.models import User, UserRole, ClinicalEncounter, Invoice, Payment, Claim, Appointment
+from app.db.models import User, UserRole, ClinicalEncounter, Invoice, Payment, Claim, Appointment, AuditLog
 from app.schemas.user import UserRegister, AuthResponse, UserResponse, UserUpdate
 from app.core.security import get_password_hash, create_access_token, create_refresh_token, get_current_user
 
@@ -423,3 +423,47 @@ def update_settings(
             current[section] = values
     _save_settings(current)
     return current
+
+
+# ─── HIPAA AUDIT LOG ──────────────────────────────────────────────────────────
+
+@router.get("/audit-logs")
+def get_audit_logs(
+    skip: int = 0,
+    limit: int = 50,
+    user_email: str = None,
+    resource_type: str = None,
+    action: str = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    """Return paginated HIPAA audit log entries. ADMIN only."""
+    query = db.query(AuditLog)
+    if user_email:
+        query = query.filter(AuditLog.user_email.ilike(f"%{user_email}%"))
+    if resource_type:
+        query = query.filter(AuditLog.resource_type == resource_type)
+    if action:
+        query = query.filter(AuditLog.action == action)
+    total = query.count()
+    logs = query.order_by(AuditLog.timestamp.desc()).offset(skip).limit(limit).all()
+    return {
+        "total": total,
+        "skip": skip,
+        "limit": limit,
+        "logs": [
+            {
+                "id": log.id,
+                "user_id": log.user_id,
+                "user_email": log.user_email,
+                "action": log.action,
+                "resource_type": log.resource_type,
+                "resource_id": log.resource_id,
+                "ip_address": log.ip_address,
+                "status_code": log.status_code,
+                "detail": log.detail,
+                "timestamp": log.timestamp.isoformat() if log.timestamp else None,
+            }
+            for log in logs
+        ],
+    }

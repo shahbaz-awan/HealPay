@@ -22,6 +22,11 @@ export interface User {
   zip_code?: string
   // Specialization (doctors only)
   specialization?: string
+  // Provider credentials (DOCTOR / BILLING)
+  npi_number?: string
+  taxonomy_code?: string
+  license_number?: string
+  license_state?: string
   // Status
   isActive?: boolean
   is_active?: boolean
