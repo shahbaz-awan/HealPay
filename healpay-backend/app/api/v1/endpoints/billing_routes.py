@@ -76,6 +76,112 @@ def get_my_invoices(
         for inv in invoices
     ]
 
+@router.get("/invoices/my")
+def get_my_invoices(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get all invoices for the currently authenticated patient.
+    Must be defined BEFORE /invoices/{invoice_id} to avoid shadowing.
+    """
+    invoices = (
+        db.query(Invoice)
+        .filter(Invoice.patient_id == current_user.id)
+        .order_by(Invoice.created_at.desc())
+        .all()
+    )
+    today = __import__('datetime').date.today().isoformat()
+    return [
+        {
+            "id": inv.id,
+            "invoice_number": inv.invoice_number,
+            "total_amount": inv.total_amount,
+            "amount_paid": inv.amount_paid,
+            "balance_due": inv.balance_due,
+            "status": inv.status if not (inv.status == "issued" and inv.due_date and inv.due_date < today) else "overdue",
+            "issue_date": inv.issue_date,
+            "due_date": inv.due_date,
+        }
+        for inv in invoices
+    ]
+
+
+@router.get("/invoices")
+def list_all_invoices(
+    skip: int = 0,
+    limit: int = 20,
+    status: str = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(_billing_staff)
+):
+    """Paginated list of all invoices for billing staff."""
+    from datetime import date as _date
+    today = _date.today().isoformat()
+    query = db.query(Invoice)
+    if status and status != "all":
+        if status == "overdue":
+            query = query.filter(Invoice.status == "issued", Invoice.due_date < today)
+        else:
+            query = query.filter(Invoice.status == status)
+    total = query.count()
+    invoices = query.order_by(Invoice.created_at.desc()).offset(skip).limit(limit).all()
+    return {
+        "total": total,
+        "items": [
+            {
+                "id": inv.id,
+                "invoice_number": inv.invoice_number,
+                "patient_id": inv.patient_id,
+                "claim_id": inv.claim_id,
+                "encounter_id": inv.encounter_id,
+                "total_amount": inv.total_amount,
+                "amount_paid": inv.amount_paid or 0,
+                "balance_due": inv.balance_due,
+                "status": "overdue" if inv.status == "issued" and inv.due_date and inv.due_date < today else inv.status,
+                "issue_date": inv.issue_date,
+                "due_date": inv.due_date,
+                "notes": inv.notes,
+            }
+            for inv in invoices
+        ]
+    }
+
+
+@router.get("/payments")
+def list_all_payments(
+    skip: int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(_billing_staff)
+):
+    """Paginated list of all payments for billing staff."""
+    from app.db.models import Payment as PaymentModel
+    total = db.query(PaymentModel).count()
+    payments = (
+        db.query(PaymentModel)
+        .order_by(PaymentModel.payment_date.desc())
+        .offset(skip).limit(limit).all()
+    )
+    return {
+        "total": total,
+        "items": [
+            {
+                "id": p.id,
+                "invoice_id": p.invoice_id,
+                "amount": p.amount,
+                "payment_date": p.payment_date,
+                "payment_method": p.payment_method,
+                "payer_type": p.payer_type,
+                "check_number": p.check_number,
+                "transaction_id": p.transaction_id,
+                "notes": p.notes,
+            }
+            for p in payments
+        ]
+    }
+
+
 @router.post("/invoices")
 def create_invoice(
     invoice_data: InvoiceCreate,

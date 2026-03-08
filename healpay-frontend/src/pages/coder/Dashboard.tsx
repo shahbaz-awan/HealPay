@@ -15,8 +15,11 @@ import {
 import Card, { CardHeader } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
+import Pagination from '@/components/ui/Pagination'
 import { getPendingEncounters, getCompletedEncounters, sendEncounterTo } from '@/services/clinicalService'
 import DashboardSkeleton from '@/components/ui/DashboardSkeleton'
+
+const ITEMS_PER_PAGE = 8
 
 interface PendingEncounter {
   id: number
@@ -41,6 +44,8 @@ const CoderDashboard = () => {
   const [selectedEncounter, setSelectedEncounter] = useState<PendingEncounter | null>(null)
   const [activeTab, setActiveTab] = useState<'pending' | 'completed'>('pending')
   const [sendingTo, setSendingTo] = useState<number | null>(null)
+  const [pendingPage, setPendingPage] = useState(1)
+  const [completedPage, setCompletedPage] = useState(1)
 
   useEffect(() => {
     fetchAllEncounters()
@@ -183,7 +188,7 @@ const CoderDashboard = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {encounters.map((encounter) => (
+              {encounters.slice((pendingPage - 1) * ITEMS_PER_PAGE, pendingPage * ITEMS_PER_PAGE).map((encounter) => (
                 <motion.div
                   key={encounter.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -246,6 +251,12 @@ const CoderDashboard = () => {
                   </div>
                 </motion.div>
               ))}
+              <Pagination
+                currentPage={pendingPage}
+                totalItems={encounters.length}
+                itemsPerPage={ITEMS_PER_PAGE}
+                onPageChange={setPendingPage}
+              />
             </div>
           )}
         </Card>
@@ -267,7 +278,7 @@ const CoderDashboard = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {completedEncounters.map((encounter) => (
+              {completedEncounters.slice((completedPage - 1) * ITEMS_PER_PAGE, completedPage * ITEMS_PER_PAGE).map((encounter) => (
                 <motion.div
                   key={encounter.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -344,10 +355,15 @@ const CoderDashboard = () => {
                   </div>
                 </motion.div>
               ))}
+              <Pagination
+                currentPage={completedPage}
+                totalItems={completedEncounters.length}
+                itemsPerPage={ITEMS_PER_PAGE}
+                onPageChange={setCompletedPage}
+              />
             </div>
           )}
-        </Card>
-      )}
+        </Card>      )}
 
       {/* Clinical Notes Modal */}
       {selectedEncounter && (

@@ -28,13 +28,51 @@ class BillingService:
         pending_invoices_count = db.query(Invoice).filter(Invoice.status == 'issued').count()
         overdue_invoices_count = db.query(Invoice).filter(Invoice.status == 'overdue').count()
 
+        # Invoice status breakdown
+        inv_status_rows = (
+            db.query(Invoice.status, func.count(Invoice.id))
+            .group_by(Invoice.status)
+            .all()
+        )
+        invoice_status_breakdown = {s: c for s, c in inv_status_rows}
+
+        # Claim status breakdown
+        claim_status_rows = (
+            db.query(Claim.status, func.count(Claim.id))
+            .group_by(Claim.status)
+            .all()
+        )
+        claim_status_breakdown = {s: c for s, c in claim_status_rows}
+
+        # Monthly revenue (last 6 months)
+        monthly_revenue = []
+        for i in range(5, -1, -1):
+            month_dt = (today - timedelta(days=30 * i)).replace(day=1)
+            m_start = month_dt.replace(hour=0, minute=0, second=0, microsecond=0)
+            if i == 0:
+                m_end = today
+            else:
+                next_month = (month_dt + timedelta(days=32)).replace(day=1)
+                m_end = next_month.replace(hour=0, minute=0, second=0, microsecond=0)
+            rev = db.query(Payment).filter(
+                Payment.payment_date >= m_start,
+                Payment.payment_date < m_end,
+            ).with_entities(func.sum(Payment.amount)).scalar() or 0.0
+            monthly_revenue.append({
+                "month": month_dt.strftime("%b %Y"),
+                "revenue": float(rev),
+            })
+
         return {
             "total_revenue": total_revenue,
             "outstanding": outstanding,
             "collected_month": collected_month,
             "overdue": overdue,
             "pending_invoices_count": pending_invoices_count,
-            "overdue_invoices_count": overdue_invoices_count
+            "overdue_invoices_count": overdue_invoices_count,
+            "invoice_status_breakdown": invoice_status_breakdown,
+            "claim_status_breakdown": claim_status_breakdown,
+            "monthly_revenue": monthly_revenue,
         }
 
     def get_recent_invoices(self, db: Session, limit: int = 10):
