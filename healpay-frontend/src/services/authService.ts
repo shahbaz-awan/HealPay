@@ -35,7 +35,19 @@ export const authService = {
         if (data.phone) {
             backendData.phone = data.phone
         }
-        return apiPost<{ message: string; email: string }>('/v1/auth/register', backendData)
+        return apiPost<{ message: string; email: string }>('/v1/auth/register/send-otp', backendData)
+    },
+
+    verifyOtp: async (email: string, otp: string): Promise<{ message: string; email: string }> => {
+        return apiPost<{ message: string; email: string }>('/v1/auth/register/verify-otp', { email, otp })
+    },
+
+    forgotPassword: async (email: string): Promise<{ message: string }> => {
+        return apiPost<{ message: string }>('/v1/auth/forgot-password/send-code', { email })
+    },
+
+    resetPassword: async (email: string, otp: string, new_password: string): Promise<{ message: string }> => {
+        return apiPost<{ message: string }>('/v1/auth/forgot-password/verify-and-reset', { email, otp, new_password })
     },
 
     logout: async (): Promise<void> => {
@@ -43,6 +55,6 @@ export const authService = {
     },
 
     refreshToken: async (refreshToken: string): Promise<AuthResponse> => {
-        return apiPost<AuthResponse>('/v1/auth/refresh', { refreshToken })
+        return apiPost<AuthResponse>('/v1/auth/refresh', { refresh_token: refreshToken })
     },
 }

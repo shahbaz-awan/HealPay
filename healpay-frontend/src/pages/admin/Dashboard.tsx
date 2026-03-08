@@ -5,13 +5,18 @@ import {
   Activity,
   Shield,
   BarChart3,
-  AlertCircle
+  AlertCircle,
+  CheckCircle,
+  ArrowRight,
+  DollarSign,
+  FileText,
+  Clock
 } from 'lucide-react'
 import Card, { CardHeader } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { apiGet } from '@/services/api'
 
 interface User {
@@ -26,24 +31,44 @@ interface User {
   is_active: boolean
 }
 
+interface AdminSummary {
+  users: { total: number; by_role: Record<string, number> }
+  encounters: { total: number; pending_coding: number; this_month: number }
+  billing: {
+    total_invoiced: number
+    total_collected: number
+    outstanding: number
+    overdue_count: number
+    collection_rate_pct: number
+  }
+  claims: { submitted: number; approved: number; denied: number }
+  appointments: { today: number; this_month: number }
+  monthly_revenue: Array<{ month: string; revenue: number }>
+}
+
 const AdminDashboard = () => {
   const navigate = useNavigate()
   const [users, setUsers] = useState<User[]>([])
+  const [summary, setSummary] = useState<AdminSummary | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Fetch users from API
+  // Fetch users + summary in parallel
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       try {
-        const data = await apiGet<User[]>('/v1/admin/users')
-        setUsers(data)
+        const [usersData, summaryData] = await Promise.allSettled([
+          apiGet<User[]>('/v1/admin/users'),
+          apiGet<AdminSummary>('/v1/admin/reports/summary'),
+        ])
+        if (usersData.status === 'fulfilled') setUsers(usersData.value)
+        if (summaryData.status === 'fulfilled') setSummary(summaryData.value)
       } catch (error) {
-        console.error('Error fetching users:', error)
+        console.error('Error fetching admin data:', error)
       } finally {
         setIsLoading(false)
       }
     }
-    fetchUsers()
+    fetchData()
   }, [])
 
   // Calculate real stats from user data
@@ -120,6 +145,46 @@ const AdminDashboard = () => {
     }
   ]
 
+  // Financial stats from summary API
+  const financialStats = [
+    {
+      title: 'Total Revenue Collected',
+      value: summary ? `$${summary.billing.total_collected.toLocaleString()}` : '—',
+      icon: DollarSign,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
+      change: summary ? `${summary.billing.collection_rate_pct}% collection rate` : '',
+      trend: 'up'
+    },
+    {
+      title: 'Outstanding Balance',
+      value: summary ? `$${summary.billing.outstanding.toLocaleString()}` : '—',
+      icon: Clock,
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-50',
+      change: summary ? `${summary.billing.overdue_count} overdue invoices` : '',
+      trend: 'neutral'
+    },
+    {
+      title: 'Claims Submitted',
+      value: summary ? summary.claims.submitted.toString() : '—',
+      icon: FileText,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+      change: summary ? `${summary.claims.approved} approved, ${summary.claims.denied} denied` : '',
+      trend: 'neutral'
+    },
+    {
+      title: 'Encounters This Month',
+      value: summary ? summary.encounters.this_month.toString() : '—',
+      icon: BarChart3,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50',
+      change: summary ? `${summary.encounters.pending_coding} pending coding` : '',
+      trend: 'neutral'
+    },
+  ]
+
   // User role distribution with real data
   const userDistribution = totalUsers > 0 ? [
     { role: 'Patients', count: patientCount, percentage: (patientCount / totalUsers) * 100, color: 'bg-blue-500' },
@@ -129,27 +194,33 @@ const AdminDashboard = () => {
     { role: 'Admins', count: adminCount, percentage: (adminCount / totalUsers) * 100, color: 'bg-red-500' }
   ].filter(item => item.count > 0) : []
 
-  // System alerts
-  const systemAlerts = [
-    {
-      id: 1,
-      type: 'success',
-      message: `System has ${totalUsers} registered users across all roles`,
-      time: 'Current'
-    },
-    {
-      id: 2,
-      type: 'info',
-      message: 'All validation rules are active for registration and user creation',
-      time: 'System Status'
-    },
-    {
-      id: 3,
-      type: 'success',
-      message: 'Database connection active and operational',
-      time: 'System Health'
+  // Dynamic system alerts — computed from real data
+  const systemAlerts = useMemo(() => {
+    const alerts: { id: number; type: string; message: string; time: string }[] = []
+    if (isLoading) return alerts
+
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const newUsers = users.filter(u => new Date(u.created_at) > sevenDaysAgo).length
+
+    if (doctorCount === 0) alerts.push({ id: 1, type: 'warning', message: 'No doctors are registered — patient bookings may be unavailable', time: 'Role Gap' })
+    if (coderCount === 0) alerts.push({ id: 2, type: 'warning', message: 'No medical coders registered — encounters cannot be coded', time: 'Role Gap' })
+    if (billingCount === 0) alerts.push({ id: 3, type: 'warning', message: 'No billing staff registered — invoicing unavailable', time: 'Role Gap' })
+    if (newUsers > 0) alerts.push({ id: 4, type: 'info', message: `${newUsers} new user${newUsers !== 1 ? 's' : ''} registered in the past 7 days`, time: 'Recent Activity' })
+    if (summary?.billing.overdue_count && summary.billing.overdue_count > 0) {
+      alerts.push({ id: 7, type: 'warning', message: `${summary.billing.overdue_count} invoice${summary.billing.overdue_count !== 1 ? 's are' : ' is'} overdue — follow up with patients`, time: 'Billing Alert' })
     }
-  ]
+    if (doctorCount > 0 && coderCount > 0 && billingCount > 0) {
+      alerts.push({ id: 5, type: 'success', message: 'All critical roles filled — system is fully operational', time: 'System Health' })
+    }
+    if (totalUsers > 0) alerts.push({ id: 6, type: 'info', message: `${totalUsers} registered user${totalUsers !== 1 ? 's' : ''} across ${[patientCount, doctorCount, coderCount, billingCount, adminCount].filter(Boolean).length} role groups`, time: 'System Status' })
+
+    return alerts.slice(0, 4)
+  }, [users, summary, isLoading, totalUsers, doctorCount, coderCount, billingCount, patientCount, adminCount])
+
+  const getUserStatus = (u: User) => {
+    if (u.updated_at) return <Badge variant="success">Active</Badge>
+    return <Badge variant="info">Registered</Badge>
+  }
 
   const getRoleBadgeColor = (role: string) => {
     const colors: Record<string, string> = {
@@ -164,12 +235,17 @@ const AdminDashboard = () => {
 
   const getAlertIcon = (type: string) => {
     switch (type) {
-      case 'warning':
-        return <AlertCircle className="w-5 h-5 text-yellow-600" />
-      case 'success':
-        return <Activity className="w-5 h-5 text-green-600" />
-      default:
-        return <Activity className="w-5 h-5 text-blue-600" />
+      case 'warning': return <AlertCircle className="w-5 h-5 text-yellow-600" />
+      case 'success': return <CheckCircle className="w-5 h-5 text-green-600" />
+      default: return <Activity className="w-5 h-5 text-blue-600" />
+    }
+  }
+
+  const getAlertBg = (type: string) => {
+    switch (type) {
+      case 'warning': return 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
+      case 'success': return 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+      default: return 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
     }
   }
 
@@ -178,9 +254,16 @@ const AdminDashboard = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900">Admin Dashboard</h1>
-          <p className="text-secondary-600 mt-1">System overview and user management</p>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Admin Dashboard</h1>
+          <p className="text-secondary-600 dark:text-gray-400 mt-1">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            {' — '}{totalUsers} registered user{totalUsers !== 1 ? 's' : ''}
+          </p>
         </div>
+        <Button variant="outline" size="sm" onClick={() => navigate('/admin/users')}>
+          <Users className="w-4 h-4 mr-2" />
+          Manage Users
+        </Button>
       </div>
 
       {/* Stats Grid */}
@@ -210,6 +293,37 @@ const AdminDashboard = () => {
             </Card>
           </motion.div>
         ))}
+      </div>
+
+      {/* Financial Stats Grid */}
+      <div>
+        <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Financial Overview</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {financialStats.map((stat, index) => (
+            <motion.div
+              key={`fin-${index}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 + index * 0.1 }}
+            >
+              <Card className="hover-card relative overflow-hidden">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-sm text-secondary-600 mb-1">{stat.title}</p>
+                    <h3 className="text-2xl font-bold text-secondary-900 dark:text-white mb-2">
+                      {isLoading ? <span className="text-secondary-400">—</span> : stat.value}
+                    </h3>
+                    <p className="text-xs text-secondary-500">{stat.change}</p>
+                  </div>
+                  <div className={`p-4 rounded-xl ${stat.bgColor}`}>
+                    <stat.icon className={`w-7 h-7 ${stat.color}`} />
+                  </div>
+                </div>
+                <div className={`absolute bottom-0 left-0 right-0 h-1 ${stat.bgColor}`}></div>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
       </div>
 
       {/* Main Content Grid */}
@@ -269,10 +383,10 @@ const AdminDashboard = () => {
                             {user.role}
                           </span>
                         </td>
-                        <td className="p-4 text-sm text-secondary-900">{formatDate(user.created_at)}</td>
-                        <td className="p-4 text-sm text-secondary-600">{getTimeAgo(user.updated_at || user.created_at)}</td>
+                        <td className="p-4 text-sm text-secondary-900 dark:text-white">{formatDate(user.created_at)}</td>
+                        <td className="p-4 text-sm text-secondary-600 dark:text-gray-400">{getTimeAgo(user.updated_at || user.created_at)}</td>
                         <td className="p-4 text-center">
-                          <Badge variant="success">Active</Badge>
+                          {getUserStatus(user)}
                         </td>
                       </motion.tr>
                     ))}
@@ -292,16 +406,21 @@ const AdminDashboard = () => {
               subtitle="Recent notifications"
             />
             <div className="space-y-3">
-              {systemAlerts.map((alert) => (
+              {systemAlerts.length === 0 ? (
+                <div className="p-6 text-center">
+                  <CheckCircle className="w-10 h-10 text-green-400 mx-auto mb-2" />
+                  <p className="text-sm text-secondary-500">No alerts — system healthy</p>
+                </div>
+              ) : systemAlerts.map((alert) => (
                 <div
                   key={alert.id}
-                  className="p-3 bg-gray-50 rounded-lg border border-gray-200"
+                  className={`p-3 rounded-lg border ${getAlertBg(alert.type)}`}
                 >
                   <div className="flex items-start gap-3">
                     {getAlertIcon(alert.type)}
                     <div className="flex-1">
-                      <p className="text-sm text-secondary-900">{alert.message}</p>
-                      <p className="text-xs text-secondary-500 mt-1">{alert.time}</p>
+                      <p className="text-sm text-secondary-900 dark:text-white">{alert.message}</p>
+                      <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">{alert.time}</p>
                     </div>
                   </div>
                 </div>
@@ -337,42 +456,30 @@ const AdminDashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="hover-card cursor-pointer group" onClick={() => navigate('/admin/users')}>
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
-              <Users className="w-6 h-6 text-blue-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors">Manage Users</h3>
-              <p className="text-sm text-secondary-600">Add, edit, or remove users</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="hover-card cursor-pointer group">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-50 rounded-lg group-hover:bg-purple-100 transition-colors">
-              <BarChart3 className="w-6 h-6 text-purple-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors">Analytics</h3>
-              <p className="text-sm text-secondary-600">View detailed reports</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="hover-card cursor-pointer group">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-green-50 rounded-lg group-hover:bg-green-100 transition-colors">
-              <Shield className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors">Security Settings</h3>
-              <p className="text-sm text-secondary-600">Configure system security</p>
-            </div>
-          </div>
-        </Card>
+      <div>
+        <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { label: 'Manage Users', sub: `${totalUsers} total users`, icon: Users, color: 'bg-blue-50 dark:bg-blue-900/20', iconColor: 'text-blue-600', route: '/admin/users' },
+            { label: 'Analytics', sub: 'View detailed reports', icon: BarChart3, color: 'bg-purple-50 dark:bg-purple-900/20', iconColor: 'text-purple-600', route: '/admin/analytics' },
+            { label: 'Security Settings', sub: 'Configure system security', icon: Shield, color: 'bg-green-50 dark:bg-green-900/20', iconColor: 'text-green-600', route: '/admin/settings' },
+          ].map((action, i) => (
+            <motion.div key={i} whileHover={{ y: -2 }} className="cursor-pointer" onClick={() => navigate(action.route)}>
+              <Card className="hover:shadow-md transition-shadow border hover:border-primary-300">
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 ${action.color} rounded-xl`}>
+                    <action.icon className={`w-6 h-6 ${action.iconColor}`} />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-secondary-900 dark:text-white text-sm">{action.label}</h3>
+                    <p className="text-xs text-secondary-500 dark:text-gray-400 mt-0.5">{action.sub}</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-secondary-400" />
+                </div>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </div>
   )

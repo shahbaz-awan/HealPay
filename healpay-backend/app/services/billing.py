@@ -1,6 +1,10 @@
-from sqlalchemy.orm import Session
-from app.db.models import Invoice, Payment, ClinicalEncounter, Claim, Appointment
+import logging
+from sqlalchemy import func, join
+from sqlalchemy.orm import Session, joinedload
+from app.db.models import Invoice, Payment, ClinicalEncounter, Claim, Appointment, User
 from datetime import datetime, timedelta
+
+logger = logging.getLogger(__name__)
 
 class BillingService:
     def get_dashboard_stats(self, db: Session):
@@ -34,9 +38,28 @@ class BillingService:
         }
 
     def get_recent_invoices(self, db: Session, limit: int = 10):
-        """Get list of recent invoices with patient details"""
-        invoices = db.query(Invoice).order_by(Invoice.created_at.desc()).limit(limit).all()
-        return invoices
+        """Get list of recent invoices with patient details using a join (no N+1)"""
+        rows = (
+            db.query(Invoice, User)
+            .join(User, User.id == Invoice.patient_id)
+            .order_by(Invoice.created_at.desc())
+            .limit(limit)
+            .all()
+        )
+        results = []
+        for inv, patient in rows:
+            results.append({
+                "id": inv.id,
+                "invoice_number": inv.invoice_number,
+                "patient_name": f"{patient.first_name} {patient.last_name}",
+                "total_amount": inv.total_amount,
+                "amount_paid": inv.amount_paid,
+                "balance_due": inv.balance_due,
+                "status": inv.status,
+                "issue_date": inv.issue_date,
+                "due_date": inv.due_date,
+            })
+        return results
 
     def get_recent_payments(self, db: Session, limit: int = 10):
         """Get list of recent payments with patient details"""

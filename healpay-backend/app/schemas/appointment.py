@@ -26,6 +26,8 @@ class AppointmentResponse(BaseModel):
     # Additional fields for frontend
     doctorName: Optional[str] = None
     patientName: Optional[str] = None
+    patient_email: Optional[str] = None
+    patient_phone: Optional[str] = None
 
     class Config:
         from_attributes = True

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { createClinicalEncounter } from '@/services/clinicalService'
+import { createClinicalEncounter, submitEncounterForCoding } from '@/services/clinicalService'
 import { toast } from 'react-toastify'
 
 interface AddNoteModalProps {
@@ -34,12 +34,17 @@ const AddNoteModal = ({ patientId, patientName, onClose, onSuccess }: AddNoteMod
 
         setIsLoading(true)
         try {
-            await createClinicalEncounter({
+            const encounter = await createClinicalEncounter({
                 patient_id: patientId,
                 ...formData
             })
 
-            toast.success('Clinical note saved successfully!')
+            // Explicitly submit for coding so it appears in coder's queue
+            if (encounter?.id) {
+                await submitEncounterForCoding(encounter.id)
+            }
+
+            toast.success('Clinical note saved and submitted to coding queue!')
             onSuccess?.()
             onClose()
         } catch (error: any) {
@@ -164,7 +169,7 @@ const AddNoteModal = ({ patientId, patientName, onClose, onSuccess }: AddNoteMod
                             Cancel
                         </Button>
                         <Button type="submit" disabled={isLoading}>
-                            {isLoading ? 'Saving...' : 'Save Clinical Note'}
+                            {isLoading ? 'Submitting...' : 'Save & Submit to Coding Queue'}
                         </Button>
                     </div>
                 </form>

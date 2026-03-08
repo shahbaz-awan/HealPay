@@ -63,6 +63,7 @@ const createUserSchema = z.object({
     .optional()
     .or(z.literal('')),
   role: z.nativeEnum(UserRole),
+  specialization: z.string().max(100, 'Specialization too long').optional().or(z.literal('')),
 })
 
 type CreateUserFormData = z.infer<typeof createUserSchema>
@@ -75,12 +76,13 @@ const AdminUsers = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [users, setUsers] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const { token, user } = useAuthStore()
+  const { user } = useAuthStore()
 
   const {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserSchema),
@@ -89,11 +91,13 @@ const AdminUsers = () => {
     },
   })
 
+  const selectedRole = watch('role')
+
   // Fetch users from API
   const fetchUsers = async () => {
     setIsLoading(true)
     try {
-      const data = await apiGet('/v1/admin/users')
+      const data = await apiGet<any[]>('/v1/admin/users')
       setUsers(data)
     } catch (error) {
       console.error('Error fetching users:', error)
@@ -122,7 +126,8 @@ const AdminUsers = () => {
         city: data.city || null,
         state: data.state || null,
         zip_code: data.zipCode || null,
-        role: data.role
+        role: data.role,
+        specialization: data.role === UserRole.DOCTOR ? (data.specialization || null) : null
       }
 
       console.log('Creating user with data:', backendData)
@@ -167,7 +172,8 @@ const AdminUsers = () => {
       city: '',
       state: '',
       zipCode: '',
-      role: user.role
+      role: user.role,
+      specialization: user.specialization || ''
     })
   }
 
@@ -182,7 +188,8 @@ const AdminUsers = () => {
         last_name: data.lastName,
         email: data.email,
         phone: data.phone || null,
-        role: data.role
+        role: data.role,
+        specialization: data.role === UserRole.DOCTOR ? (data.specialization || null) : null
       }
 
       // Only include password if it was changed
@@ -541,6 +548,15 @@ const AdminUsers = () => {
                 </p>
               </div>
 
+              {selectedRole === UserRole.DOCTOR && (
+                <Input
+                  label="Specialization (Doctors only)"
+                  placeholder="e.g. Cardiology, General Practice"
+                  error={errors.specialization?.message}
+                  {...register('specialization')}
+                />
+              )}
+
               <Input
                 label="Password"
                 type="password"
@@ -656,6 +672,15 @@ const AdminUsers = () => {
                   <option value={UserRole.ADMIN}>Administrator</option>
                 </select>
               </div>
+
+              {selectedRole === UserRole.DOCTOR && (
+                <Input
+                  label="Specialization (Doctors only)"
+                  placeholder="e.g. Cardiology, General Practice"
+                  error={errors.specialization?.message}
+                  {...register('specialization')}
+                />
+              )}
 
               <div className="flex gap-3 pt-4">
                 <Button

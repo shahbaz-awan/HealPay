@@ -1,142 +1,145 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+import logging
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.db.models import User, UserRole
 from app.schemas.user import UserRegister, UserLogin, AuthResponse, UserResponse, UserUpdate
 from app.core.security import (
-    verify_password, 
-    get_password_hash, 
-    create_access_token, 
+    verify_password,
+    get_password_hash,
+    create_access_token,
     create_refresh_token,
+    decode_token,
     get_current_user
 )
+from app.core.limiter import limiter
 from datetime import datetime
-from fastapi import Request
 from fastapi.responses import RedirectResponse
 from fastapi_sso.sso.google import GoogleSSO
 from app.core.config import settings
 import secrets
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
+# ---------------------------------------------------------------------------
+# Request body models (keep sensitive data OUT of query strings / URL logs)
+# ---------------------------------------------------------------------------
+class OtpVerifyRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+    otp: str
+    new_password: str
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class TokenRefreshRequest(BaseModel):
+    refresh_token: str
+
+
 @router.post("/register/send-otp")
-async def send_signup_otp(user_data: UserRegister, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+async def send_signup_otp(request: Request, user_data: UserRegister, db: Session = Depends(get_db)):
     """
-    Send OTP for email verification during signup
-    Stores user data temporarily until OTP is verified
+    Send OTP for email verification during signup.
+    Stores user registration data in the DB alongside the OTP.
     """
     from app.services.email_service import send_otp_email
     from app.utils.otp_utils import generate_otp, store_otp
-    
+
     # Check if user already exists
     existing_user = db.query(User).filter(User.email == user_data.email).first()
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
+            detail="Email already registered",
         )
-    
-    # Generate OTP
+
     otp_code = generate_otp()
-    
-    # Store OTP with user registration data
-    from app.utils.otp_utils import _otp_storage
-    _otp_storage[user_data.email] = {
-        'code': otp_code,
-        'created_at': datetime.now(),
-        'expiry_minutes': 3,
-        'user_data': {
-            'email': user_data.email,
-            'password': user_data.password,
-            'first_name': user_data.first_name,
-            'last_name': user_data.last_name,
-            'phone': user_data.phone
-        }
-    }
-    
-    # Send OTP email
+
+    # Persist OTP + registration data in DB (survives server restarts)
+    store_otp(
+        db=db,
+        email=user_data.email,
+        otp_code=otp_code,
+        purpose="signup",
+        expiry_minutes=3,
+        user_data={
+            "email": user_data.email,
+            "password": user_data.password,
+            "first_name": user_data.first_name,
+            "last_name": user_data.last_name,
+            "phone": user_data.phone,
+        },
+    )
+
     try:
         email_sent = send_otp_email(user_data.email, otp_code, purpose="signup")
         if email_sent:
             return {"message": "OTP sent to your email. Please verify to complete registration."}
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to send OTP email"
-            )
-    except Exception as e:
-        print(f"Error sending OTP: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to send OTP email"
+            detail="Failed to send OTP email",
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("Error sending signup OTP: %s", e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to send OTP email",
         )
 
 @router.post("/register/verify-otp", response_model=dict, status_code=status.HTTP_201_CREATED)
-async def verify_signup_otp(email: str, otp: str, db: Session = Depends(get_db)):
+async def verify_signup_otp(body: OtpVerifyRequest, db: Session = Depends(get_db)):
     """
-    Verify OTP and create user account
+    Verify OTP and create user account.
     """
-    from app.utils.otp_utils import _otp_storage, is_otp_expired
-    
-    # Check if OTP exists
-    if email not in _otp_storage:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No OTP found. Please request a new one."
-        )
-    
-    stored_data = _otp_storage[email]
-    stored_otp = stored_data['code']
-    created_at = stored_data['created_at']
-    
-    # Verify OTP
-    if stored_otp != otp:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid OTP code"
-        )
-    
-    # Check if expired
-    if is_otp_expired(created_at, stored_data.get('expiry_minutes', 3)):
-        del _otp_storage[email]
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="OTP has expired. Please request a new one."
-        )
-    
-    # Get stored user data
-    user_info = stored_data.get('user_data')
+    from app.utils.otp_utils import verify_otp, get_signup_user_data, delete_otp
+
+    email = body.email
+
+    # Verify OTP against DB record
+    is_valid, error_msg = verify_otp(db, email, body.otp, purpose="signup")
+    if not is_valid:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error_msg)
+
+    # Retrieve stored registration data
+    user_info = get_signup_user_data(db, email)
     if not user_info:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User data not found. Please start registration again."
+            detail="Registration data not found. Please start registration again.",
         )
-    
+
     # Create user account
-    hashed_password = get_password_hash(user_info['password'])
+    hashed_password = get_password_hash(user_info["password"])
     new_user = User(
-        email=user_info['email'],
+        email=user_info["email"],
         hashed_password=hashed_password,
-        first_name=user_info['first_name'],
-        last_name=user_info['last_name'],
-        phone=user_info.get('phone'),
+        first_name=user_info["first_name"],
+        last_name=user_info["last_name"],
+        phone=user_info.get("phone"),
         role=UserRole.PATIENT,
     )
-    
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    
-    # Clean up OTP storage
-    del _otp_storage[email]
-    
-    return {
-        "message": "Registration successful! You can now log in.",
-        "email": new_user.email
-    }
+
+    # Clean up OTP records
+    delete_otp(db, email, purpose="signup")
+
+    logger.info("New patient account created: %s", email)
+    return {"message": "Registration successful! You can now log in.", "email": new_user.email}
 
 @router.post("/login", response_model=AuthResponse)
-async def login(credentials: UserLogin, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+async def login(request: Request, credentials: UserLogin, db: Session = Depends(get_db)):
     """
     Login endpoint for all user types
     Returns JWT tokens and user information
@@ -163,14 +166,15 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
         first_name=user.first_name,
         last_name=user.last_name,
         phone=user.phone,
-        address=None,  # Not in current model
+        address=None,
         city=None,
         state=None,
         zip_code=None,
         role=user.role,
-        is_active=True,  # Simplified - all users active
-        is_verified=True,  # Simplified - all users verified
-        avatar=None,  # Not in current model
+        specialization=user.specialization,
+        is_active=user.is_active,
+        is_verified=user.is_verified,
+        avatar=None,
         created_at=user.created_at,
         updated_at=user.updated_at
     )
@@ -197,8 +201,9 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
         state=None,
         zip_code=None,
         role=current_user.role,
-        is_active=True,
-        is_verified=True,
+        specialization=current_user.specialization,
+        is_active=current_user.is_active,
+        is_verified=current_user.is_verified,
         avatar=None,
         created_at=current_user.created_at,
         updated_at=current_user.updated_at
@@ -221,6 +226,8 @@ async def update_my_profile(
         current_user.last_name = update_data.last_name
     if update_data.phone is not None:
         current_user.phone = update_data.phone
+    if update_data.specialization is not None:
+        current_user.specialization = update_data.specialization
     
     db.commit()
     db.refresh(current_user)
@@ -237,81 +244,121 @@ async def update_my_profile(
         state=None,
         zip_code=None,
         role=current_user.role,
-        is_active=True,
-        is_verified=True,
+        specialization=current_user.specialization,
+        is_active=current_user.is_active,
+        is_verified=current_user.is_verified,
         avatar=None,
         created_at=current_user.created_at,
         updated_at=current_user.updated_at
     )
 
 @router.post("/forgot-password/send-code")
-async def send_reset_code(email: str, db: Session = Depends(get_db)):
+async def send_reset_code(body: ForgotPasswordRequest, db: Session = Depends(get_db)):
     """
-    Send OTP code to user's email for password reset
+    Send OTP code to user's email for password reset.
     """
     from app.services.email_service import send_otp_email
     from app.utils.otp_utils import generate_otp, store_otp
-    
-    # Check if user exists
+
+    email = body.email
     user = db.query(User).filter(User.email == email).first()
     if not user:
-        # Don't reveal if email exists for security
+        # Don't reveal whether email exists
         return {"message": "If the email exists, a reset code has been sent"}
-    
-    # Generate and store OTP
+
     otp_code = generate_otp()
-    store_otp(db, email, otp_code)
-    
-    # Send email
+    store_otp(db, email, otp_code, purpose="password_reset", expiry_minutes=6)
+
     try:
         email_sent = send_otp_email(email, otp_code, purpose="password_reset")
         if email_sent:
             return {"message": "Reset code sent successfully"}
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to send reset code"
-            )
-    except Exception as e:
-        print(f"Error sending reset email: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to send reset code"
+            detail="Failed to send reset code",
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("Error sending reset email: %s", e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to send reset code",
         )
 
 @router.post("/forgot-password/verify-and-reset")
-async def verify_and_reset(email: str, otp: str, new_password: str, db: Session = Depends(get_db)):
+async def verify_and_reset(body: PasswordResetRequest, db: Session = Depends(get_db)):
     """
-    Verify OTP and reset password
+    Verify OTP and reset password.
     """
-    from app.utils.otp_utils import verify_otp
-    
-    # Verify OTP
-    if not verify_otp(db, email, otp):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid or expired OTP code"
-        )
-    
+    from app.utils.otp_utils import verify_otp, delete_otp
+    import re
+
+    new_password = body.new_password
+
+    # Validate password strength
+    if len(new_password) < 8:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password must be at least 8 characters")
+    if not re.search(r"[A-Z]", new_password):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password must contain at least one uppercase letter")
+    if not re.search(r"[0-9]", new_password):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password must contain at least one number")
+
+    # Verify OTP against DB
+    is_valid, error_msg = verify_otp(db, body.email, body.otp, purpose="password_reset")
+    if not is_valid:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error_msg)
+
     # Find user
-    user = db.query(User).filter(User.email == email).first()
+    user = db.query(User).filter(User.email == body.email).first()
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
-    
-    # Update password
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    # Update password and clean up
     user.hashed_password = get_password_hash(new_password)
     db.commit()
-    
+    delete_otp(db, body.email, purpose="password_reset")
+    logger.info("Password reset successful for %s", body.email)
     return {"message": "Password reset successful"}
+
+# ---------------------------------------------------------------------------
+# Token Refresh
+# ---------------------------------------------------------------------------
+@router.post("/refresh")
+async def refresh_access_token(body: TokenRefreshRequest, db: Session = Depends(get_db)):
+    """
+    Exchange a valid refresh token for a new access token
+    """
+    try:
+        payload = decode_token(body.refresh_token)
+    except HTTPException:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token"
+        )
+
+    if payload.get("type") != "refresh":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Provided token is not a refresh token"
+        )
+
+    email: str = payload.get("sub")
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+
+    token_data = {"sub": user.email, "role": user.role.value}
+    new_access_token = create_access_token(data=token_data)
+    new_refresh_token = create_refresh_token(data=token_data)
+    return {"token": new_access_token, "refreshToken": new_refresh_token}
+
 
 # Google SSO Configuration
 google_sso = GoogleSSO(
     client_id=settings.GOOGLE_CLIENT_ID,
     client_secret=settings.GOOGLE_CLIENT_SECRET,
-    redirect_uri=f"http://localhost:8001/api/v1/auth/google/callback",
+    redirect_uri=f"{settings.BACKEND_URL}/api/v1/auth/google/callback",
     allow_insecure_http=True
 )
 

@@ -96,3 +96,78 @@ export const recordPayment = async (data: {
         throw error
     }
 }
+
+export const createInvoiceFromEncounter = async (encounterId: number) => {
+    try {
+        const response = await apiPost<any>(`/v1/billing/invoices/from-encounter/${encounterId}`, {})
+        return response
+    } catch (error) {
+        console.error('Error creating invoice from encounter:', error)
+        throw error
+    }
+}
+
+export const getInvoiceDetail = async (invoiceId: number) => {
+    try {
+        const response = await apiGet<any>(`/v1/billing/invoices/${invoiceId}`)
+        return response
+    } catch (error) {
+        console.error('Error fetching invoice detail:', error)
+        throw error
+    }
+}
+
+export const getMyInvoices = async () => {
+    try {
+        const response = await apiGet<any[]>('/v1/billing/invoices/my')
+        return response
+    } catch (error) {
+        console.error('Error fetching my invoices:', error)
+        throw error
+    }
+}
+export interface RiskIssue {
+    severity: 'HIGH' | 'MEDIUM' | 'LOW'
+    field: string
+    box: string
+    message: string
+    suggestion: string
+}
+
+export interface ClaimRiskResult {
+    risk_level: 'HIGH' | 'MEDIUM' | 'LOW'
+    risk_score: number
+    total_issues: number
+    high_count: number
+    medium_count: number
+    low_count: number
+    issues: RiskIssue[]
+    passed_checks: string[]
+    summary: string
+}
+
+export const createClaim = async (data: {
+    encounter_id: number
+    insurance_provider: string
+    total_amount: number
+    patient_responsibility?: number
+    notes?: string
+}): Promise<any> => {
+    try {
+        const response = await apiPost<any>('/v1/billing/claims', data)
+        return response
+    } catch (error) {
+        console.error('Error creating claim:', error)
+        throw error
+    }
+}
+
+export const analyzeClaimRisk = async (formData: Record<string, any>): Promise<ClaimRiskResult> => {
+    try {
+        const response = await apiPost<ClaimRiskResult>('/v1/billing/analyze-claim-risk', formData)
+        return response
+    } catch (error) {
+        console.error('Error analyzing claim risk:', error)
+        throw error
+    }
+}

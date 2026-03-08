@@ -2,13 +2,14 @@
 Clinical Encounters API endpoints
 Handles doctor clinical notes and medical coder access
 """
+import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
-from datetime import datetime
+from typing import List, Optional
+from datetime import datetime, date
 
 from app.db.database import get_db
-from app.db.models import ClinicalEncounter, MedicalCode, User, UserRole, CodeLibrary
+from app.db.models import ClinicalEncounter, MedicalCode, User, UserRole, CodeLibrary, PatientIntake
 from app.schemas.clinical import (
     ClinicalEncounterCreate,
     ClinicalEncounterResponse,
@@ -21,7 +22,28 @@ from app.schemas.clinical import (
 from app.core.security import get_current_user
 from app.services.recommendation_service import get_recommendation_service
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
+
+
+def _calculate_age(dob_str: Optional[str]) -> int:
+    """Calculate age in years from a date-of-birth string (YYYY-MM-DD). Returns 0 if unparseable."""
+    if not dob_str:
+        return 0
+    try:
+        dob = datetime.strptime(dob_str, "%Y-%m-%d").date()
+        today = date.today()
+        return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+    except (ValueError, TypeError):
+        return 0
+
+
+def _get_patient_age(db: Session, patient_id: int) -> int:
+    """Look up the patient's age from their intake form DOB."""
+    intake = db.query(PatientIntake).filter(PatientIntake.user_id == patient_id).first()
+    if intake and intake.date_of_birth:
+        return _calculate_age(intake.date_of_birth)
+    return 0
 
 
 # Doctor creates clinical encounter note
@@ -65,20 +87,60 @@ def get_patient_encounters(
     return encounters
 
 
-# Get pending encounters for coding (for medical coder)
-@router.get("/encounters/pending-coding", response_model=List[EncounterForCoding])
-def get_pending_encounters(
+# Doctor explicitly submits an encounter for coding
+@router.put("/encounters/{encounter_id}/submit-for-coding", response_model=ClinicalEncounterResponse)
+def submit_encounter_for_coding(
+    encounter_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Get all encounters pending medical coding"""
+    """Doctor marks an encounter as ready for medical coding"""
+    if current_user.role not in [UserRole.DOCTOR, UserRole.ADMIN]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only doctors and admins can submit encounters for coding"
+        )
+
+    encounter = db.query(ClinicalEncounter).filter(
+        ClinicalEncounter.id == encounter_id
+    ).first()
+
+    if not encounter:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Encounter not found"
+        )
+
+    # Verify the doctor owns this encounter (admins can bypass)
+    if current_user.role == UserRole.DOCTOR and encounter.doctor_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only submit your own encounters for coding"
+        )
+
+    encounter.status = "pending_coding"
+    db.commit()
+    db.refresh(encounter)
+
+    logger.info(f"Encounter {encounter_id} submitted for coding by doctor {current_user.id}")
+    return encounter
+
+
+# Get pending encounters for coding (for medical coder)
+@router.get("/encounters/pending-coding", response_model=List[EncounterForCoding])
+def get_pending_encounters(
+    skip: int = 0,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get encounters pending medical coding (paginated)."""
     if current_user.role != UserRole.CODER:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only medical coders can access this endpoint"
         )
-    
-    # Get encounters with pending_coding status
+
     encounters = db.query(
         ClinicalEncounter.id,
         ClinicalEncounter.encounter_date,
@@ -95,22 +157,19 @@ def get_pending_encounters(
         User, ClinicalEncounter.patient_id == User.id
     ).filter(
         ClinicalEncounter.status == "pending_coding"
-    ).all()
-    
-    # Get doctor info for each encounter
+    ).order_by(
+        ClinicalEncounter.encounter_date.asc()   # oldest first → highest priority
+    ).offset(skip).limit(limit).all()
+
     result = []
     for enc in encounters:
-        encounter_obj = db.query(ClinicalEncounter).filter(
-            ClinicalEncounter.id == enc.id
-        ).first()
-        
+        encounter_obj = db.query(ClinicalEncounter).filter(ClinicalEncounter.id == enc.id).first()
         doctor = db.query(User).filter(User.id == encounter_obj.doctor_id).first()
-        
         result.append(EncounterForCoding(
             id=enc.id,
             encounter_date=enc.encounter_date,
             patient_name=f"{enc.patient_first_name} {enc.patient_last_name}",
-            patient_age=45,  # TODO: Calculate from DOB
+            patient_age=_get_patient_age(db, encounter_obj.patient_id),
             encounter_type=enc.encounter_type,
             chief_complaint=enc.chief_complaint,
             subjective_notes=enc.subjective_notes,
@@ -120,7 +179,6 @@ def get_pending_encounters(
             doctor_name=f"Dr. {doctor.first_name} {doctor.last_name}",
             status=enc.status
         ))
-    
     return result
 
 
@@ -174,7 +232,7 @@ def get_completed_encounters(
             id=enc.id,
             encounter_date=enc.encounter_date,
             patient_name=f"{enc.patient_first_name} {enc.patient_last_name}",
-            patient_age=45,  # TODO: Calculate from DOB
+            patient_age=_get_patient_age(db, encounter_obj.patient_id),
             encounter_type=enc.encounter_type,
             chief_complaint=enc.chief_complaint,
             subjective_notes=enc.subjective_notes,
@@ -213,7 +271,7 @@ def get_encounter_details(
         id=encounter.id,
         encounter_date=encounter.encounter_date,
         patient_name=f"{patient.first_name} {patient.last_name}",
-        patient_age=45,  # TODO: Calculate from DOB
+        patient_age=_get_patient_age(db, encounter.patient_id),
         encounter_type=encounter.encounter_type,
         chief_complaint=encounter.chief_complaint,
         subjective_notes=encounter.subjective_notes,
@@ -520,44 +578,78 @@ def get_code_recommendations(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Get AI-powered medical code recommendations for a clinical encounter
-    Returns ICD-10 diagnosis codes and CPT procedure codes with explanations
+    Get AI-powered medical code recommendations for a clinical encounter.
+    Validates that the chief complaint is a recognisable medical text before running the model.
     """
     if current_user.role not in [UserRole.CODER, UserRole.ADMIN]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only medical coders and admins can access recommendations"
         )
-    
+
     # Get encounter
     encounter = db.query(ClinicalEncounter).filter(
         ClinicalEncounter.id == encounter_id
     ).first()
-    
+
     if not encounter:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Encounter not found"
         )
-    
-    # Get recommendation service
-    rec_service = get_recommendation_service(db)
-    
-    # Get ICD-10 recommendations (diagnosis codes)
-    icd_recommendations = rec_service.get_recommendations(
-        encounter=encounter,
-        code_type='ICD10_CM',
-        top_n=5
-    )
-    
-    # Get CPT recommendations (procedure codes)
-    cpt_recommendations = rec_service.get_recommendations(
-        encounter=encounter,
-        code_type='CPT',
-        top_n=3
-    )
-    
-    
+
+    # Require chief complaint
+    if not encounter.chief_complaint or not encounter.chief_complaint.strip():
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Chief complaint is required before generating AI recommendations. "
+                   "Please add a chief complaint to the encounter first.",
+        )
+
+    # Get recommendation service (loads library + model on first call)
+    try:
+        rec_service = get_recommendation_service(db)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"AI service could not be initialised: {exc}",
+        )
+
+    # ── Validate the chief complaint is medical ──────────────────────────────
+    try:
+        is_medical, reason = rec_service.validate_medical_text(encounter.chief_complaint)
+    except Exception:
+        is_medical, reason = True, ""  # If validation itself fails, proceed
+
+    if not is_medical:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=reason,
+        )
+
+    # ── Generate recommendations ─────────────────────────────────────────────
+    try:
+        icd_recommendations = rec_service.get_recommendations(
+            encounter=encounter,
+            code_type='ICD10_CM',
+            top_n=5
+        )
+        cpt_recommendations = rec_service.get_recommendations(
+            encounter=encounter,
+            code_type='CPT',
+            top_n=3
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"AI recommendation engine error: {exc}",
+        )
+
     return RecommendationResponse(
         encounter_id=encounter_id,
         icd10_recommendations=[CodeRecommendation(**rec) for rec in icd_recommendations],

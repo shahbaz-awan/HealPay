@@ -21,7 +21,7 @@ const GoogleCallback = () => {
 
             try {
                 // Fetch user profile using the token
-                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/me`, {
+                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/v1/auth/me`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

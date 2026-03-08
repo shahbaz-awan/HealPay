@@ -9,13 +9,17 @@ import {
   CheckCircle,
   AlertCircle,
   BarChart3,
-  ClipboardList
+  ClipboardList,
+  ArrowRight
 } from 'lucide-react'
 import Card, { CardHeader } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 import { useEffect, useState } from 'react'
-import { getBillingStats, getRecentInvoices, getReadyToBillEncounters, BillingStats } from '@/services/billingService'
+import { getBillingStats, getRecentInvoices, getReadyToBillEncounters, createInvoiceFromEncounter, getInvoiceDetail, BillingStats } from '@/services/billingService'
+import RecordPaymentModal from '@/components/modals/RecordPaymentModal'
+import DashboardSkeleton from '@/components/ui/DashboardSkeleton'
+import { toast } from 'react-toastify'
 
 const BillingDashboard = () => {
   const navigate = useNavigate()
@@ -23,6 +27,9 @@ const BillingDashboard = () => {
   const [recentInvoices, setRecentInvoices] = useState<any[]>([])
   const [readyEncounters, setReadyEncounters] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [generatingInvoiceId, setGeneratingInvoiceId] = useState<number | null>(null)
+  const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -98,6 +105,11 @@ const BillingDashboard = () => {
   // Payment activity (Placeholder for now, could be fetched via API later)
   const paymentActivity: any[] = []
 
+  // Collection efficiency
+  const collectionRate = stats && (stats.total_revenue + stats.outstanding) > 0
+    ? (stats.total_revenue / (stats.total_revenue + stats.outstanding)) * 100
+    : 0
+
   const getStatusBadge = (status: string) => {
     const badges: any = {
       paid: <Badge variant="success">Paid</Badge>,
@@ -108,16 +120,45 @@ const BillingDashboard = () => {
     return badges[status] || <Badge variant="info">{status}</Badge>
   }
 
-  const getPaymentMethodIcon = (method: string) => {
+  const getPaymentMethodIcon = (_method: string) => {
     return <CreditCard className="w-4 h-4 text-gray-400" />
   }
 
+  const handleGenerateInvoice = async (encounterId: number) => {
+    setGeneratingInvoiceId(encounterId)
+    try {
+      const result = await createInvoiceFromEncounter(encounterId)
+      if (result.already_existed) {
+        toast.info(`Invoice ${result.invoice_number} already exists for this encounter`)
+      } else {
+        toast.success(`Invoice ${result.invoice_number} created for $${result.total_amount?.toFixed(2)}`)
+      }
+      // Refresh data
+      const [invoicesData, readyData] = await Promise.all([
+        getRecentInvoices().catch(() => []),
+        getReadyToBillEncounters().catch(() => [])
+      ])
+      setRecentInvoices(invoicesData || [])
+      setReadyEncounters(readyData || [])
+    } catch (error: any) {
+      toast.error(error.response?.data?.detail || 'Failed to generate invoice')
+    } finally {
+      setGeneratingInvoiceId(null)
+    }
+  }
+
+  const handleViewInvoice = async (invoiceId: number) => {
+    try {
+      const detail = await getInvoiceDetail(invoiceId)
+      setSelectedInvoice(detail)
+      setShowPaymentModal(true)
+    } catch {
+      toast.error('Could not load invoice details')
+    }
+  }
+
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-      </div>
-    )
+    return <DashboardSkeleton statCount={4} />
   }
 
   return (
@@ -213,7 +254,17 @@ const BillingDashboard = () => {
                         <td className="p-4 text-sm text-secondary-600">{encounter.doctor_name}</td>
                         <td className="p-4 text-sm text-secondary-600">{encounter.type}</td>
                         <td className="p-4 text-center">
-                          <Button size="sm" variant="primary">Generate Claim</Button>
+                          <div className="flex items-center justify-center gap-2">
+                            <Button size="sm" variant="primary" onClick={() => navigate(`/billing/cms1500/${encounter.id}`)}>Generate Claim</Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleGenerateInvoice(encounter.id)}
+                              disabled={generatingInvoiceId === encounter.id}
+                            >
+                              {generatingInvoiceId === encounter.id ? 'Creating...' : 'Generate Invoice'}
+                            </Button>
+                          </div>
                         </td>
                       </motion.tr>
                     ))
@@ -279,7 +330,13 @@ const BillingDashboard = () => {
                         <td className="p-4 text-sm text-secondary-600">{invoice.due_date}</td>
                         <td className="p-4 text-center">{getStatusBadge(invoice.status)}</td>
                         <td className="p-4 text-center">
-                          <Button size="sm" variant="ghost">View</Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleViewInvoice(invoice.id)}
+                          >
+                            {invoice.status !== 'paid' ? 'Record Payment' : 'View'}
+                          </Button>
                         </td>
                       </motion.tr>
                     ))
@@ -290,8 +347,40 @@ const BillingDashboard = () => {
           </Card>
         </div>
 
-        {/* Payment Activity - 1 column */}
-        <div>
+        {/* Payment Activity + Collection Rate - 1 column */}
+        <div className="space-y-6">
+          {/* Collection Efficiency Card */}
+          <Card>
+            <CardHeader title="Collection Rate" subtitle="Revenue vs outstanding" />
+            <div className="p-2">
+              <div className="flex items-end justify-between mb-2">
+                <span className="text-3xl font-bold text-secondary-900 dark:text-white">
+                  {collectionRate.toFixed(1)}%
+                </span>
+                <span className={`text-sm font-medium px-2 py-1 rounded-full ${collectionRate >= 80 ? 'bg-green-100 text-green-700' : collectionRate >= 60 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
+                  {collectionRate >= 80 ? 'Excellent' : collectionRate >= 60 ? 'Fair' : 'Needs Attention'}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3 mb-3">
+                <div
+                  className={`h-3 rounded-full transition-all duration-700 ${collectionRate >= 80 ? 'bg-green-500' : collectionRate >= 60 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                  style={{ width: `${Math.min(collectionRate, 100)}%` }}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg text-center">
+                  <p className="text-xs text-secondary-500 dark:text-gray-400">Collected</p>
+                  <p className="font-bold text-green-700 dark:text-green-400">${(stats?.total_revenue ?? 0).toLocaleString()}</p>
+                </div>
+                <div className="p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-center">
+                  <p className="text-xs text-secondary-500 dark:text-gray-400">Outstanding</p>
+                  <p className="font-bold text-yellow-700 dark:text-yellow-400">${(stats?.outstanding ?? 0).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Payment Activity */}
           <Card>
             <CardHeader
               title="Payment Activity"
@@ -335,55 +424,49 @@ const BillingDashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="hover-card cursor-pointer group" onClick={() => navigate('/billing/cms1500')}>
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-red-50 rounded-lg group-hover:bg-red-100 transition-colors">
-              <ClipboardList className="w-6 h-6 text-red-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors">CMS-1500 Form</h3>
-              <p className="text-sm text-secondary-600">Generate claim forms</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="hover-card cursor-pointer group">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
-              <FileText className="w-6 h-6 text-blue-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors">All Invoices</h3>
-              <p className="text-sm text-secondary-600">View invoice history</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="hover-card cursor-pointer group">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-green-50 rounded-lg group-hover:bg-green-100 transition-colors">
-              <CreditCard className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors">Payment Methods</h3>
-              <p className="text-sm text-secondary-600">Manage payment options</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="hover-card cursor-pointer group">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-50 rounded-lg group-hover:bg-purple-100 transition-colors">
-              <BarChart3 className="w-6 h-6 text-purple-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-secondary-900 group-hover:text-primary-600 transition-colors">Financial Reports</h3>
-              <p className="text-sm text-secondary-600">Detailed analytics</p>
-            </div>
-          </div>
-        </Card>
+      <div>
+        <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: 'CMS-1500 Form', sub: 'Generate insurance claim forms', icon: ClipboardList, color: 'bg-red-50 dark:bg-red-900/20', iconColor: 'text-red-600', route: '/billing/cms1500' },
+            { label: 'All Invoices', sub: `${recentInvoices.length} recent invoices`, icon: FileText, color: 'bg-blue-50 dark:bg-blue-900/20', iconColor: 'text-blue-600', route: '/billing/invoices' },
+            { label: 'Ready to Bill', sub: `${readyEncounters.length} encounter${readyEncounters.length !== 1 ? 's' : ''} pending`, icon: CreditCard, color: 'bg-green-50 dark:bg-green-900/20', iconColor: 'text-green-600', route: '/billing' },
+            { label: 'Financial Reports', sub: 'Revenue analytics & exports', icon: BarChart3, color: 'bg-purple-50 dark:bg-purple-900/20', iconColor: 'text-purple-600', route: '/billing/reports' },
+          ].map((action, i) => (
+            <motion.div key={i} whileHover={{ y: -2 }} className="cursor-pointer" onClick={() => navigate(action.route)}>
+              <Card className="hover:shadow-md transition-shadow border hover:border-primary-300">
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 ${action.color} rounded-xl`}>
+                    <action.icon className={`w-6 h-6 ${action.iconColor}`} />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-secondary-900 dark:text-white text-sm">{action.label}</h3>
+                    <p className="text-xs text-secondary-500 dark:text-gray-400 mt-0.5">{action.sub}</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-secondary-400" />
+                </div>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
       </div>
+
+      {/* Record Payment Modal */}
+      {showPaymentModal && selectedInvoice && (
+        <RecordPaymentModal
+          invoice={selectedInvoice}
+          onClose={() => {
+            setShowPaymentModal(false)
+            setSelectedInvoice(null)
+          }}
+          onSuccess={async () => {
+            const invoicesData = await getRecentInvoices().catch(() => [])
+            setRecentInvoices(invoicesData || [])
+            const statsData = await getBillingStats().catch(() => null)
+            setStats(statsData)
+          }}
+        />
+      )}
     </div>
   )
 }

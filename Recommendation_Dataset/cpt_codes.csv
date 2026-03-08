@@ -1,0 +1,690 @@
+code,short_description,long_description,category
+99201,office outpatient visit new patient minimal,office or other outpatient visit for evaluation and management of a new patient requiring straightforward medical decision making,Evaluation and Management
+99202,office outpatient visit new patient low complexity,office or other outpatient visit for evaluation and management of a new patient requiring low level of medical decision making typically 15 to 29 minutes,Evaluation and Management
+99203,office outpatient visit new patient moderate complexity,office or other outpatient visit for evaluation and management of a new patient requiring moderate level of medical decision making typically 30 to 44 minutes,Evaluation and Management
+99204,office outpatient visit new patient high complexity,office or other outpatient visit for evaluation and management of a new patient requiring high level of medical decision making typically 45 to 59 minutes,Evaluation and Management
+99205,office outpatient visit new patient highest complexity,office or other outpatient visit for evaluation and management of a new patient requiring high level of medical decision making typically 60 to 74 minutes,Evaluation and Management
+99211,office outpatient visit established patient minimal,office or other outpatient visit for evaluation and management of an established patient that may not require the presence of a physician,Evaluation and Management
+99212,office outpatient visit established patient straightforward,office or other outpatient visit for evaluation and management of an established patient requiring straightforward medical decision making,Evaluation and Management
+99213,office outpatient visit established patient low complexity,office or other outpatient visit for evaluation and management of an established patient requiring low level of medical decision making typically 15 minutes,Evaluation and Management
+99214,office outpatient visit established patient moderate complexity,office or other outpatient visit for evaluation and management of an established patient requiring moderate level of medical decision making typically 30 minutes,Evaluation and Management
+99215,office outpatient visit established patient high complexity,office or other outpatient visit for evaluation and management of an established patient requiring high level of medical decision making typically 40 minutes,Evaluation and Management
+99221,initial hospital inpatient care low complexity,initial hospital inpatient or observation care per day for evaluation and management requiring straightforward or low complexity medical decision making,Evaluation and Management
+99222,initial hospital inpatient care moderate complexity,initial hospital inpatient or observation care per day for evaluation and management requiring moderate complexity medical decision making,Evaluation and Management
+99223,initial hospital inpatient care high complexity,initial hospital inpatient or observation care per day for evaluation and management requiring high complexity medical decision making,Evaluation and Management
+99231,subsequent hospital inpatient care low complexity,subsequent hospital inpatient or observation care per day for evaluation and management with straightforward or low complexity decision making,Evaluation and Management
+99232,subsequent hospital inpatient care moderate complexity,subsequent hospital inpatient or observation care per day for evaluation and management with moderate complexity medical decision making,Evaluation and Management
+99233,subsequent hospital inpatient care high complexity,subsequent hospital inpatient or observation care per day for evaluation and management with high complexity medical decision making,Evaluation and Management
+99238,hospital discharge day management 30 minutes or less,hospital inpatient or observation discharge day management including final examination discharge instructions and prescriptions typically 30 minutes or less,Evaluation and Management
+99239,hospital discharge day management more than 30 minutes,hospital inpatient or observation discharge day management including final examination discharge instructions typically more than 30 minutes,Evaluation and Management
+99241,office consultation straightforward,office or other outpatient consultation for a new or established patient requiring straightforward medical decision making,Evaluation and Management
+99242,office consultation low complexity,office or other outpatient consultation for a new or established patient requiring low complexity medical decision making,Evaluation and Management
+99243,office consultation moderate complexity,office or other outpatient consultation for a new or established patient requiring moderate complexity medical decision making,Evaluation and Management
+99244,office consultation high complexity,office or other outpatient consultation for a new or established patient requiring high complexity medical decision making,Evaluation and Management
+99245,office consultation highest complexity,office or other outpatient consultation for a new or established patient requiring highest complexity medical decision making typically 80 minutes,Evaluation and Management
+99251,inpatient consultation straightforward,inpatient or observation consultation for a new or established patient requiring straightforward medical decision making,Evaluation and Management
+99252,inpatient consultation low complexity,inpatient or observation consultation for a new or established patient requiring low complexity medical decision making,Evaluation and Management
+99253,inpatient consultation moderate complexity,inpatient or observation consultation for a new or established patient requiring moderate complexity medical decision making,Evaluation and Management
+99254,inpatient consultation high complexity,inpatient or observation consultation for a new or established patient requiring high complexity medical decision making,Evaluation and Management
+99255,inpatient consultation highest complexity,inpatient or observation consultation for a new or established patient requiring highest complexity medical decision making,Evaluation and Management
+99281,emergency department visit straightforward,emergency department visit for evaluation and management of a patient requiring straightforward medical decision making,Evaluation and Management
+99282,emergency department visit low complexity,emergency department visit for evaluation and management of a patient requiring low complexity medical decision making,Evaluation and Management
+99283,emergency department visit moderate complexity,emergency department visit for evaluation and management of a patient requiring moderate complexity medical decision making,Evaluation and Management
+99284,emergency department visit high complexity,emergency department visit for evaluation and management of a patient requiring high complexity medical decision making,Evaluation and Management
+99285,emergency department visit highest complexity,emergency department visit for evaluation and management of a patient requiring high complexity medical decision making with life threatening conditions,Evaluation and Management
+99291,critical care first 30 to 74 minutes,critical care evaluation and management of a critically ill or injured patient first 30 to 74 minutes requiring constant bedside attention,Evaluation and Management
+99292,critical care each additional 30 minutes,critical care evaluation and management of a critically ill or injured patient each additional 30 minutes beyond the first period,Evaluation and Management
+99304,nursing facility initial care low complexity,initial nursing facility care per day for evaluation and management of a patient requiring straightforward or low complexity decision making,Evaluation and Management
+99305,nursing facility initial care moderate complexity,initial nursing facility care per day for evaluation and management of a patient requiring moderate complexity medical decision making,Evaluation and Management
+99306,nursing facility initial care high complexity,initial nursing facility care per day for evaluation and management of a patient requiring high complexity medical decision making,Evaluation and Management
+99307,nursing facility subsequent care straightforward,subsequent nursing facility care per day requiring straightforward medical decision making for stable patient,Evaluation and Management
+99308,nursing facility subsequent care low complexity,subsequent nursing facility care per day requiring low complexity medical decision making for patient with minor complications,Evaluation and Management
+99309,nursing facility subsequent care moderate complexity,subsequent nursing facility care per day requiring moderate complexity medical decision making for patient with new problems,Evaluation and Management
+99310,nursing facility subsequent care high complexity,subsequent nursing facility care per day requiring high complexity medical decision making for patient with significant complications,Evaluation and Management
+99341,home visit new patient low complexity,home or residence visit for evaluation and management of a new patient requiring straightforward medical decision making,Evaluation and Management
+99342,home visit new patient moderate complexity,home or residence visit for evaluation and management of a new patient requiring moderate complexity medical decision making,Evaluation and Management
+99343,home visit new patient high complexity,home or residence visit for evaluation and management of a new patient requiring high complexity medical decision making,Evaluation and Management
+99347,home visit established patient straightforward,home or residence visit for evaluation and management of an established patient requiring straightforward medical decision making,Evaluation and Management
+99348,home visit established patient low complexity,home or residence visit for evaluation and management of an established patient requiring low complexity medical decision making,Evaluation and Management
+99349,home visit established patient moderate complexity,home or residence visit for evaluation and management of an established patient requiring moderate complexity medical decision making,Evaluation and Management
+99350,home visit established patient high complexity,home or residence visit for evaluation and management of an established patient requiring high complexity medical decision making,Evaluation and Management
+99354,prolonged service office outpatient first hour,prolonged evaluation and management service in office or outpatient setting requiring direct patient contact beyond typical time first hour,Evaluation and Management
+99355,prolonged service office outpatient each additional 30 minutes,prolonged evaluation and management service in office or outpatient setting each additional 30 minutes beyond first hour,Evaluation and Management
+99356,prolonged service inpatient first hour,prolonged evaluation and management service in inpatient or observation setting requiring direct patient contact first hour,Evaluation and Management
+99381,preventive visit new patient infant,initial comprehensive preventive medicine evaluation and management of new patient infant age younger than 1 year,Evaluation and Management
+99382,preventive visit new patient age 1 to 4,initial comprehensive preventive medicine evaluation and management of new patient early childhood age 1 through 4 years,Evaluation and Management
+99383,preventive visit new patient age 5 to 11,initial comprehensive preventive medicine evaluation and management of new patient late childhood age 5 through 11 years,Evaluation and Management
+99384,preventive visit new patient age 12 to 17,initial comprehensive preventive medicine evaluation and management of new patient adolescent age 12 through 17 years,Evaluation and Management
+99385,preventive visit new patient age 18 to 39,initial comprehensive preventive medicine evaluation and management of new patient age 18 through 39 years,Evaluation and Management
+99386,preventive visit new patient age 40 to 64,initial comprehensive preventive medicine evaluation and management of new patient age 40 through 64 years,Evaluation and Management
+99387,preventive visit new patient age 65 and older,initial comprehensive preventive medicine evaluation and management of new patient age 65 years and older,Evaluation and Management
+99391,preventive visit established patient infant,periodic comprehensive preventive medicine evaluation and management of established patient infant age younger than 1 year,Evaluation and Management
+99392,preventive visit established patient age 1 to 4,periodic comprehensive preventive medicine evaluation and management of established patient early childhood age 1 through 4 years,Evaluation and Management
+99393,preventive visit established patient age 5 to 11,periodic comprehensive preventive medicine evaluation and management of established patient late childhood age 5 through 11 years,Evaluation and Management
+99394,preventive visit established patient age 12 to 17,periodic comprehensive preventive medicine evaluation and management of established patient adolescent age 12 through 17 years,Evaluation and Management
+99395,preventive visit established patient age 18 to 39,periodic comprehensive preventive medicine evaluation and management of established patient age 18 through 39 years,Evaluation and Management
+99396,preventive visit established patient age 40 to 64,periodic comprehensive preventive medicine evaluation and management of established patient age 40 through 64 years,Evaluation and Management
+99397,preventive visit established patient age 65 and older,periodic comprehensive preventive medicine evaluation and management of established patient age 65 years and older,Evaluation and Management
+99406,smoking cessation counseling 3 to 10 minutes,smoking and tobacco use cessation counseling visit intermediate greater than 3 minutes up to 10 minutes,Evaluation and Management
+99407,smoking cessation counseling greater than 10 minutes,smoking and tobacco use cessation counseling visit intensive greater than 10 minutes,Evaluation and Management
+99408,alcohol substance abuse screening 15 to 30 minutes,alcohol and substance abuse structured screening and brief intervention 15 to 30 minutes,Evaluation and Management
+99409,alcohol substance abuse screening greater than 30 minutes,alcohol and substance abuse structured screening and brief intervention greater than 30 minutes,Evaluation and Management
+99441,telephone evaluation management 5 to 10 minutes,telephone evaluation and management service by physician or qualified health professional 5 to 10 minutes of medical discussion,Evaluation and Management
+99442,telephone evaluation management 11 to 20 minutes,telephone evaluation and management service by physician or qualified health professional 11 to 20 minutes of medical discussion,Evaluation and Management
+99443,telephone evaluation management 21 to 30 minutes,telephone evaluation and management service by physician or qualified health professional 21 to 30 minutes of medical discussion,Evaluation and Management
+99495,transitional care management moderate complexity,transitional care management services with moderate complexity medical decision making within 14 days of discharge including communication and follow up,Evaluation and Management
+99496,transitional care management high complexity,transitional care management services with high complexity medical decision making within 7 days of discharge including communication and follow up,Evaluation and Management
+99497,advance care planning first 30 minutes,advance care planning including explanation discussion of advance directives by physician first 30 minutes face to face with patient and family,Evaluation and Management
+99498,advance care planning each additional 30 minutes,advance care planning including explanation discussion of advance directives each additional 30 minutes,Evaluation and Management
+00100,anesthesia for procedures on salivary glands,anesthesia for procedures on salivary glands including biopsy excision and repair of salivary gland structures,Anesthesia
+00120,anesthesia for procedures on external ear,anesthesia for procedures on external ear including otoplasty biopsy excision and reconstruction of external ear,Anesthesia
+00140,anesthesia for procedures on eye,anesthesia for procedures on eye including lens surgery retinal procedures and extraocular muscle repair,Anesthesia
+00142,anesthesia for procedures on lens,anesthesia for procedures on lens including cataract extraction and intraocular lens implantation,Anesthesia
+00144,anesthesia for procedures on cornea,anesthesia for procedures on cornea including corneal transplant keratoplasty and pterygium excision,Anesthesia
+00160,anesthesia for procedures on nose and sinus,anesthesia for procedures on nose and accessory sinuses including rhinoplasty septoplasty and sinus surgery,Anesthesia
+00164,anesthesia for procedures on bony sinus structures,anesthesia for procedures on bony structures of nose and sinuses including radical sinus surgery osteotomy,Anesthesia
+00170,anesthesia for intraoral procedures,anesthesia for intraoral procedures including biopsy excision repair of lesions of mouth floor tongue and pharynx,Anesthesia
+00172,anesthesia for cleft palate repair,anesthesia for repair of cleft palate including palatoplasty and pharyngeal flap procedures,Anesthesia
+00190,anesthesia for procedures on facial bones,anesthesia for procedures on facial bones or skull including reduction of facial fractures and LeFort procedures,Anesthesia
+00210,anesthesia for intracranial procedures,anesthesia for intracranial procedures including craniotomy for tumor excision aneurysm repair and vascular malformation,Anesthesia
+00300,anesthesia for procedures on head neck and posterior fossa,anesthesia for all procedures on the integumentary system muscles and nerves of head neck and posterior fossa,Anesthesia
+00320,anesthesia for procedures on cervical spine,anesthesia for all procedures on cervical spine and cord including laminectomy discectomy and fusion,Anesthesia
+00400,anesthesia for procedures on anterior trunk,anesthesia for integumentary system procedures on anterior trunk including breast biopsy mastectomy and chest wall repair,Anesthesia
+00402,anesthesia for breast reconstruction,anesthesia for breast reconstruction procedures including tissue expander placement and flap procedures,Anesthesia
+00500,anesthesia for esophageal procedures,anesthesia for all procedures on esophagus including esophagoscopy esophagectomy and fundoplication,Anesthesia
+00520,anesthesia for closed chest procedures on thorax,anesthesia for closed chest procedures including thoracentesis chest tube placement and mediastinoscopy,Anesthesia
+00522,anesthesia for closed chest procedures on mediastinum,anesthesia for procedures on mediastinum including mediastinoscopy biopsy and mediastinal mass excision,Anesthesia
+00530,anesthesia for pacemaker insertion,anesthesia for permanent transvenous pacemaker insertion including generator placement and lead positioning,Anesthesia
+00540,anesthesia for thoracotomy procedures,anesthesia for thoracotomy procedures not otherwise specified including lung resection decortication and thoracoplasty,Anesthesia
+00560,anesthesia for cardiac procedures with bypass,anesthesia for procedures on heart pericardium and great vessels with pump oxygenator including coronary artery bypass,Anesthesia
+00600,anesthesia for procedures on cervical spine cord,anesthesia for procedures on cervical spine and spinal cord via anterior approach including discectomy and fusion,Anesthesia
+00620,anesthesia for procedures on thoracic spine,anesthesia for procedures on thoracic spine and spinal cord via anterior approach including thoracic discectomy,Anesthesia
+00630,anesthesia for procedures on lumbar spine,anesthesia for procedures on lumbar and sacral spine and spinal cord including lumbar laminectomy discectomy and fusion,Anesthesia
+00700,anesthesia for procedures on upper anterior abdomen,anesthesia for procedures on upper anterior abdominal wall including hernia repair gastrostomy and laparotomy,Anesthesia
+00730,anesthesia for upper gi endoscopy,anesthesia for upper gastrointestinal endoscopic procedures including esophagogastroduodenoscopy with or without biopsy,Anesthesia
+00740,anesthesia for upper abdominal procedures,anesthesia for procedures on upper abdomen including cholecystectomy gastrectomy and hepatic procedures,Anesthesia
+00790,anesthesia for intraperitoneal procedures upper abdomen,anesthesia for intraperitoneal procedures in upper abdomen including pancreatectomy splenectomy and liver resection,Anesthesia
+00800,anesthesia for procedures on lower anterior abdomen,anesthesia for procedures on lower anterior abdominal wall including lower hernia repair and abdominal wall reconstruction,Anesthesia
+00840,anesthesia for intraperitoneal procedures lower abdomen,anesthesia for intraperitoneal procedures in lower abdomen including appendectomy colectomy and small bowel resection,Anesthesia
+00860,anesthesia for renal procedures,anesthesia for extraperitoneal procedures including renal transplant nephrectomy and adrenalectomy,Anesthesia
+10060,incision and drainage of abscess simple,incision and drainage of abscess such as carbuncle suppurative hidradenitis cutaneous or subcutaneous abscess simple or single,Surgery - Integumentary
+10061,incision and drainage of abscess complicated,incision and drainage of abscess such as carbuncle suppurative hidradenitis cutaneous or subcutaneous abscess complicated or multiple,Surgery - Integumentary
+10080,incision and drainage of pilonidal cyst simple,incision and drainage of pilonidal cyst simple,Surgery - Integumentary
+10120,incision and removal of foreign body subcutaneous simple,incision and removal of foreign body from subcutaneous tissue simple,Surgery - Integumentary
+10121,incision and removal of foreign body subcutaneous complicated,incision and removal of foreign body from subcutaneous tissue complicated,Surgery - Integumentary
+10140,incision and drainage of hematoma seroma or fluid collection,incision and drainage of hematoma seroma or fluid collection from soft tissue,Surgery - Integumentary
+10160,puncture aspiration of abscess hematoma bulla or cyst,puncture aspiration of abscess hematoma bulla or cyst including percutaneous drainage,Surgery - Integumentary
+11000,debridement of extensive eczematous or infected skin,debridement of extensive eczematous or infected skin up to 10 percent of body surface area,Surgery - Integumentary
+11001,debridement of extensive eczematous skin each additional 10 percent,debridement of extensive eczematous or infected skin each additional 10 percent of body surface area,Surgery - Integumentary
+11010,debridement including removal of foreign material skin associated with open fracture,debridement including removal of foreign material associated with open fracture or dislocation of skin and subcutaneous tissues,Surgery - Integumentary
+11042,debridement subcutaneous tissue first 20 sq cm,debridement of subcutaneous tissue including epidermis dermis and subcutaneous tissue first 20 sq cm or less,Surgery - Integumentary
+11043,debridement muscle fascia first 20 sq cm,debridement of muscle and or fascia including epidermis dermis subcutaneous tissue first 20 sq cm or less,Surgery - Integumentary
+11044,debridement bone first 20 sq cm,debridement of bone including epidermis dermis subcutaneous tissue muscle and or fascia first 20 sq cm or less,Surgery - Integumentary
+11055,paring or cutting of benign hyperkeratotic skin lesion,paring or cutting of benign hyperkeratotic lesion such as corn or callus single lesion,Surgery - Integumentary
+11056,paring benign hyperkeratotic lesion 2 to 4 lesions,paring or cutting of benign hyperkeratotic lesion such as corn or callus 2 to 4 lesions,Surgery - Integumentary
+11100,skin biopsy single lesion,biopsy of skin subcutaneous tissue and or mucous membrane including simple closure single lesion,Surgery - Integumentary
+11101,skin biopsy each additional lesion,biopsy of skin subcutaneous tissue and or mucous membrane each separate additional lesion,Surgery - Integumentary
+11200,removal of skin tags up to 15 lesions,removal of skin tags multiple fibrocutaneous tags any area up to and including 15 lesions,Surgery - Integumentary
+11300,shave removal of epidermal lesion trunk arms legs 0.5 cm or less,shaving of epidermal or dermal lesion trunk arms or legs lesion diameter 0.5 cm or less,Surgery - Integumentary
+11400,excision benign lesion trunk arms legs 0.5 cm or less,excision of benign lesion including margins except skin tag trunk arms or legs lesion diameter 0.5 cm or less,Surgery - Integumentary
+11402,excision benign lesion trunk arms legs 1.1 to 2.0 cm,excision of benign lesion including margins trunk arms or legs excised diameter 1.1 to 2.0 cm,Surgery - Integumentary
+11440,excision benign lesion face 0.5 cm or less,excision of other benign lesion including margins face ears eyelids nose lips lesion diameter 0.5 cm or less,Surgery - Integumentary
+11600,excision malignant lesion trunk arms legs 0.5 cm or less,excision of malignant lesion including margins trunk arms or legs excised diameter 0.5 cm or less,Surgery - Integumentary
+11602,excision malignant lesion trunk arms legs 1.1 to 2.0 cm,excision of malignant lesion including margins trunk arms or legs excised diameter 1.1 to 2.0 cm,Surgery - Integumentary
+11640,excision malignant lesion face 0.5 cm or less,excision of malignant lesion including margins face ears eyelids nose lips mucous membrane excised diameter 0.5 cm or less,Surgery - Integumentary
+11720,debridement of nails any method 1 to 5 nails,debridement of nails by any method 1 to 5 nails including trimming of dystrophic nails,Surgery - Integumentary
+11721,debridement of nails any method 6 or more nails,debridement of nails by any method 6 or more nails including trimming of dystrophic nails,Surgery - Integumentary
+11730,avulsion of nail plate partial or complete simple single,avulsion of nail plate partial or complete simple single nail,Surgery - Integumentary
+11740,evacuation of subungual hematoma,evacuation of subungual hematoma drainage of blood from under fingernail or toenail,Surgery - Integumentary
+11750,excision of nail and nail matrix permanent removal,excision of nail and nail matrix partial or complete for permanent removal including chemical or surgical matrixectomy,Surgery - Integumentary
+11770,excision of pilonidal cyst or sinus simple,excision of pilonidal cyst or sinus not complicated,Surgery - Integumentary
+12001,simple repair superficial wound 2.5 cm or less,simple repair of superficial wounds of scalp neck axillae external genitalia trunk and extremities 2.5 cm or less,Surgery - Integumentary
+12002,simple repair superficial wound 2.6 to 7.5 cm,simple repair of superficial wounds of scalp neck axillae external genitalia trunk and extremities 2.6 to 7.5 cm,Surgery - Integumentary
+12011,simple repair superficial wound face 2.5 cm or less,simple repair of superficial wounds of face ears eyelids nose lips and or mucous membranes 2.5 cm or less,Surgery - Integumentary
+12031,intermediate repair wound 2.5 cm or less,repair intermediate of wounds of scalp axillae trunk and or extremities including layered closure 2.5 cm or less,Surgery - Integumentary
+12051,intermediate repair wound face 2.5 cm or less,repair intermediate of wounds of face ears eyelids nose lips and or mucous membranes 2.5 cm or less,Surgery - Integumentary
+13100,complex repair wound trunk 1.1 to 2.5 cm,repair complex of trunk wound requiring layered closure scar revision debridement extensive undermining 1.1 to 2.5 cm,Surgery - Integumentary
+13131,complex repair wound face 1.1 to 2.5 cm,repair complex of wound of forehead cheeks chin mouth neck axillae genitalia hands and feet 1.1 to 2.5 cm,Surgery - Integumentary
+15100,split thickness skin graft trunk arms legs first 100 sq cm,split thickness autograft for wound repair trunk arms legs first 100 sq cm or less or each additional 100 sq cm,Surgery - Integumentary
+15120,split thickness skin graft face scalp eyelids first 100 sq cm,split thickness autograft for wound repair face scalp eyelids mouth nose ears first 100 sq cm,Surgery - Integumentary
+17000,destruction benign or premalignant lesion first lesion,destruction by any method of benign or premalignant lesion other than skin tags or cutaneous vascular proliferative lesions first lesion,Surgery - Integumentary
+17003,destruction benign or premalignant lesion 2 to 14 lesions each,destruction by any method of benign or premalignant lesion second through 14th lesion each additional lesion,Surgery - Integumentary
+17110,destruction of flat warts up to 14 lesions,destruction by any method of flat warts molluscum contagiosum or milia up to 14 lesions,Surgery - Integumentary
+17111,destruction of flat warts 15 or more lesions,destruction by any method of flat warts molluscum contagiosum or milia 15 or more lesions,Surgery - Integumentary
+19000,puncture aspiration of breast cyst,puncture aspiration of cyst of breast including ultrasound guidance when performed,Surgery - Integumentary
+19001,puncture aspiration of breast cyst each additional cyst,puncture aspiration of cyst of breast each additional cyst including ultrasound guidance,Surgery - Integumentary
+19081,breast biopsy with imaging guidance first lesion,breast biopsy with placement of breast localization device first lesion including stereotactic guidance,Surgery - Integumentary
+19083,breast biopsy with ultrasound guidance first lesion,breast biopsy with placement of breast localization device first lesion including ultrasound guidance,Surgery - Integumentary
+19120,excision of breast cyst or aberrant tissue,excision of cyst fibroadenoma or other benign or malignant tumor aberrant breast tissue duct lesion,Surgery - Integumentary
+19301,mastectomy partial with axillary lymphadenectomy,mastectomy partial including axillary lymphadenectomy for breast cancer treatment,Surgery - Integumentary
+19303,mastectomy simple complete,simple complete mastectomy for breast cancer treatment including removal of all breast tissue,Surgery - Integumentary
+19318,breast reduction,reduction mammaplasty bilateral breast reduction surgery for symptomatic macromastia,Surgery - Integumentary
+19325,breast augmentation with implant,augmentation mammaplasty with prosthetic breast implant,Surgery - Integumentary
+19340,immediate breast reconstruction with tissue expander,immediate insertion of breast prosthesis following mastectomy including tissue expander,Surgery - Integumentary
+20220,bone biopsy trocar or needle,biopsy of bone using trocar or needle including imaging guidance when performed,Surgery - Musculoskeletal
+20225,bone biopsy deep open,biopsy of bone open method requiring deep incision exploration and tissue sampling,Surgery - Musculoskeletal
+20240,bone biopsy excisional superficial,bone biopsy excisional of superficial bone such as ilium sternum spinous process ribs,Surgery - Musculoskeletal
+20245,bone biopsy excisional deep,bone biopsy excisional of deep bone such as vertebral body femur requiring deep dissection,Surgery - Musculoskeletal
+20520,removal of foreign body muscle or tendon sheath simple,removal of foreign body in muscle or tendon sheath simple,Surgery - Musculoskeletal
+20525,removal of foreign body muscle or tendon deep complicated,removal of foreign body deep in muscle or tendon sheath complicated including dissection,Surgery - Musculoskeletal
+20550,injection single tendon sheath or ligament,injection of single tendon sheath or ligament aponeurosis including corticosteroid for tendinitis treatment,Surgery - Musculoskeletal
+20551,injection single tendon origin or insertion,injection of single tendon origin or insertion site with corticosteroid for tendinopathy treatment,Surgery - Musculoskeletal
+20552,injection trigger point 1 or 2 muscles,injection of single or multiple trigger points in 1 or 2 muscles including dry needling or anesthetic for myofascial pain,Surgery - Musculoskeletal
+20553,injection trigger point 3 or more muscles,injection of single or multiple trigger points in 3 or more muscles including dry needling for myofascial pain syndrome,Surgery - Musculoskeletal
+20600,arthrocentesis aspiration injection small joint,arthrocentesis aspiration and or injection of small joint or bursa such as fingers toes without ultrasound guidance,Surgery - Musculoskeletal
+20605,arthrocentesis aspiration injection intermediate joint,arthrocentesis aspiration and or injection of intermediate joint or bursa such as temporomandibular acromioclavicular wrist elbow ankle,Surgery - Musculoskeletal
+20610,arthrocentesis aspiration injection major joint,arthrocentesis aspiration and or injection of major joint or bursa such as shoulder hip knee subacromial bursa without ultrasound,Surgery - Musculoskeletal
+20611,arthrocentesis aspiration injection major joint with ultrasound,arthrocentesis aspiration and or injection of major joint or bursa with ultrasound guidance with permanent recording and reporting,Surgery - Musculoskeletal
+20680,removal of implant deep including screws and plates,removal of implant from bone including screws plates rods and nails requiring deep incision,Surgery - Musculoskeletal
+20900,bone graft any donor area minor,bone graft obtained from any donor area including cortical or cancellous bone minor or small amount,Surgery - Musculoskeletal
+20902,bone graft any donor area major,bone graft obtained from any donor area including cortical cancellous or corticocancellous bone major or large amount including structural grafts,Surgery - Musculoskeletal
+23350,injection procedure shoulder arthrography,injection procedure for shoulder arthrography or enhanced imaging of glenohumeral joint,Surgery - Musculoskeletal
+23412,repair of rotator cuff chronic,repair of ruptured musculotendinous cuff open of shoulder chronic rotator cuff tear,Surgery - Musculoskeletal
+23430,tenodesis of long tendon of biceps,tenodesis of long tendon of biceps at shoulder for bicipital tendinitis or instability,Surgery - Musculoskeletal
+23472,total shoulder replacement arthroplasty,arthroplasty glenohumeral joint total shoulder replacement including humeral head and glenoid components,Surgery - Musculoskeletal
+23615,open treatment proximal humerus fracture,open treatment of proximal humeral fracture including internal fixation with plates screws or nails,Surgery - Musculoskeletal
+24065,biopsy soft tissue upper arm or elbow deep,biopsy of soft tissue of upper arm or elbow area deep subfascial or intramuscular,Surgery - Musculoskeletal
+24340,tenodesis of biceps tendon at elbow,tenodesis of biceps tendon at elbow with or without tendon graft for distal biceps rupture,Surgery - Musculoskeletal
+24341,repair lateral collateral ligament elbow,repair of lateral collateral ligament of elbow with local tissue augmentation for elbow instability,Surgery - Musculoskeletal
+25500,closed treatment of radial shaft fracture,closed treatment of radial shaft fracture without manipulation of distal radius fracture,Surgery - Musculoskeletal
+25515,open treatment of radial shaft fracture,open treatment of radial shaft fracture with internal fixation including plate and screw fixation,Surgery - Musculoskeletal
+25600,closed treatment of distal radial fracture,closed treatment of distal radial fracture such as colles or smith type without manipulation,Surgery - Musculoskeletal
+25607,open treatment of distal radial fracture,open treatment of distal radial fracture with internal fixation including volar plate fixation,Surgery - Musculoskeletal
+26010,drainage of finger abscess simple,drainage of finger abscess simple including felon or paronychia incision and drainage,Surgery - Musculoskeletal
+26055,tendon sheath incision trigger finger,tendon sheath incision for trigger finger or trigger thumb release of A1 pulley,Surgery - Musculoskeletal
+26600,closed treatment of metacarpal fracture,closed treatment of metacarpal fracture single without manipulation,Surgery - Musculoskeletal
+26735,open treatment of phalangeal fracture proximal or middle,open treatment of phalangeal shaft fracture proximal or middle phalanx finger or thumb with internal fixation,Surgery - Musculoskeletal
+27096,injection procedure sacroiliac joint,injection procedure for sacroiliac joint anesthetic and or steroid with image guidance including fluoroscopy or CT,Surgery - Musculoskeletal
+27130,total hip replacement arthroplasty,arthroplasty acetabular and proximal femoral prosthetic replacement total hip arthroplasty with or without autograft or allograft,Surgery - Musculoskeletal
+27235,open treatment femoral neck fracture internal fixation,percutaneous skeletal fixation of femoral neck fracture with internal fixation including screws or pins,Surgery - Musculoskeletal
+27236,open treatment femoral neck fracture with prosthetic replacement,open treatment of femoral neck fracture with internal fixation or prosthetic replacement hemiarthroplasty,Surgery - Musculoskeletal
+27244,open treatment intertrochanteric femur fracture,open treatment of intertrochanteric pertrochanteric or subtrochanteric femoral fracture with intramedullary implant,Surgery - Musculoskeletal
+27245,open treatment intertrochanteric fracture with plate,treatment of intertrochanteric fracture with plate and hip screw construct including sliding hip screw,Surgery - Musculoskeletal
+27332,arthrotomy knee with excision of semilunar cartilage,arthrotomy with excision of semilunar cartilage meniscectomy of knee including any meniscal shaving,Surgery - Musculoskeletal
+27405,repair primary torn ligament of knee,repair of primary torn ligaments of knee including collateral and cruciate ligaments,Surgery - Musculoskeletal
+27427,reconstruction ligament knee extra articular,ligamentous reconstruction of knee extra articular augmentation including lateral extra articular tenodesis,Surgery - Musculoskeletal
+27447,total knee replacement arthroplasty,arthroplasty of knee condyle and plateau medial and lateral compartments total knee replacement with or without patella resurfacing,Surgery - Musculoskeletal
+27570,manipulation of knee joint under general anesthesia,manipulation of knee joint under general anesthesia including application of traction apparatus for adhesions,Surgery - Musculoskeletal
+27750,closed treatment tibial shaft fracture,closed treatment of tibial shaft fracture without traction or manipulation,Surgery - Musculoskeletal
+27756,open treatment tibial shaft fracture,percutaneous skeletal fixation of tibial shaft fracture with intramedullary nail including locking,Surgery - Musculoskeletal
+27786,closed treatment of distal fibular fracture,closed treatment of distal fibular fracture lateral malleolus without manipulation,Surgery - Musculoskeletal
+27792,open treatment of distal fibular fracture,open treatment of distal fibular fracture lateral malleolus with internal fixation,Surgery - Musculoskeletal
+28285,correction of hammertoe,correction of hammertoe involving interphalangeal joint requiring partial or complete phalangectomy,Surgery - Musculoskeletal
+28296,correction of hallux valgus bunion,correction of hallux valgus bunion with metatarsal osteotomy and soft tissue procedures,Surgery - Musculoskeletal
+29125,application of short arm splint forearm to hand static,application of short arm splint forearm to hand static immobilization for fracture or sprain,Surgery - Musculoskeletal
+29130,application of finger splint static,application of finger splint static for immobilization of finger fracture or mallet finger,Surgery - Musculoskeletal
+29515,application of short leg splint calf to foot,application of short leg splint calf to foot static for ankle fracture or sprain immobilization,Surgery - Musculoskeletal
+29580,strapping application of unna boot,application of unna boot paste boot for venous stasis ulcer or lower extremity edema treatment,Surgery - Musculoskeletal
+29881,arthroscopy knee with meniscectomy medial or lateral,arthroscopy of knee surgical with meniscectomy including any meniscal shaving medial or lateral compartment,Surgery - Musculoskeletal
+29882,arthroscopy knee with meniscus repair medial or lateral,arthroscopy of knee surgical with meniscus repair medial or lateral compartment,Surgery - Musculoskeletal
+29888,arthroscopy knee anterior cruciate ligament reconstruction,arthroscopically aided anterior cruciate ligament repair or reconstruction with tendon graft harvesting,Surgery - Musculoskeletal
+30000,drainage of abscess or hematoma of nasal septum,drainage of abscess or hematoma of nasal septum,Surgery - Respiratory
+30100,biopsy intranasal,biopsy of intranasal tissue mass or lesion for pathological examination,Surgery - Respiratory
+30110,excision nasal polyp simple,excision of nasal polyp or polyps simple single or bilateral,Surgery - Respiratory
+30115,excision nasal polyp extensive,excision of nasal polyps extensive requiring general anesthesia and debridement,Surgery - Respiratory
+30117,excision or destruction intranasal lesion internal approach,excision or destruction of intranasal lesion internal approach including cautery or cryotherapy,Surgery - Respiratory
+30140,submucous resection inferior turbinate partial or complete,submucous resection of inferior turbinate partial or complete including any lateral displacement of turbinate bone,Surgery - Respiratory
+30300,removal of foreign body intranasal office type,removal of foreign body from intranasal cavity office type procedure,Surgery - Respiratory
+30410,rhinoplasty primary complete external parts,rhinoplasty primary complete lateral and alar cartilages and or elevation of nasal tip external parts,Surgery - Respiratory
+30420,rhinoplasty primary including major septal repair,rhinoplasty primary including major septal repair nasal septoplasty with rhinoplasty,Surgery - Respiratory
+30520,septoplasty with or without cartilage scoring,septoplasty or submucous resection with or without cartilage scoring contouring or replacement with graft for deviated septum,Surgery - Respiratory
+31231,nasal endoscopy diagnostic,nasal endoscopy diagnostic unilateral or bilateral examination of nasal passages and nasopharynx,Surgery - Respiratory
+31237,nasal endoscopy surgical with biopsy polypectomy or debridement,nasal or sinus endoscopy surgical with biopsy polypectomy or debridement unilateral or bilateral,Surgery - Respiratory
+31254,nasal endoscopy with ethmoidectomy partial anterior,nasal or sinus endoscopy surgical with ethmoidectomy partial anterior including removal of tissue polyps,Surgery - Respiratory
+31255,nasal endoscopy with ethmoidectomy total anterior and posterior,nasal or sinus endoscopy surgical with ethmoidectomy total anterior and posterior for chronic sinusitis,Surgery - Respiratory
+31256,nasal endoscopy with maxillary antrostomy,nasal or sinus endoscopy surgical with maxillary antrostomy for drainage of maxillary sinus disease,Surgery - Respiratory
+31267,nasal endoscopy with maxillary antrostomy and removal of tissue,nasal or sinus endoscopy surgical with maxillary antrostomy with removal of tissue from maxillary sinus,Surgery - Respiratory
+31276,nasal endoscopy with frontal sinus exploration,nasal or sinus endoscopy surgical with frontal sinus exploration including sinusotomy frontal recess approach,Surgery - Respiratory
+31500,emergency endotracheal intubation,intubation endotracheal emergency procedure including placement of endotracheal tube and verification,Surgery - Respiratory
+31525,laryngoscopy direct diagnostic with or without tracheoscopy,laryngoscopy direct diagnostic except newborn with or without tracheoscopy,Surgery - Respiratory
+31535,laryngoscopy direct operative with biopsy,laryngoscopy direct operative with biopsy of laryngeal mass or lesion,Surgery - Respiratory
+31536,laryngoscopy direct operative with excision of tumor,laryngoscopy direct operative with excision of tumor and or stripping of vocal cords or epiglottis,Surgery - Respiratory
+31575,laryngoscopy flexible diagnostic,laryngoscopy flexible fiberoptic diagnostic examination of larynx and hypopharynx,Surgery - Respiratory
+31622,bronchoscopy diagnostic with cell washing,bronchoscopy rigid or flexible diagnostic including cell washing when performed for evaluation of airway,Surgery - Respiratory
+31623,bronchoscopy with brushing or protected brushings,bronchoscopy with brushing or protected brushings for obtaining specimens from lower respiratory tract,Surgery - Respiratory
+31624,bronchoscopy with bronchial alveolar lavage,bronchoscopy with bronchial alveolar lavage for diagnostic evaluation of pulmonary disease,Surgery - Respiratory
+31625,bronchoscopy with bronchial biopsy,bronchoscopy with bronchial or endobronchial biopsy single or multiple sites for tissue diagnosis,Surgery - Respiratory
+33016,pericardiocentesis including imaging guidance,pericardiocentesis including imaging guidance and monitoring for drainage of pericardial effusion,Surgery - Cardiovascular
+33020,pericardiostomy for removal of clot or foreign body,pericardiostomy for removal of clot foreign body or exploration of pericardium,Surgery - Cardiovascular
+33025,creation of pericardial window for drainage,creation of pericardial window or partial resection for drainage of pericardial effusion,Surgery - Cardiovascular
+33120,excision of intracardiac tumor,excision of intracardiac tumor resection with cardiopulmonary bypass,Surgery - Cardiovascular
+33202,insertion of epicardial electrode,insertion of epicardial electrode by thoracotomy approach for permanent pacemaker or defibrillator,Surgery - Cardiovascular
+33206,insertion of permanent pacemaker atrial,insertion of new or replacement of permanent pacemaker with transvenous electrode atrial,Surgery - Cardiovascular
+33207,insertion of permanent pacemaker ventricular,insertion of new or replacement of permanent pacemaker with transvenous electrode ventricular,Surgery - Cardiovascular
+33208,insertion of permanent pacemaker dual chamber,insertion of new or replacement of permanent pacemaker with transvenous electrodes atrial and ventricular dual chamber,Surgery - Cardiovascular
+33210,insertion of temporary transvenous pacemaker electrode,insertion of temporary transvenous single chamber cardiac electrode or pacemaker catheter,Surgery - Cardiovascular
+33213,insertion of pacemaker pulse generator dual lead,insertion of pacemaker pulse generator only with existing dual leads including connection to existing leads,Surgery - Cardiovascular
+33216,insertion of single transvenous electrode permanent pacemaker,insertion of a single transvenous electrode for permanent pacemaker or cardioverter defibrillator,Surgery - Cardiovascular
+33217,insertion of dual transvenous electrodes permanent pacemaker,insertion of 2 transvenous electrodes for permanent pacemaker or cardioverter defibrillator,Surgery - Cardiovascular
+33225,insertion of pacing electrode left ventricular via coronary sinus,insertion of pacing electrode cardiac venous system for left ventricular pacing via coronary venous system,Surgery - Cardiovascular
+33233,removal of permanent pacemaker pulse generator,removal of permanent pacemaker pulse generator only without replacement,Surgery - Cardiovascular
+33249,insertion or replacement of permanent implantable defibrillator,insertion or replacement of permanent implantable cardioverter defibrillator system with transvenous leads,Surgery - Cardiovascular
+33261,operative ablation of ventricular tachycardia,operative tissue ablation and reconstruction of atria or ventricles for treatment of ventricular tachycardia,Surgery - Cardiovascular
+33405,aortic valve replacement with cardiopulmonary bypass,replacement of aortic valve with cardiopulmonary bypass with prosthetic valve other than homograft or stentless valve,Surgery - Cardiovascular
+33426,mitral valve repair,mitral valve valvuloplasty repair including cardiopulmonary bypass for mitral regurgitation,Surgery - Cardiovascular
+33430,mitral valve replacement,replacement of mitral valve with cardiopulmonary bypass with prosthetic valve for mitral stenosis or regurgitation,Surgery - Cardiovascular
+33510,coronary artery bypass graft using venous single graft,coronary artery bypass vein only single coronary venous graft for coronary artery disease,Surgery - Cardiovascular
+33511,coronary artery bypass graft using venous 2 grafts,coronary artery bypass vein only 2 coronary venous grafts for treatment of coronary artery disease,Surgery - Cardiovascular
+33512,coronary artery bypass graft using venous 3 grafts,coronary artery bypass vein only 3 coronary venous grafts for multivessel coronary artery disease,Surgery - Cardiovascular
+33533,coronary artery bypass graft using arterial single graft,coronary artery bypass using arterial graft single arterial graft including harvesting of artery,Surgery - Cardiovascular
+33534,coronary artery bypass graft using arterial 2 grafts,coronary artery bypass using arterial graft 2 coronary arterial grafts including harvesting of grafts,Surgery - Cardiovascular
+33572,coronary endarterectomy open performed with cabg,coronary endarterectomy open any method of coronary artery performed in conjunction with coronary artery bypass graft,Surgery - Cardiovascular
+33880,endovascular repair of descending thoracic aorta,endovascular repair of descending thoracic aorta using stent graft including coverage of left subclavian artery,Surgery - Cardiovascular
+33881,endovascular repair of descending thoracic aorta extension,placement of proximal extension prosthesis for endovascular repair of descending thoracic aorta,Surgery - Cardiovascular
+34800,endovascular repair of infrarenal abdominal aortic aneurysm,endovascular repair of infrarenal abdominal aortic aneurysm or dissection including deployment of bifurcated prosthesis,Surgery - Cardiovascular
+35301,carotid endarterectomy with or without patch graft,thromboendarterectomy including patch graft of carotid artery by neck incision for carotid stenosis,Surgery - Cardiovascular
+35302,superficial femoral artery endarterectomy,thromboendarterectomy including patch graft of superficial femoral artery for peripheral vascular disease,Surgery - Cardiovascular
+35500,venous bypass graft harvest of vein,harvest of upper extremity vein one segment for lower extremity or coronary artery bypass procedure,Surgery - Cardiovascular
+35556,bypass graft femoral popliteal,bypass graft with vein femoral popliteal for peripheral arterial occlusive disease,Surgery - Cardiovascular
+35656,bypass graft femoral popliteal with synthetic conduit,bypass graft with other than vein femoral popliteal for peripheral arterial disease,Surgery - Cardiovascular
+36000,introduction of needle or intracatheter vein,introduction of needle or intracatheter into vein for intravenous access,Surgery - Cardiovascular
+36010,introduction of catheter superior or inferior vena cava,introduction of catheter into superior or inferior vena cava,Surgery - Cardiovascular
+36140,introduction of needle or catheter upper extremity artery,introduction of needle or intracatheter into upper extremity artery for arterial puncture,Surgery - Cardiovascular
+36200,introduction of catheter aorta,introduction of catheter aorta performed from any approach for angiography,Surgery - Cardiovascular
+36215,selective catheter placement renal artery,selective catheter placement arterial system each first order renal artery branch,Surgery - Cardiovascular
+36245,selective catheter placement arterial second order,selective catheter placement arterial system second order thoracic or brachiocephalic branch,Surgery - Cardiovascular
+36410,venipuncture age 3 years or older for specimen collection,venipuncture patient 3 years or older requiring physician or other qualified health professional skill for specimen collection,Surgery - Cardiovascular
+36415,collection of venous blood by venipuncture routine,collection of venous blood by venipuncture routine phlebotomy for laboratory testing,Surgery - Cardiovascular
+36556,insertion of non tunneled centrally inserted central venous catheter,insertion of non tunneled centrally inserted central venous catheter age 5 years or older,Surgery - Cardiovascular
+36561,insertion of tunneled centrally inserted central venous catheter,insertion of tunneled centrally inserted central venous access device with subcutaneous port,Surgery - Cardiovascular
+36600,arterial puncture for blood gas collection,arterial puncture withdrawal of blood for diagnosis of arterial blood gas analysis,Surgery - Cardiovascular
+37228,revascularization iliac artery with stent,revascularization open or percutaneous tibial peroneal with transluminal stent placement including angioplasty,Surgery - Cardiovascular
+37700,ligation and division of long saphenous vein,ligation and division of long saphenous vein at saphenofemoral junction or distal interruptions for varicose veins,Surgery - Cardiovascular
+40490,biopsy of lip,biopsy of lip tissue for pathological examination of oral lesion,Surgery - Digestive
+40808,biopsy of vestibule of mouth,biopsy of vestibule of mouth for pathological examination of oral mucosal lesion,Surgery - Digestive
+41100,biopsy of tongue anterior two thirds,biopsy of tongue anterior two thirds for pathological diagnosis of tongue lesion,Surgery - Digestive
+42100,biopsy of palate uvula,biopsy of palate or uvula tissue for pathological examination of palatal lesion,Surgery - Digestive
+42415,excision of parotid gland or tumor lateral lobe,excision of parotid tumor or parotid gland lateral lobe without nerve dissection for parotid mass,Surgery - Digestive
+42700,incision and drainage of peritonsillar abscess,incision and drainage of abscess peritonsillar also known as quinsy drainage,Surgery - Digestive
+42820,tonsillectomy and adenoidectomy younger than age 12,tonsillectomy and adenoidectomy for patient younger than age 12 for recurrent tonsillitis or obstructive sleep apnea,Surgery - Digestive
+42826,tonsillectomy primary or secondary age 12 or over,tonsillectomy primary or secondary for patient age 12 or over for recurrent tonsillitis,Surgery - Digestive
+43200,esophagoscopy flexible diagnostic,esophagoscopy flexible transoral diagnostic including collection of specimen by brushing or washing when performed,Surgery - Digestive
+43202,esophagoscopy with biopsy,esophagoscopy flexible transoral with biopsy single or multiple for diagnosis of esophageal pathology,Surgery - Digestive
+43215,esophagoscopy with removal of foreign body,esophagoscopy flexible transoral with removal of foreign body from esophagus,Surgery - Digestive
+43235,esophagogastroduodenoscopy diagnostic,esophagogastroduodenoscopy flexible transoral diagnostic including collection of specimens by brushing or washing when performed,Surgery - Digestive
+43239,upper gi endoscopy with biopsy,esophagogastroduodenoscopy flexible transoral with biopsy single or multiple for pathological diagnosis of upper gi disease,Surgery - Digestive
+43246,upper gi endoscopy with gastrostomy tube placement,esophagogastroduodenoscopy flexible transoral with directed placement of percutaneous gastrostomy tube,Surgery - Digestive
+43247,upper gi endoscopy with foreign body removal,esophagogastroduodenoscopy flexible transoral with removal of foreign body from upper gastrointestinal tract,Surgery - Digestive
+43248,upper gi endoscopy with dilation of esophagus,esophagogastroduodenoscopy flexible transoral with insertion of guide wire followed by passage of dilator over guide wire,Surgery - Digestive
+43249,upper gi endoscopy with balloon dilation of esophagus,esophagogastroduodenoscopy flexible transoral with balloon dilation of esophagus less than 30 mm diameter,Surgery - Digestive
+43255,upper gi endoscopy with control of bleeding,esophagogastroduodenoscopy flexible transoral with control of bleeding by injection cautery or other methods,Surgery - Digestive
+43280,laparoscopic fundoplication for gastroesophageal reflux,laparoscopy surgical esophagogastric fundoplasty nissen fundoplication for gastroesophageal reflux disease,Surgery - Digestive
+43289,laparoscopic unlisted esophageal procedure,unlisted laparoscopy procedure for esophagus including diagnostic and therapeutic procedures,Surgery - Digestive
+44120,enterectomy resection of small intestine,enterectomy resection of small intestine single resection and anastomosis for small bowel disease,Surgery - Digestive
+44140,colectomy partial with anastomosis,colectomy partial with anastomosis for colon cancer diverticular disease or other colonic pathology,Surgery - Digestive
+44180,laparoscopic enterolysis lysis of adhesions,laparoscopy surgical enterolysis lysis of adhesions freeing of intestinal adhesions,Surgery - Digestive
+44202,laparoscopic enterectomy small intestine resection,laparoscopy surgical enterectomy resection of small intestine single resection and anastomosis,Surgery - Digestive
+44204,laparoscopic colectomy partial with anastomosis,laparoscopy surgical colectomy partial with anastomosis for colon cancer or diverticulitis,Surgery - Digestive
+44312,revision of ileostomy,revision of ileostomy including simple lysis or relocation of ostomy,Surgery - Digestive
+44950,appendectomy,appendectomy open approach for acute appendicitis with or without abscess drainage,Surgery - Digestive
+44970,laparoscopic appendectomy,laparoscopy surgical appendectomy for acute appendicitis including removal of appendix,Surgery - Digestive
+45300,proctosigmoidoscopy diagnostic,proctosigmoidoscopy rigid diagnostic with or without collection of specimen by brushing or washing,Surgery - Digestive
+45330,sigmoidoscopy flexible diagnostic,sigmoidoscopy flexible diagnostic including collection of specimen by brushing or washing when performed,Surgery - Digestive
+45331,sigmoidoscopy flexible with biopsy,sigmoidoscopy flexible with biopsy single or multiple for pathological diagnosis of colorectal disease,Surgery - Digestive
+45378,colonoscopy flexible diagnostic,colonoscopy flexible proximal to splenic flexure diagnostic including collection of specimen by brushing or washing,Surgery - Digestive
+45380,colonoscopy with biopsy,colonoscopy flexible with biopsy single or multiple by hot biopsy forceps or bipolar cautery,Surgery - Digestive
+45381,colonoscopy with submucosal injection,colonoscopy flexible with directed submucosal injection of any substance for polyp removal site marking,Surgery - Digestive
+45384,colonoscopy with removal of polyp by hot biopsy forceps,colonoscopy flexible with removal of tumor polyp or other lesion by hot biopsy forceps,Surgery - Digestive
+45385,colonoscopy with removal of polyp by snare,colonoscopy flexible with removal of tumor polyp or other lesion by snare technique,Surgery - Digestive
+46083,incision of thrombosed external hemorrhoid,incision of thrombosed hemorrhoid external including drainage and evacuation of thrombus,Surgery - Digestive
+46221,hemorrhoidectomy by rubber band ligation internal,hemorrhoidectomy internal by rubber band ligation for treatment of symptomatic internal hemorrhoids,Surgery - Digestive
+46255,hemorrhoidectomy external complete,hemorrhoidectomy external complete including excision of external hemorrhoidal tags when performed,Surgery - Digestive
+46260,hemorrhoidectomy internal and external complex,hemorrhoidectomy internal and external complex or extensive for treatment of combined hemorrhoid disease,Surgery - Digestive
+46600,anoscopy diagnostic,anoscopy diagnostic including collection of specimen by brushing or washing when performed,Surgery - Digestive
+47000,liver biopsy needle percutaneous,biopsy of liver percutaneous needle approach including imaging guidance when performed,Surgery - Digestive
+47100,liver biopsy wedge,biopsy of liver wedge approach during open abdominal surgery for hepatic disease diagnosis,Surgery - Digestive
+47562,laparoscopic cholecystectomy,laparoscopy surgical cholecystectomy for gallbladder removal due to cholelithiasis or cholecystitis,Surgery - Digestive
+47563,laparoscopic cholecystectomy with cholangiography,laparoscopy surgical cholecystectomy with cholangiography including intraoperative imaging of bile ducts,Surgery - Digestive
+49505,inguinal hernia repair age 5 or over initial reducible,repair of initial inguinal hernia age 5 years or older reducible open approach,Surgery - Digestive
+49507,inguinal hernia repair age 5 or over incarcerated,repair of initial inguinal hernia age 5 years or older incarcerated or strangulated open approach,Surgery - Digestive
+49520,repair of recurrent inguinal hernia,repair of recurrent inguinal hernia any age reducible including mesh when used,Surgery - Digestive
+49560,repair of incisional or ventral hernia initial reducible,repair of initial incisional or ventral hernia reducible with mesh or other prosthesis when used,Surgery - Digestive
+49585,repair of umbilical hernia age 5 or over reducible,repair of umbilical hernia age 5 years or over reducible including mesh when used,Surgery - Digestive
+49650,laparoscopic repair of inguinal hernia initial,laparoscopy surgical repair of initial inguinal hernia including mesh insertion when performed,Surgery - Digestive
+50060,nephrolithotomy removal of calculus,nephrolithotomy removal of calculus including stone extraction from kidney,Surgery - Urinary
+50200,renal biopsy percutaneous needle,renal biopsy percutaneous by trocar or needle approach including imaging guidance for kidney disease,Surgery - Urinary
+50230,nephrectomy radical with regional lymphadenectomy,nephrectomy including radical with regional lymphadenectomy and or vena caval thrombectomy for renal cell carcinoma,Surgery - Urinary
+50234,nephrectomy with total ureterectomy,nephrectomy with total ureterectomy and bladder cuff for urothelial carcinoma of renal pelvis,Surgery - Urinary
+50543,laparoscopic partial nephrectomy,laparoscopy surgical partial nephrectomy including renal tumor excision with preservation of remaining kidney,Surgery - Urinary
+50545,laparoscopic radical nephrectomy,laparoscopy surgical radical nephrectomy including removal of gerota fascia and regional lymphadenectomy when performed,Surgery - Urinary
+50590,lithotripsy extracorporeal shock wave,lithotripsy extracorporeal shock wave for renal or ureteral calculus stone fragmentation,Surgery - Urinary
+50700,ureteroplasty plastic operation on ureter,ureteroplasty plastic operation on ureter for stricture repair or ureteral reconstruction,Surgery - Urinary
+50727,revision of urinary cutaneous diversion,revision of urinary cutaneous ostomy stoma for stenosis or malposition including urinary diversion maintenance,Surgery - Urinary
+50945,laparoscopic ureterolithotomy,laparoscopy surgical ureterolithotomy removal of ureteral calculus from ureter,Surgery - Urinary
+51020,cystotomy with drainage of pelvic abscess,cystotomy or cystostomy with fulguration and or insertion of radioactive material,Surgery - Urinary
+51050,cystolithotomy removal of bladder calculus,cystolithotomy surgical removal of calculus from urinary bladder including stone extraction,Surgery - Urinary
+51102,aspiration of bladder by trocar or needle,aspiration of bladder by needle or trocar approach with or without ultrasound guidance for urinary retention,Surgery - Urinary
+51600,injection procedure for cystography,injection procedure for cystography or voiding urethrocystography for evaluation of bladder anatomy,Surgery - Urinary
+51700,bladder irrigation simple lavage,bladder irrigation simple lavage and or instillation for treatment of bladder inflammation,Surgery - Urinary
+51702,insertion of temporary indwelling bladder catheter simple,insertion of temporary indwelling bladder catheter simple foley catheter without imaging guidance,Surgery - Urinary
+51705,change of cystostomy tube simple,change of cystostomy tube simple replacement of suprapubic catheter,Surgery - Urinary
+51720,bladder instillation of anticarcinogenic agent,bladder instillation of anticarcinogenic agent such as bcg or mitomycin for bladder cancer treatment,Surgery - Urinary
+51726,complex cystometrogram with voiding pressure studies,complex cystometrogram with voiding pressure studies including measurement of bladder capacity and compliance,Surgery - Urinary
+51798,measurement of post void residual urine,measurement of post void residual urine and or bladder capacity by ultrasound non imaging,Surgery - Urinary
+52000,cystourethroscopy diagnostic,cystourethroscopy cystoscopy diagnostic examination of bladder and urethra,Surgery - Urinary
+52001,cystourethroscopy with irrigation and evacuation of clots,cystourethroscopy with irrigation and evacuation of multiple obstructing clots from bladder,Surgery - Urinary
+52005,cystourethroscopy with ureteral catheterization,cystourethroscopy with ureteral catheterization with or without irrigation for collecting ureteral specimens,Surgery - Urinary
+52204,cystourethroscopy with biopsy,cystourethroscopy with biopsy of bladder wall or urethra for pathological diagnosis,Surgery - Urinary
+52235,cystourethroscopy with fulguration of bladder tumor,cystourethroscopy with fulguration including treatment of minor bladder tumors 0.5 to 2.0 cm,Surgery - Urinary
+52310,cystourethroscopy with removal of foreign body or calculus,cystourethroscopy with removal of foreign body calculus or ureteral stent from bladder,Surgery - Urinary
+61000,subdural tap through fontanelle,subdural tap through fontanelle or suture in infant for drainage of subdural fluid collection,Surgery - Nervous System
+61105,twist drill hole for subdural drainage,twist drill hole for subdural or ventricular puncture for drainage of subdural hematoma,Surgery - Nervous System
+61154,burr hole with evacuation of hematoma extradural or subdural,burr hole or trephine with evacuation and or drainage of hematoma extradural or subdural,Surgery - Nervous System
+61210,burr hole for implanting ventricular catheter,burr hole for subdural implantation of transducer or ventricular catheter for intracranial pressure monitoring,Surgery - Nervous System
+61312,craniectomy for evacuation of hematoma supratentorial,craniectomy or craniotomy for evacuation of hematoma supratentorial extradural or subdural,Surgery - Nervous System
+61313,craniectomy for evacuation of hematoma infratentorial,craniectomy or craniotomy for evacuation of hematoma infratentorial extradural or subdural posterior fossa,Surgery - Nervous System
+61510,craniectomy for excision of brain tumor supratentorial,craniectomy trephination bone flap craniotomy for excision of brain tumor supratentorial except meningioma,Surgery - Nervous System
+61518,craniectomy for excision of brain tumor infratentorial,craniectomy for excision of brain tumor infratentorial or posterior fossa except meningioma cerebellopontine angle tumor,Surgery - Nervous System
+62223,creation of shunt ventriculo peritoneal,creation of shunt ventriculoperitoneal ventriculoatrial or ventriculopleural for hydrocephalus treatment,Surgery - Nervous System
+62230,replacement or revision of csf shunt valve or catheter,replacement or revision of cerebrospinal fluid shunt obstructed valve or proximal or distal catheter,Surgery - Nervous System
+62270,lumbar puncture spinal tap diagnostic,spinal puncture lumbar diagnostic cerebrospinal fluid collection for analysis of meningitis or neurological disease,Surgery - Nervous System
+62272,spinal puncture therapeutic for drainage of csf,spinal puncture therapeutic for drainage of cerebrospinal fluid for treatment of pseudotumor cerebri,Surgery - Nervous System
+62280,injection of neurolytic substance subarachnoid,injection or infusion of neurolytic substance subarachnoid for pain management of cancer pain,Surgery - Nervous System
+62310,injection epidural or subarachnoid cervical or thoracic,injection of diagnostic or therapeutic substance epidural or subarachnoid cervical or thoracic region,Surgery - Nervous System
+62311,injection epidural or subarachnoid lumbar or sacral,injection of diagnostic or therapeutic substance epidural or subarachnoid lumbar or sacral for back pain treatment,Surgery - Nervous System
+63001,laminectomy for exploration decompression of spinal cord cervical,laminectomy with exploration and or decompression of spinal cord and or cauda equina cervical region,Surgery - Nervous System
+63005,laminectomy for exploration decompression lumbar,laminectomy with exploration and or decompression of spinal cord and or cauda equina lumbar region including central spinal stenosis,Surgery - Nervous System
+63030,laminotomy with discectomy lumbar,laminotomy hemilaminectomy with decompression of nerve root including partial facetectomy and foraminotomy and discectomy one interspace lumbar,Surgery - Nervous System
+63042,laminotomy with discectomy lumbar reexploration,laminotomy for reexploration and decompression including discectomy lumbar for recurrent disc herniation,Surgery - Nervous System
+63047,laminectomy with facetectomy and foraminotomy lumbar single,laminectomy facetectomy and foraminotomy single vertebral segment with decompression of spinal cord lumbar,Surgery - Nervous System
+63075,discectomy anterior with decompression cervical,discectomy anterior with decompression of spinal cord and or nerve root cervical single interspace including osteophytectomy,Surgery - Nervous System
+64405,injection anesthetic agent greater occipital nerve,injection of anesthetic agent and or steroid into greater occipital nerve for occipital neuralgia and headache,Surgery - Nervous System
+64447,injection anesthetic agent femoral nerve single,injection of anesthetic agent femoral nerve single for lower extremity pain management,Surgery - Nervous System
+64450,injection anesthetic agent peripheral nerve,injection of anesthetic agent other peripheral nerve or branch for nerve block and pain management,Surgery - Nervous System
+64483,injection transforaminal epidural lumbar single level,injection including fluoroscopic guidance transforaminal epidural with anesthetic and steroid lumbar or sacral single level,Surgery - Nervous System
+64493,injection paravertebral facet joint lumbar single level,injection of diagnostic or therapeutic agent paravertebral facet joint or nerve innervating joint lumbar single level,Surgery - Nervous System
+70030,radiologic examination eye for foreign body detection,radiologic examination of eye for detection of foreign body or orbital evaluation,Radiology
+70100,radiologic examination mandible partial,radiologic examination of mandible partial less than 4 views for evaluation of fracture or dental pathology,Radiology
+70110,radiologic examination mandible complete,radiologic examination of mandible complete minimum of 4 views for comprehensive evaluation,Radiology
+70150,radiologic examination facial bones complete,radiologic examination of facial bones complete minimum of 3 views for evaluation of facial fracture,Radiology
+70200,radiologic examination orbits complete,radiologic examination of orbits complete minimum of 4 views for orbital pathology evaluation,Radiology
+70210,radiologic examination sinuses paranasal less than 3 views,radiologic examination of sinuses paranasal less than 3 views for evaluation of sinusitis or sinus pathology,Radiology
+70220,radiologic examination sinuses paranasal complete,radiologic examination of sinuses paranasal complete minimum of 3 views for comprehensive sinus evaluation,Radiology
+70250,radiologic examination skull less than 4 views,radiologic examination of skull less than 4 views for evaluation of skull fracture or cranial pathology,Radiology
+70260,radiologic examination skull complete,radiologic examination of skull complete minimum of 4 views for comprehensive cranial evaluation,Radiology
+70328,radiologic examination temporomandibular joint bilateral,radiologic examination of temporomandibular joint open and closed mouth bilateral for tmj dysfunction,Radiology
+70450,ct scan head or brain without contrast,computed tomography of head or brain without contrast material for evaluation of stroke hemorrhage or tumor,Radiology
+70460,ct scan head or brain with contrast,computed tomography of head or brain with contrast material for enhanced evaluation of intracranial pathology,Radiology
+70470,ct scan head or brain without contrast followed by with contrast,computed tomography of head or brain without contrast material followed by contrast material and further sections,Radiology
+70486,ct scan maxillofacial without contrast,computed tomography of maxillofacial area without contrast for evaluation of sinus disease facial trauma,Radiology
+70491,ct scan soft tissue neck with contrast,computed tomography of soft tissue of neck with contrast material for evaluation of neck mass or lymphadenopathy,Radiology
+70496,ct angiography head with contrast,computed tomographic angiography of head with contrast material including 3d rendering for evaluation of cerebral vasculature,Radiology
+70498,ct angiography neck with contrast,computed tomographic angiography of neck with contrast material including 3d rendering for evaluation of carotid stenosis,Radiology
+70540,mri orbit face neck without contrast,magnetic resonance imaging of orbit face and or neck without contrast material for soft tissue evaluation,Radiology
+70551,mri brain without contrast,magnetic resonance imaging of brain including brainstem without contrast material for evaluation of neurological disease,Radiology
+70553,mri brain without contrast followed by with contrast,magnetic resonance imaging of brain including brainstem without contrast material followed by contrast material and further sequences,Radiology
+71045,chest x ray single view,radiologic examination of chest single view frontal for evaluation of pulmonary and cardiac conditions,Radiology
+71046,chest x ray two views frontal and lateral,radiologic examination of chest two views frontal and lateral for comprehensive pulmonary and cardiac evaluation,Radiology
+71047,chest x ray 3 views,radiologic examination of chest 3 views including frontal lateral and additional view for detailed evaluation,Radiology
+71100,radiologic examination ribs unilateral 2 views,radiologic examination of ribs unilateral 2 views for evaluation of rib fracture or chest wall pathology,Radiology
+71250,ct scan chest without contrast,computed tomography of thorax chest without contrast material for evaluation of pulmonary nodule lung disease or mediastinal pathology,Radiology
+71260,ct scan chest with contrast,computed tomography of thorax chest with contrast material for enhanced evaluation of chest pathology lymphadenopathy,Radiology
+71275,ct angiography chest with contrast,computed tomographic angiography of chest with contrast including 3d rendering for evaluation of pulmonary embolism aortic disease,Radiology
+71550,mri chest without contrast,magnetic resonance imaging of chest without contrast material for evaluation of mediastinal mass or chest wall pathology,Radiology
+72040,radiologic examination spine cervical 2 or 3 views,radiologic examination of spine cervical 2 or 3 views for evaluation of cervical spine pathology or injury,Radiology
+72050,radiologic examination spine cervical 4 or 5 views,radiologic examination of spine cervical 4 or 5 views including flexion extension for cervical spine evaluation,Radiology
+72070,radiologic examination spine thoracic 2 views,radiologic examination of thoracic spine 2 views for evaluation of thoracic spine pathology,Radiology
+72100,radiologic examination spine lumbosacral 2 or 3 views,radiologic examination of spine lumbosacral 2 or 3 views for evaluation of low back pain or spinal pathology,Radiology
+72110,radiologic examination spine lumbosacral complete,radiologic examination of spine lumbosacral complete including bending views minimum of 4 views,Radiology
+72125,ct scan cervical spine without contrast,computed tomography of cervical spine without contrast for evaluation of cervical disc disease fracture or stenosis,Radiology
+72131,ct scan lumbar spine without contrast,computed tomography of lumbar spine without contrast for evaluation of lumbar disc herniation fracture or stenosis,Radiology
+72141,mri cervical spine without contrast,magnetic resonance imaging of cervical spine without contrast material for evaluation of disc herniation radiculopathy or myelopathy,Radiology
+72148,mri lumbar spine without contrast,magnetic resonance imaging of lumbar spine without contrast material for evaluation of disc herniation sciatica or spinal stenosis,Radiology
+72156,mri cervical spine without contrast followed by with contrast,magnetic resonance imaging of cervical spine without contrast followed by contrast material and further sequences,Radiology
+72158,mri lumbar spine without contrast followed by with contrast,magnetic resonance imaging of lumbar spine without contrast followed by contrast material and further sequences,Radiology
+72170,radiologic examination pelvis 1 or 2 views,radiologic examination of pelvis 1 or 2 views for evaluation of pelvic fracture or hip pathology,Radiology
+72192,ct scan pelvis without contrast,computed tomography of pelvis without contrast material for evaluation of pelvic mass fracture or abdominal pathology,Radiology
+72193,ct scan pelvis with contrast,computed tomography of pelvis with contrast material for enhanced evaluation of pelvic mass lymphadenopathy or abscess,Radiology
+73000,radiologic examination clavicle complete,radiologic examination of clavicle complete for evaluation of clavicular fracture or pathology,Radiology
+73030,radiologic examination shoulder complete,radiologic examination of shoulder complete minimum of 2 views for evaluation of shoulder pain fracture or dislocation,Radiology
+73060,radiologic examination humerus,radiologic examination of humerus minimum of 2 views for evaluation of humeral fracture or pathology,Radiology
+73070,radiologic examination elbow 2 views,radiologic examination of elbow 2 views anteroposterior and lateral for evaluation of elbow pathology,Radiology
+73090,radiologic examination forearm 2 views,radiologic examination of forearm 2 views anteroposterior and lateral for evaluation of forearm fracture,Radiology
+73100,radiologic examination wrist 2 views,radiologic examination of wrist 2 views anteroposterior and lateral for evaluation of wrist fracture or arthritis,Radiology
+73110,radiologic examination wrist complete,radiologic examination of wrist complete minimum of 3 views for comprehensive evaluation of wrist pathology,Radiology
+73120,radiologic examination hand 2 views,radiologic examination of hand 2 views anteroposterior and lateral for evaluation of hand fracture,Radiology
+73130,radiologic examination hand complete,radiologic examination of hand minimum of 3 views for comprehensive evaluation of hand fracture or arthritis,Radiology
+73500,radiologic examination hip unilateral 1 view,radiologic examination of hip unilateral with pelvis when performed 1 view for hip evaluation,Radiology
+73560,radiologic examination knee 1 or 2 views,radiologic examination of knee 1 or 2 views for evaluation of knee pain fracture or arthritis,Radiology
+73590,radiologic examination tibia and fibula 2 views,radiologic examination of tibia and fibula 2 views for evaluation of lower leg fracture or pathology,Radiology
+73600,radiologic examination ankle 2 views,radiologic examination of ankle 2 views anteroposterior and lateral for evaluation of ankle fracture or sprain,Radiology
+73610,radiologic examination ankle complete,radiologic examination of ankle complete minimum of 3 views for comprehensive ankle evaluation,Radiology
+73620,radiologic examination foot 2 views,radiologic examination of foot 2 views anteroposterior and lateral for evaluation of foot fracture,Radiology
+73630,radiologic examination foot complete,radiologic examination of foot complete minimum of 3 views for comprehensive foot evaluation,Radiology
+73700,ct scan lower extremity without contrast,computed tomography of lower extremity without contrast for evaluation of fracture tumor or vascular pathology,Radiology
+73721,mri any joint of lower extremity without contrast,magnetic resonance imaging of any joint of lower extremity without contrast material for evaluation of ligament meniscal or cartilage injury,Radiology
+74000,radiologic examination abdomen single view,radiologic examination of abdomen single anteroposterior view for evaluation of bowel obstruction or free air,Radiology
+74018,radiologic examination abdomen 2 views,radiologic examination of abdomen 2 views including anteroposterior upright and supine for abdominal evaluation,Radiology
+74022,radiologic examination abdomen complete acute abdomen series,radiologic examination of abdomen complete acute abdomen series including supine upright and chest views,Radiology
+74150,ct scan abdomen without contrast,computed tomography of abdomen without contrast material for evaluation of abdominal mass liver pathology or acute abdomen,Radiology
+74160,ct scan abdomen with contrast,computed tomography of abdomen with contrast material for enhanced evaluation of abdominal pathology including liver pancreas kidney,Radiology
+74170,ct scan abdomen without contrast followed by with contrast,computed tomography of abdomen without contrast followed by with contrast material and further sections for comprehensive abdominal evaluation,Radiology
+74176,ct scan abdomen and pelvis without contrast,computed tomography of abdomen and pelvis without contrast material for evaluation of combined abdominal and pelvic pathology,Radiology
+74177,ct scan abdomen and pelvis with contrast,computed tomography of abdomen and pelvis with contrast material for comprehensive evaluation of abdominal and pelvic disease,Radiology
+74178,ct scan abdomen and pelvis without then with contrast,computed tomography of abdomen and pelvis without contrast material in one or both body regions followed by contrast and further sections,Radiology
+76536,ultrasound soft tissue head neck including thyroid,ultrasound of soft tissues of head and neck including thyroid parathyroids parotid and lymph nodes real time with image documentation,Radiology
+76700,ultrasound abdomen complete,ultrasound of abdomen real time with image documentation complete including liver gallbladder common bile duct pancreas spleen kidneys,Radiology
+76770,ultrasound retroperitoneal complete,ultrasound of retroperitoneal area complete real time with image documentation including kidneys and aorta,Radiology
+76805,ultrasound pregnant uterus complete,ultrasound of pregnant uterus real time with image documentation fetal and maternal evaluation complete transabdominal approach,Radiology
+76830,ultrasound transvaginal,ultrasound transvaginal pelvic examination real time with image documentation for evaluation of uterus ovaries and adnexa,Radiology
+76856,ultrasound pelvic non obstetric complete,ultrasound pelvic nonobstetric real time with image documentation complete evaluation of pelvic organs,Radiology
+76881,ultrasound extremity non vascular complete,ultrasound of extremity nonvascular real time with image documentation complete evaluation of soft tissue mass or fluid collection,Radiology
+77065,diagnostic mammography unilateral,diagnostic mammography including computer aided detection when performed unilateral,Radiology
+77066,diagnostic mammography bilateral,diagnostic mammography including computer aided detection when performed bilateral for breast cancer screening or evaluation,Radiology
+77067,screening mammography bilateral,screening mammography bilateral including computer aided detection when performed for breast cancer screening,Radiology
+77080,dxa bone density study axial skeleton,dual energy x ray absorptiometry dxa bone density study axial skeleton including hip and spine for osteoporosis evaluation,Radiology
+80047,basic metabolic panel ionized calcium,basic metabolic panel with ionized calcium including glucose bun creatinine sodium potassium chloride co2,Pathology and Laboratory
+80048,basic metabolic panel calcium total,basic metabolic panel with calcium total including glucose bun creatinine sodium potassium chloride co2 calcium,Pathology and Laboratory
+80050,general health panel,general health panel including comprehensive metabolic panel cbc with differential and thyroid stimulating hormone,Pathology and Laboratory
+80053,comprehensive metabolic panel,comprehensive metabolic panel including glucose bun creatinine sodium potassium chloride co2 calcium total protein albumin bilirubin alkaline phosphatase alt ast,Pathology and Laboratory
+80055,obstetric panel,obstetric panel including hepatitis b surface antigen hiv rubella syphilis antibody screen blood type rh and cbc,Pathology and Laboratory
+80061,lipid panel,lipid panel including total cholesterol hdl cholesterol ldl cholesterol measured or calculated and triglycerides,Pathology and Laboratory
+80069,renal function panel,renal function panel including albumin bun calcium co2 creatinine glucose phosphorus sodium and potassium,Pathology and Laboratory
+80074,acute hepatitis panel,acute hepatitis panel including hepatitis a antibody igm hepatitis b core antibody igm hepatitis b surface antigen hepatitis c antibody,Pathology and Laboratory
+80076,hepatic function panel,hepatic function panel including albumin total bilirubin direct bilirubin alkaline phosphatase total protein alt and ast,Pathology and Laboratory
+81000,urinalysis with microscopy non automated,urinalysis by non automated with microscopy for detection of urinary tract infection kidney disease or metabolic disorder,Pathology and Laboratory
+81001,urinalysis automated with microscopy,urinalysis automated with microscopy examination of urine specimen for detection of infection or disease,Pathology and Laboratory
+81002,urinalysis non automated without microscopy,urinalysis by non automated without microscopy dipstick method for rapid screening,Pathology and Laboratory
+81003,urinalysis automated without microscopy,urinalysis automated without microscopy for rapid screening of urine abnormalities,Pathology and Laboratory
+81025,urine pregnancy test,urine pregnancy test by visual color comparison method for detection of human chorionic gonadotropin,Pathology and Laboratory
+82040,serum albumin quantitative,albumin serum plasma or whole blood quantitative measurement for evaluation of liver function and nutritional status,Pathology and Laboratory
+82150,amylase,amylase serum quantitative measurement for evaluation of pancreatitis or pancreatic disease,Pathology and Laboratory
+82247,total bilirubin,bilirubin total quantitative measurement for evaluation of liver function jaundice or hemolytic disease,Pathology and Laboratory
+82248,direct bilirubin,bilirubin direct quantitative measurement for evaluation of obstructive jaundice or hepatobiliary disease,Pathology and Laboratory
+82306,vitamin d 25 hydroxy,vitamin d 25 hydroxy includes d2 and d3 quantitative measurement for evaluation of vitamin d deficiency,Pathology and Laboratory
+82310,calcium total,calcium total quantitative measurement in blood for evaluation of parathyroid disease or bone metabolism,Pathology and Laboratory
+82374,carbon dioxide bicarbonate,carbon dioxide co2 bicarbonate quantitative measurement for evaluation of acid base balance,Pathology and Laboratory
+82378,carcinoembryonic antigen cea,carcinoembryonic antigen cea quantitative measurement for monitoring of colorectal cancer treatment response,Pathology and Laboratory
+82465,cholesterol serum total,cholesterol serum or whole blood total quantitative measurement for cardiovascular risk assessment,Pathology and Laboratory
+82550,creatine kinase total,creatine kinase ck total quantitative measurement for evaluation of myocardial infarction or muscle disease,Pathology and Laboratory
+82553,creatine kinase mb fraction,creatine kinase ck mb fraction quantitative measurement for diagnosis of acute myocardial infarction,Pathology and Laboratory
+82565,creatinine blood,creatinine blood quantitative measurement for evaluation of kidney function and glomerular filtration rate,Pathology and Laboratory
+82570,creatinine urine,creatinine quantitative in other source such as urine for evaluation of kidney function and creatinine clearance,Pathology and Laboratory
+82607,cyanocobalamin vitamin b12,cyanocobalamin vitamin b12 quantitative measurement for evaluation of b12 deficiency and pernicious anemia,Pathology and Laboratory
+82652,vitamin d 1 25 dihydroxy,vitamin d 1 25 dihydroxy including fraction quantitative measurement for evaluation of calcium metabolism,Pathology and Laboratory
+82670,estradiol,estradiol e2 quantitative measurement for evaluation of reproductive function menopause or infertility,Pathology and Laboratory
+82728,ferritin,ferritin quantitative measurement for evaluation of iron deficiency anemia or iron overload hemochromatosis,Pathology and Laboratory
+82746,folic acid serum,folic acid serum quantitative measurement for evaluation of folate deficiency and megaloblastic anemia,Pathology and Laboratory
+82784,gammaglobulin immunoglobulin igg iga igm each,gammaglobulin immunoglobulin igg iga igm quantitative measurement each for evaluation of immune deficiency or myeloma,Pathology and Laboratory
+82947,glucose quantitative blood,glucose quantitative blood except reagent strip for evaluation of diabetes mellitus and glycemic control,Pathology and Laboratory
+82950,glucose post dose tolerance test 3 specimens,glucose post glucose dose tolerance test including fasting 1 hour and 2 hour specimens for gestational diabetes screening,Pathology and Laboratory
+82951,glucose tolerance test 3 specimens,glucose tolerance test 3 specimens including fasting for diagnosis of diabetes mellitus and insulin resistance,Pathology and Laboratory
+83001,gonadotropin fsh,gonadotropin follicle stimulating hormone fsh quantitative measurement for evaluation of reproductive function,Pathology and Laboratory
+83002,gonadotropin lh,gonadotropin luteinizing hormone lh quantitative measurement for evaluation of reproductive function ovulation,Pathology and Laboratory
+83013,helicobacter pylori breath test,helicobacter pylori breath test analysis for c13 or c14 urea for detection of h pylori infection,Pathology and Laboratory
+83036,hemoglobin a1c glycated hemoglobin,glycosylated hemoglobin hemoglobin a1c quantitative measurement for monitoring of diabetes mellitus glycemic control,Pathology and Laboratory
+83088,histamine,histamine quantitative measurement for evaluation of allergic reactions anaphylaxis and mastocytosis,Pathology and Laboratory
+83518,immunoassay for analyte not elsewhere specified,immunoassay for analyte other than infectious agent antibody or infectious agent antigen quantitative not otherwise specified,Pathology and Laboratory
+83540,iron serum,iron serum quantitative measurement for evaluation of iron deficiency anemia or iron overload,Pathology and Laboratory
+83550,iron binding capacity total tibc,iron binding capacity total tibc quantitative measurement for evaluation of iron status and anemia,Pathology and Laboratory
+83615,lactate dehydrogenase ldh,lactate dehydrogenase ldh quantitative measurement for evaluation of tissue damage hemolytic anemia or liver disease,Pathology and Laboratory
+83690,lipase,lipase quantitative measurement in blood for evaluation of pancreatitis or pancreatic disease,Pathology and Laboratory
+83718,lipoprotein direct measurement hdl cholesterol,lipoprotein direct measurement high density lipoprotein hdl cholesterol for cardiovascular risk assessment,Pathology and Laboratory
+83721,lipoprotein direct measurement ldl cholesterol,lipoprotein direct measurement low density lipoprotein ldl cholesterol for cardiovascular risk assessment,Pathology and Laboratory
+83735,magnesium,magnesium quantitative measurement in blood for evaluation of electrolyte imbalance cardiac arrhythmia or malabsorption,Pathology and Laboratory
+84075,alkaline phosphatase,phosphatase alkaline quantitative measurement for evaluation of liver disease bone disease or biliary obstruction,Pathology and Laboratory
+84100,phosphorus inorganic phosphate,phosphorus inorganic phosphate quantitative measurement for evaluation of kidney disease bone metabolism or parathyroid function,Pathology and Laboratory
+84132,potassium serum,potassium serum plasma or whole blood quantitative measurement for evaluation of electrolyte balance renal function,Pathology and Laboratory
+84153,prostate specific antigen psa total,prostate specific antigen psa total quantitative measurement for screening and monitoring of prostate cancer,Pathology and Laboratory
+84295,sodium serum,sodium serum plasma or whole blood quantitative measurement for evaluation of electrolyte balance and hydration status,Pathology and Laboratory
+84436,thyroxine total t4,thyroxine t4 total quantitative measurement for evaluation of thyroid function hypothyroidism or hyperthyroidism,Pathology and Laboratory
+84439,thyroxine free t4,thyroxine free ft4 quantitative measurement for evaluation of thyroid function and diagnosis of thyroid disorders,Pathology and Laboratory
+84443,thyroid stimulating hormone tsh,thyroid stimulating hormone tsh quantitative measurement for evaluation of thyroid function screening for hypothyroidism,Pathology and Laboratory
+84460,alanine aminotransferase alt sgpt,transferase alanine amino alt sgpt quantitative measurement for evaluation of liver disease hepatitis or drug toxicity,Pathology and Laboratory
+84478,triglycerides,triglycerides quantitative measurement for evaluation of lipid metabolism cardiovascular risk and pancreatitis risk,Pathology and Laboratory
+84480,triiodothyronine total t3,triiodothyronine t3 total quantitative measurement for evaluation of thyroid function and hyperthyroidism,Pathology and Laboratory
+84484,troponin quantitative,troponin quantitative measurement for diagnosis of acute myocardial infarction and myocardial injury,Pathology and Laboratory
+84520,blood urea nitrogen bun,urea nitrogen bun quantitative measurement in blood for evaluation of kidney function and hydration status,Pathology and Laboratory
+84550,uric acid blood,uric acid blood quantitative measurement for evaluation of gout hyperuricemia kidney disease or tumor lysis syndrome,Pathology and Laboratory
+85004,automated differential white blood cell count,automated differential wbc count including neutrophils lymphocytes monocytes eosinophils and basophils,Pathology and Laboratory
+85014,hematocrit,hematocrit quantitative measurement of packed red blood cell volume for evaluation of anemia or polycythemia,Pathology and Laboratory
+85018,hemoglobin,hemoglobin quantitative measurement for evaluation of anemia polycythemia or blood loss,Pathology and Laboratory
+85025,complete blood count with automated differential,complete blood count cbc automated including wbc rbc hemoglobin hematocrit and platelet count with automated differential,Pathology and Laboratory
+85027,complete blood count automated,complete blood count cbc automated including wbc rbc hemoglobin hematocrit and platelet count without differential,Pathology and Laboratory
+85041,red blood cell count automated,red blood cell count automated for evaluation of anemia erythrocytosis or blood loss,Pathology and Laboratory
+85045,reticulocyte count automated,reticulocyte count automated for evaluation of bone marrow response to anemia hemolytic disease or blood loss,Pathology and Laboratory
+85048,white blood cell count automated,automated white blood cell leukocyte count for evaluation of infection inflammation or hematologic disease,Pathology and Laboratory
+85049,platelet count automated,platelet count automated for evaluation of thrombocytopenia thrombocytosis or bleeding disorders,Pathology and Laboratory
+85379,d dimer quantitative,d dimer quantitative or semi quantitative measurement for evaluation of deep vein thrombosis pulmonary embolism or dic,Pathology and Laboratory
+85610,prothrombin time pt,prothrombin time pt one stage measurement for evaluation of coagulation and monitoring of warfarin anticoagulation therapy,Pathology and Laboratory
+85730,partial thromboplastin time ptt,partial thromboplastin time ptt activated for evaluation of intrinsic coagulation pathway and heparin monitoring,Pathology and Laboratory
+86140,c reactive protein crp,c reactive protein crp quantitative measurement for evaluation of inflammation infection or cardiovascular risk,Pathology and Laboratory
+86200,cyclic citrullinated peptide antibody,cyclic citrullinated peptide ccp antibody for diagnosis and evaluation of rheumatoid arthritis,Pathology and Laboratory
+86235,nuclear antigen antibody ena,extractable nuclear antigen antibody ena for evaluation of systemic lupus erythematosus and connective tissue disease,Pathology and Laboratory
+86300,immunoassay for tumor antigen ca 15 3,immunoassay for tumor antigen quantitative ca 15 3 for monitoring breast cancer treatment response,Pathology and Laboratory
+86304,immunoassay for tumor antigen ca 125,immunoassay for tumor antigen quantitative ca 125 for monitoring ovarian cancer treatment response,Pathology and Laboratory
+86580,tuberculin skin test ppd,tuberculin skin test intradermal ppd purified protein derivative for screening of tuberculosis infection,Pathology and Laboratory
+86592,syphilis test qualitative rpr or vdrl,syphilis test qualitative rapid plasma reagin rpr or vdrl for screening of syphilis infection,Pathology and Laboratory
+86689,htlv antibody confirmatory,htlv or hiv antibody confirmatory test such as western blot for confirmation of hiv infection,Pathology and Laboratory
+86694,herpes simplex type 1 antibody,herpes simplex virus type 1 antibody for detection of hsv 1 infection,Pathology and Laboratory
+86695,herpes simplex type 2 antibody,herpes simplex virus type 2 antibody for detection of hsv 2 infection genital herpes,Pathology and Laboratory
+86696,hepatitis a antibody total,hepatitis a antibody total for evaluation of hepatitis a virus exposure or immunity,Pathology and Laboratory
+86704,hepatitis b core antibody total,hepatitis b core antibody hbcab total for evaluation of hepatitis b virus infection status,Pathology and Laboratory
+86706,hepatitis b surface antibody,hepatitis b surface antibody hbsab quantitative for evaluation of hepatitis b immunity after vaccination or infection,Pathology and Laboratory
+86803,hepatitis c antibody,hepatitis c antibody for screening and detection of hepatitis c virus infection,Pathology and Laboratory
+87040,blood culture for bacteria,culture bacterial blood aerobic including isolation identification and presumptive susceptibility testing,Pathology and Laboratory
+87045,stool culture bacteria,culture bacterial stool aerobic with isolation and preliminary examination for enteric pathogens,Pathology and Laboratory
+87070,culture bacterial any source except urine blood stool,culture bacterial any other source except urine blood or stool aerobic with isolation and identification,Pathology and Laboratory
+87077,culture anaerobic organism identification,culture bacterial aerobic and additional anaerobic identification of organisms for anaerobic infection,Pathology and Laboratory
+87081,culture presumptive pathogen screening,culture screening only for single organism including presumptive identification by colony morphology,Pathology and Laboratory
+87086,urine culture bacterial quantitative colony count,culture bacterial quantitative urine colony count with isolation identification and susceptibility for urinary tract infection,Pathology and Laboratory
+87186,susceptibility testing antimicrobial mic,susceptibility studies antimicrobial agent minimum inhibitory concentration mic for treatment guidance of bacterial infection,Pathology and Laboratory
+87491,chlamydia trachomatis nucleic acid amplification,infectious agent detection by nucleic acid dna or rna chlamydia trachomatis amplified probe technique for chlamydia screening,Pathology and Laboratory
+87591,neisseria gonorrhoeae nucleic acid amplification,infectious agent detection by nucleic acid dna or rna neisseria gonorrhoeae amplified probe technique for gonorrhea screening,Pathology and Laboratory
+87635,sars cov 2 covid 19 nucleic acid amplification,infectious agent detection by nucleic acid sars cov 2 covid 19 amplified probe technique including specimen collection,Pathology and Laboratory
+87801,infectious agent detection multiple organisms amplified,infectious agent detection by nucleic acid multiple organisms amplified probe technique for respiratory viral panel,Pathology and Laboratory
+87880,group a strep rapid antigen detection,infectious agent antigen detection by immunoassay with direct optical observation streptococcus group a rapid strep test,Pathology and Laboratory
+88112,cytopathology selective cellular enhancement,cytopathology selective cellular enhancement technique with interpretation including filter preparation for fine needle aspirate,Pathology and Laboratory
+88160,cytopathology smears any other source,cytopathology smears any other source screening and interpretation for cytological diagnosis of abnormal cells,Pathology and Laboratory
+88175,cytopathology cervical or vaginal thinprep,cytopathology cervical or vaginal collected in preservative fluid automated thin layer preparation screening by automated system and manual rescreening,Pathology and Laboratory
+88305,surgical pathology gross and microscopic level 4,surgical pathology gross and microscopic examination level iv including breast biopsy colon biopsy thyroid lobectomy and lymph node biopsy,Pathology and Laboratory
+88307,surgical pathology gross and microscopic level 5,surgical pathology gross and microscopic examination level v including bone marrow biopsy kidney biopsy liver biopsy,Pathology and Laboratory
+88312,special stains group 1,special stain including interpretation and report group 1 for microorganisms such as acid fast gram or iron stain,Pathology and Laboratory
+88342,immunohistochemistry each antibody,immunohistochemistry or immunocytochemistry per specimen each separately identifiable antibody for tumor marker analysis,Pathology and Laboratory
+90460,immunization administration first vaccine component,immunization administration through 18 years of age via any route of administration with counseling by physician first or only component,Medicine
+90471,immunization administration first injection,immunization administration including percutaneous intradermal subcutaneous or intramuscular injections first vaccine or toxoid component,Medicine
+90472,immunization administration each additional injection,immunization administration each additional vaccine or toxoid component administered at same encounter,Medicine
+90651,human papillomavirus vaccine 9 valent,human papillomavirus hpv vaccine 9 valent gardasil 9 for prevention of hpv infection and cervical cancer 3 dose schedule,Medicine
+90658,influenza vaccine trivalent split virus,influenza virus vaccine trivalent iva3 split virus for intramuscular use seasonal flu vaccination,Medicine
+90681,rotavirus vaccine pentavalent oral,rotavirus vaccine pentavalent rvv oral 3 dose schedule for prevention of rotavirus gastroenteritis,Medicine
+90686,influenza vaccine quadrivalent preservative free,influenza virus vaccine quadrivalent iiv4 split virus preservative free for intramuscular use seasonal flu vaccination,Medicine
+90707,measles mumps rubella mmr vaccine,measles mumps rubella mmr virus vaccine live for subcutaneous use immunization against measles mumps and rubella,Medicine
+90710,measles mumps rubella varicella mmrv vaccine,measles mumps rubella and varicella mmrv vaccine live for subcutaneous use childhood immunization,Medicine
+90713,poliovirus vaccine inactivated ipv,poliovirus vaccine inactivated ipv for subcutaneous or intramuscular use for polio prevention,Medicine
+90714,tetanus diphtheria td vaccine adult use,tetanus and diphtheria toxoids td adsorbed preservative free for intramuscular use age 7 years or older,Medicine
+90715,tetanus diphtheria pertussis tdap vaccine,tetanus diphtheria toxoids and acellular pertussis vaccine tdap for intramuscular use age 7 years or older,Medicine
+90716,varicella vaccine live,varicella virus vaccine live for subcutaneous use immunization against chickenpox varicella zoster virus,Medicine
+90732,pneumococcal polysaccharide vaccine,pneumococcal polysaccharide vaccine 23 valent ppsv23 for subcutaneous or intramuscular adult use for pneumonia prevention,Medicine
+90734,meningococcal conjugate vaccine,meningococcal conjugate vaccine serogroups a c y w 135 for intramuscular use for meningitis prevention,Medicine
+90837,psychotherapy 60 minutes with patient,psychotherapy 60 minutes with patient when performed with an evaluation and management service for mental health treatment,Medicine
+90846,family psychotherapy without patient present,family psychotherapy without patient present 50 minutes for family counseling and mental health support,Medicine
+90847,family psychotherapy with patient present,family psychotherapy conjoint psychotherapy with patient present 50 minutes for family mental health treatment,Medicine
+90853,group psychotherapy,group psychotherapy other than of a multiple family group for mental health treatment,Medicine
+90901,biofeedback training,biofeedback training by any modality including electromyographic autonomic or neurological feedback therapy,Medicine
+90935,hemodialysis single treatment with evaluation,hemodialysis procedure with single evaluation by a physician or other qualified health care professional,Medicine
+90937,hemodialysis repeated evaluation,hemodialysis procedure requiring repeated evaluation with or without substantial revision of dialysis prescription,Medicine
+90945,dialysis procedure other than hemodialysis single evaluation,dialysis procedure other than hemodialysis such as peritoneal dialysis with single evaluation,Medicine
+92002,ophthalmological services new patient intermediate,ophthalmological services medical examination and evaluation with initiation of diagnostic and treatment program intermediate new patient,Medicine
+92004,ophthalmological services new patient comprehensive,ophthalmological services medical examination and evaluation with initiation or continuation of diagnostic and treatment program comprehensive new patient,Medicine
+92012,ophthalmological services established patient intermediate,ophthalmological services medical examination and evaluation intermediate established patient,Medicine
+92014,ophthalmological services established patient comprehensive,ophthalmological services medical examination and evaluation with initiation or continuation of treatment comprehensive established patient,Medicine
+92015,refraction determination,determination of refractive state including refraction and prescription for corrective lenses,Medicine
+92060,sensorimotor examination,sensorimotor examination with multiple measurements of ocular deviation strabismus evaluation,Medicine
+92083,visual field examination extended,visual field examination unilateral or bilateral with extended testing such as tangent screen or goldmann type perimetry,Medicine
+92250,fundus photography with interpretation,fundus photography with interpretation and report for evaluation of retinal disease diabetic retinopathy or macular degeneration,Medicine
+92507,speech language therapy individual,treatment of speech language voice communication and or auditory processing disorder individual therapy session,Medicine
+92523,speech language evaluation,evaluation of speech sound production language comprehension expression and communication for diagnosis of speech disorder,Medicine
+92551,screening test pure tone air only,screening test pure tone air only for hearing loss evaluation,Medicine
+92557,comprehensive audiometry,comprehensive audiometry threshold evaluation and speech recognition for diagnosis of hearing loss,Medicine
+93000,electrocardiogram 12 lead with interpretation,electrocardiogram ecg routine 12 lead with at least 12 leads with interpretation and report for cardiac evaluation,Medicine
+93005,electrocardiogram 12 lead tracing only,electrocardiogram ecg routine 12 lead tracing only without interpretation for cardiac evaluation,Medicine
+93010,electrocardiogram 12 lead interpretation and report only,electrocardiogram ecg routine 12 lead interpretation and report only for cardiac rhythm evaluation,Medicine
+93015,cardiovascular stress test,cardiovascular stress test using maximal or submaximal treadmill or bicycle exercise continuous ecg monitoring and supervision,Medicine
+93017,cardiovascular stress test tracing only,cardiovascular stress test using treadmill or bicycle exercise continuous electrocardiographic monitoring tracing only without interpretation,Medicine
+93040,rhythm ecg 1 to 3 leads with interpretation,rhythm ecg 1 to 3 leads with interpretation and report for cardiac arrhythmia evaluation,Medicine
+93224,holter monitor external ecg recording up to 48 hours,external electrocardiographic recording up to 48 hours by continuous rhythm recording including holter monitor analysis and report,Medicine
+93268,event monitor external ecg recording,external patient activated electrocardiographic recording event monitor with interpretation and analysis for arrhythmia detection,Medicine
+93280,programming device evaluation pacemaker,programming device evaluation in person of cardiac pacemaker system with iterative adjustment of programmable parameters,Medicine
+93303,transthoracic echocardiography complete,transthoracic echocardiography for congenital cardiac anomalies complete study for evaluation of cardiac structure and function,Medicine
+93306,echocardiography transthoracic with doppler complete,echocardiography transthoracic real time with image documentation 2d with or without m mode recording complete with doppler and color flow mapping,Medicine
+93307,echocardiography transthoracic without doppler,echocardiography transthoracic real time with image documentation 2d with or without m mode recording complete without doppler,Medicine
+93312,echocardiography transesophageal,echocardiography transesophageal real time with image documentation 2d with or without m mode recording for cardiac evaluation,Medicine
+93350,stress echocardiography,echocardiography transthoracic real time with image documentation during rest and cardiovascular stress test with comparison,Medicine
+93451,right heart catheterization,right heart catheterization including measurement of oxygen saturation and cardiac output when performed for hemodynamic evaluation,Medicine
+93452,left heart catheterization,left heart catheterization including intraprocedural injection for left ventriculography imaging supervision and interpretation,Medicine
+93458,catheter placement coronary angiography,catheter placement in coronary artery for coronary angiography including intraprocedural injection imaging supervision,Medicine
+94010,spirometry including graphic record,spirometry including graphic record forced vital capacity fvc and forced expiratory volume fev1 for pulmonary function evaluation,Medicine
+94060,bronchodilator responsiveness spirometry,bronchodilator responsiveness spirometry pre and post bronchodilator administration for evaluation of asthma and copd,Medicine
+94375,respiratory flow volume loop,respiratory flow volume loop including maximal inspiratory and expiratory flow volume loop for pulmonary function evaluation,Medicine
+94620,pulmonary stress testing simple,pulmonary stress testing simple evaluation of respiratory function during exercise for dyspnea evaluation,Medicine
+94640,pressurized or nonpressurized inhalation treatment,pressurized or nonpressurized inhalation treatment for acute airway obstruction or for sputum induction for diagnostic purposes nebulizer therapy,Medicine
+94664,demonstration and evaluation of patient use of aerosol device,demonstration and or evaluation of patient utilization of an aerosol generator nebulizer metered dose inhaler or ippb device,Medicine
+94726,plethysmography for lung volumes,plethysmography for determination of lung volumes and when performed airway resistance for evaluation of restrictive or obstructive lung,Medicine
+94729,diffusing capacity dlco,diffusing capacity dlco measurement of carbon monoxide diffusing capacity for evaluation of gas exchange efficiency,Medicine
+94760,pulse oximetry single determination,noninvasive ear or pulse oximetry for oxygen saturation single determination for evaluation of hypoxemia,Medicine
+94761,pulse oximetry multiple determinations,noninvasive ear or pulse oximetry for oxygen saturation multiple determinations for monitoring of respiratory status,Medicine
+95004,allergy skin test percutaneous,percutaneous tests prick puncture with allergenic extracts immediate type reaction for evaluation of allergies,Medicine
+95024,allergy skin test intracutaneous,intracutaneous intradermal tests with allergenic extracts immediate type reaction including test interpretation for allergy evaluation,Medicine
+95115,allergen immunotherapy single injection,professional services for allergen immunotherapy not including provision of allergenic extracts single injection,Medicine
+95165,allergen immunotherapy supervision of preparation,professional services for allergen immunotherapy supervision of preparation and provision of antigens for allergen immunotherapy single dose vials,Medicine
+95250,ambulatory continuous glucose monitoring,ambulatory continuous glucose monitoring of interstitial tissue fluid via subcutaneous sensor for minimum 72 hours for diabetes management,Medicine
+95700,electroencephalogram eeg routine,electroencephalogram eeg continuous recording without video routine eeg for evaluation of epilepsy seizure disorder,Medicine
+95810,polysomnography sleep study,polysomnography sleep testing attended by a technologist including staging with 4 or more parameters for diagnosis of sleep apnea,Medicine
+95819,electroencephalogram eeg with sleep,electroencephalogram eeg including recording awake and asleep with photic stimulation for seizure evaluation,Medicine
+95900,nerve conduction motor study,nerve conduction studies motor with or without f wave study for evaluation of neuropathy carpal tunnel syndrome or nerve injury,Medicine
+95903,nerve conduction motor study each additional nerve,nerve conduction studies motor with or without f wave study each additional nerve for comprehensive nerve evaluation,Medicine
+95907,nerve conduction study 1 to 2 studies,nerve conduction studies 1 to 2 studies for evaluation of peripheral neuropathy or nerve entrapment,Medicine
+95910,nerve conduction study 5 to 6 studies,nerve conduction studies 5 to 6 studies for comprehensive evaluation of polyneuropathy or multiple nerve entrapment,Medicine
+95923,autonomic function testing sudomotor,testing of autonomic nervous system function sudomotor including quantitative sudomotor axon reflex test for evaluation of neuropathy,Medicine
+95930,visual evoked potential testing,visual evoked potential vep checkerboard or flash testing central nervous system for evaluation of optic nerve function,Medicine
+96360,intravenous infusion hydration initial 31 minutes to 1 hour,intravenous infusion hydration initial 31 minutes to 1 hour for treatment of dehydration,Medicine
+96365,intravenous infusion therapy diagnostic or prophylactic initial up to 1 hour,intravenous infusion for therapy prophylaxis or diagnosis initial up to 1 hour for drug administration,Medicine
+96372,therapeutic injection subcutaneous or intramuscular,therapeutic prophylactic or diagnostic injection subcutaneous or intramuscular for medication administration,Medicine
+96374,therapeutic injection intravenous push single,therapeutic prophylactic or diagnostic injection intravenous push single or initial substance or drug for treatment,Medicine
+96375,therapeutic injection intravenous push each additional,each additional sequential intravenous push of new substance or drug for additional medication administration,Medicine
+96413,chemotherapy administration intravenous infusion up to 1 hour,chemotherapy administration intravenous infusion technique up to 1 hour single or initial substance or drug for cancer treatment,Medicine
+96415,chemotherapy administration intravenous each additional hour,chemotherapy administration intravenous infusion technique each additional hour for extended cancer treatment,Medicine
+96417,chemotherapy administration intravenous each additional sequential,chemotherapy administration intravenous infusion technique each additional sequential infusion of new substance up to 1 hour,Medicine
+96446,chemotherapy intracavitary,intracavitary instillation of antineoplastic agent including assessment and monitoring for cancer treatment,Medicine
+96900,actinotherapy ultraviolet light,actinotherapy ultraviolet light therapy for treatment of dermatological conditions psoriasis or other skin disorders,Medicine
+96910,photochemotherapy tar and ultraviolet b,photochemotherapy tar and ultraviolet b goeckerman treatment or petrolatum and ultraviolet b for psoriasis treatment,Medicine
+96920,pulse light treatment for dermatologic conditions,laser treatment for inflammatory skin disease such as psoriasis not in conjunction with photodynamic therapy,Medicine
+97010,hot or cold pack application,application of a modality to one or more areas hot or cold packs for physical therapy pain management,Medicine
+97014,electrical stimulation therapy unattended,application of a modality to one or more areas electrical stimulation unattended for physical therapy pain management,Medicine
+97016,vasopneumatic compression therapy,application of a modality to one or more areas vasopneumatic devices for compression therapy of lymphedema or edema,Medicine
+97032,electrical stimulation therapy attended,application of electrical stimulation manual each 15 minutes attended for neuromuscular reeducation pain management,Medicine
+97035,ultrasound therapy each 15 minutes,application of a modality ultrasound each 15 minutes for therapeutic treatment of musculoskeletal conditions,Medicine
+97110,therapeutic exercise each 15 minutes,therapeutic procedure one or more areas each 15 minutes exercises to develop strength endurance flexibility and range of motion,Medicine
+97112,neuromuscular reeducation each 15 minutes,neuromuscular reeducation of movement balance coordination kinesthetic proprioceptive each 15 minutes for rehabilitation,Medicine
+97116,gait training therapy each 15 minutes,gait training therapy including stair climbing each 15 minutes for rehabilitation and mobility improvement,Medicine
+97140,manual therapy one or more regions,manual therapy techniques including mobilization manipulation one or more regions each 15 minutes for musculoskeletal treatment,Medicine
+97161,physical therapy evaluation low complexity,physical therapy evaluation low complexity requiring body system examination and clinical decision making of low complexity,Medicine
+97162,physical therapy evaluation moderate complexity,physical therapy evaluation moderate complexity body system examination and clinical decision making of moderate complexity,Medicine
+97163,physical therapy evaluation high complexity,physical therapy evaluation high complexity body system examination and clinical decision making of high complexity,Medicine
+97530,therapeutic activities each 15 minutes,therapeutic activities direct one on one patient contact each 15 minutes using dynamic activities to improve functional performance,Medicine
+97542,wheelchair management training each 15 minutes,wheelchair management and propulsion training each 15 minutes for patient rehabilitation and mobility independence,Medicine
+97597,debridement open wound selective each additional 20 sq cm,debridement open wound selective without anesthesia including topical application each additional 20 sq cm,Medicine
+97598,debridement open wound non selective,removal of devitalized tissue from wound non selective including wet to moist dressings enzymatic and abrasion,Medicine
+97760,orthotic management and training initial encounter,orthotic management and training including assessment fitting and use of orthotic device initial encounter,Medicine
+97810,acupuncture one or more needles without electrical stimulation initial 15 minutes,acupuncture one or more needles without electrical stimulation initial 15 minutes of personal one on one contact,Medicine
+99173,visual acuity screening,screening test of visual acuity quantitative bilateral for early detection of vision problems,Medicine

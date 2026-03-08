@@ -13,22 +13,22 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium text-secondary-700 mb-2">
+          <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
             {label}
           </label>
         )}
         <div className="relative">
           {leftIcon && (
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary-400">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary-400 dark:text-gray-500">
               {leftIcon}
             </div>
           )}
           <input
             type={type}
             className={cn(
-              'w-full px-4 py-2.5 bg-white border border-secondary-300 text-secondary-900 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200',
+              'w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-secondary-300 dark:border-gray-600 text-secondary-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200',
               'hover:border-primary-400 hover:shadow-md',
-              'placeholder:text-secondary-400',
+              'placeholder:text-secondary-400 dark:placeholder:text-gray-500',
               error && 'border-red-500 focus:ring-red-500',
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',

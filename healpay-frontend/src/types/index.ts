@@ -8,6 +8,25 @@ export interface User {
   avatar?: string
   createdAt: string
   updatedAt: string
+  // Backend snake_case equivalents (mapped after login)
+  first_name?: string
+  last_name?: string
+  created_at?: string
+  updated_at?: string
+  // Profile fields
+  phone?: string
+  address?: string
+  city?: string
+  state?: string
+  zipCode?: string
+  zip_code?: string
+  // Specialization (doctors only)
+  specialization?: string
+  // Status
+  isActive?: boolean
+  is_active?: boolean
+  isVerified?: boolean
+  is_verified?: boolean
 }
 
 export enum UserRole {

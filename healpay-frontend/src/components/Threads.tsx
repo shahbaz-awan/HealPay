@@ -133,7 +133,7 @@ const Threads = ({
     distance = 0.1,
     enableMouseInteraction = true,
     ...rest
-}: ThreadsProps & React.HTMLAttributes<HTMLDivElement>) => {
+}: ThreadsProps & Omit<React.HTMLAttributes<HTMLDivElement>, 'color'>) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const animationFrameId = useRef<number>();
 

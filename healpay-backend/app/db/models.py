@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text, Enum as SQLEnum
+from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text, Enum as SQLEnum, Index
 from sqlalchemy.sql import func
 from app.db.database import Base
 import enum
@@ -20,9 +20,12 @@ class User(Base):
     first_name = Column(String)
     last_name = Column(String)
     phone = Column(String)
-    
+    specialization = Column(String, nullable=True)  # e.g. Cardiology, General Practice
+    is_active = Column(Boolean, default=True, nullable=False)
+    is_verified = Column(Boolean, default=True, nullable=False)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     def __repr__(self):
         return f"<User {self.email} - {self.role}>"
@@ -266,3 +269,49 @@ class Payment(Base):
     
     def __repr__(self):
         return f"<Payment {self.id} - {self.amount}>"
+
+
+# Database-backed OTP storage (replaces in-memory dict)
+class OtpVerification(Base):
+    __tablename__ = "otp_verifications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, nullable=False, index=True)
+    otp_code = Column(String, nullable=False)
+    purpose = Column(String, nullable=False, default="signup")  # signup | password_reset
+    # Stores serialized user registration data for signup OTP
+    user_data = Column(Text, nullable=True)
+    expires_at = Column(DateTime(timezone=True), nullable=False)
+    used = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    def __repr__(self):
+        return f"<OtpVerification {self.email} purpose={self.purpose}>"
+
+
+# Notifications
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    title = Column(String, nullable=False)
+    message = Column(Text, nullable=False)
+    type = Column(String, default="info")  # info | success | warning | error
+    is_read = Column(Boolean, default=False)
+    link = Column(String, nullable=True)   # optional frontend route
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    def __repr__(self):
+        return f"<Notification {self.id} user={self.user_id}>"
+
+
+# ─── Performance indexes ──────────────────────────────────────────────────
+Index("ix_clinical_encounter_status",   ClinicalEncounter.__table__.c.status)
+Index("ix_invoice_status",              Invoice.__table__.c.status)
+Index("ix_invoice_patient_id",          Invoice.__table__.c.patient_id)
+Index("ix_appointment_user_id",         Appointment.__table__.c.user_id)
+Index("ix_appointment_status",          Appointment.__table__.c.status)
+Index("ix_medical_code_encounter_id",   MedicalCode.__table__.c.encounter_id)
+Index("ix_notification_user_unread",    Notification.__table__.c.user_id, Notification.__table__.c.is_read)

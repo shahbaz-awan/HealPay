@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import {
     Calendar,
@@ -9,7 +9,9 @@ import {
     Stethoscope,
     Plus,
     X,
-    Check
+    Check,
+    AlertCircle,
+    Loader2
 } from 'lucide-react'
 import Card, { CardHeader } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
@@ -51,11 +53,18 @@ const PatientAppointments = () => {
     const [doctors, setDoctors] = useState<Doctor[]>([])
     const [patientDOB, setPatientDOB] = useState('')
     const [appointments, setAppointments] = useState<any[]>([])
+    const [availability, setAvailability] = useState<{
+        checked: boolean
+        available: boolean
+        message: string
+        isChecking: boolean
+    }>({ checked: false, available: false, message: '', isChecking: false })
 
     const {
         register,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm<AppointmentFormData>({
         resolver: zodResolver(appointmentSchema),
@@ -65,27 +74,52 @@ const PatientAppointments = () => {
         },
     })
 
-    // Fetch doctors from system
+    const watchedDoctorId = watch('doctorId')
+    const watchedDate = watch('appointmentDate')
+    const watchedTime = watch('appointmentTime')
+
+    // Fetch doctors from dedicated endpoint (no admin privileges needed)
     useEffect(() => {
         const fetchDoctors = async () => {
             try {
-                const allUsers = await apiGet<any[]>('/v1/admin/users')
-                const doctorUsers = allUsers.filter(u => u.role === 'DOCTOR')
-                setDoctors(doctorUsers)
+                const doctorList = await apiGet<Doctor[]>('/v1/appointments/doctors')
+                setDoctors(doctorList)
             } catch (error) {
                 console.error('Error fetching doctors:', error)
-                toast.error('Failed to load doctors')
+                toast.error('Failed to load doctors. Please try again.')
             }
         }
         fetchDoctors()
     }, [])
+
+    // Auto-check availability whenever doctor + date + time are all selected
+    const checkAvailability = useCallback(async (doctorId: string, date: string, time: string) => {
+        if (!doctorId || !date || !time) {
+            setAvailability({ checked: false, available: false, message: '', isChecking: false })
+            return
+        }
+        setAvailability(prev => ({ ...prev, isChecking: true }))
+        try {
+            const result = await apiGet<{ available: boolean; message: string }>(
+                `/v1/appointments/check-availability?doctor_id=${doctorId}&appointment_date=${date}&appointment_time=${encodeURIComponent(time)}`
+            )
+            setAvailability({ checked: true, available: result.available, message: result.message, isChecking: false })
+        } catch (error: any) {
+            const msg = error?.response?.data?.detail || 'Could not check availability'
+            setAvailability({ checked: true, available: false, message: msg, isChecking: false })
+        }
+    }, [])
+
+    useEffect(() => {
+        checkAvailability(watchedDoctorId, watchedDate, watchedTime)
+    }, [watchedDoctorId, watchedDate, watchedTime, checkAvailability])
 
     // Fetch patient DOB from intake form if available
     useEffect(() => {
         const fetchPatientData = async () => {
             try {
                 // Try to fetch patient intake data
-                const intakeData = await apiGet('/v1/patient-intake/my-intake')
+                const intakeData = await apiGet<any>('/v1/patient-intake/my-intake')
                 if (intakeData && intakeData.date_of_birth) {
                     setPatientDOB(intakeData.date_of_birth)
                 }
@@ -114,6 +148,7 @@ const PatientAppointments = () => {
             toast.success('Appointment booked successfully!')
             setShowBookingModal(false)
             reset()
+            setAvailability({ checked: false, available: false, message: '', isChecking: false })
             // Refresh appointments list
             fetchAppointments()
         } catch (error: any) {
@@ -128,7 +163,7 @@ const PatientAppointments = () => {
 
     const fetchAppointments = async () => {
         try {
-            const data = await apiGet('/v1/appointments/my')
+            const data = await apiGet<any[]>('/v1/appointments/my')
             setAppointments(data)
         } catch (error) {
             console.error('Error fetching appointments:', error)
@@ -245,6 +280,7 @@ const PatientAppointments = () => {
                                 onClick={() => {
                                     setShowBookingModal(false)
                                     reset()
+                                    setAvailability({ checked: false, available: false, message: '', isChecking: false })
                                 }}
                                 className="text-secondary-400 hover:text-secondary-600"
                             >
@@ -379,6 +415,29 @@ const PatientAppointments = () => {
                                 </div>
                             </div>
 
+                            {/* Availability indicator */}
+                            {(watchedDoctorId && watchedDate && watchedTime) && (
+                                <div
+                                    className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium border ${
+                                        availability.isChecking
+                                            ? 'bg-gray-50 border-gray-200 text-gray-500'
+                                            : availability.checked && availability.available
+                                            ? 'bg-green-50 border-green-200 text-green-700'
+                                            : availability.checked && !availability.available
+                                            ? 'bg-red-50 border-red-200 text-red-700'
+                                            : 'bg-gray-50 border-gray-200 text-gray-500'
+                                    }`}
+                                >
+                                    {availability.isChecking ? (
+                                        <><Loader2 className="w-4 h-4 animate-spin" /> Checking availability…</>
+                                    ) : availability.checked && availability.available ? (
+                                        <><Check className="w-4 h-4" /> {availability.message}</>
+                                    ) : availability.checked && !availability.available ? (
+                                        <><AlertCircle className="w-4 h-4" /> {availability.message}</>
+                                    ) : null}
+                                </div>
+                            )}
+
                             {/* Reason (Optional) */}
                             <div>
                                 <label className="block text-sm font-medium text-secondary-700 mb-2">
@@ -396,7 +455,11 @@ const PatientAppointments = () => {
                             <div className="flex gap-3 pt-4">
                                 <Button
                                     type="submit"
-                                    disabled={isSubmitting}
+                                    disabled={
+                                        isSubmitting ||
+                                        availability.isChecking ||
+                                        (availability.checked && !availability.available)
+                                    }
                                     className="flex-1"
                                 >
                                     {isSubmitting ? 'Booking...' : 'Book Appointment'}
@@ -407,6 +470,7 @@ const PatientAppointments = () => {
                                     onClick={() => {
                                         setShowBookingModal(false)
                                         reset()
+                                        setAvailability({ checked: false, available: false, message: '', isChecking: false })
                                     }}
                                     className="flex-1"
                                 >

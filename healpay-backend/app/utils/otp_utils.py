@@ -1,120 +1,144 @@
-import random
+"""
+OTP Utilities — DB-backed storage (replaces the in-memory dict).
+
+All OTP records are stored in the ``otp_verifications`` table so they
+survive server restarts and work correctly under multiple Uvicorn workers.
+Old (unused) records for the same email+purpose are deleted on each new
+issuance to prevent stale data build-up.
+"""
+import json
+import secrets
 import string
 from datetime import datetime, timedelta
+from typing import Optional, Tuple
 
-def generate_otp(length: int = 4) -> str:
+from sqlalchemy.orm import Session
+
+
+def generate_otp(length: int = 6) -> str:
+    """Return a cryptographically secure numeric OTP string."""
+    return "".join(secrets.choice(string.digits) for _ in range(length))
+
+
+def store_otp(
+    db: Session,
+    email: str,
+    otp_code: str,
+    purpose: str = "password_reset",
+    expiry_minutes: int = 6,
+    user_data: Optional[dict] = None,
+) -> None:
     """
-    Generate a random OTP code.
-    
+    Persist an OTP in the database.
+
     Args:
-        length: Length of OTP (default 4)
-    
-    Returns:
-        Random numeric OTP as string
+        db: Active SQLAlchemy session.
+        email: Recipient's email address.
+        otp_code: The generated OTP string.
+        purpose: "signup" or "password_reset".
+        expiry_minutes: How many minutes until the OTP expires.
+        user_data: Optional dict of registration data (for signup OTPs).
     """
-    return ''.join(random.choices(string.digits, k=length))
+    from app.db.models import OtpVerification
+
+    # Remove any previous OTPs for this email+purpose (prevents stale reuse)
+    db.query(OtpVerification).filter(
+        OtpVerification.email == email,
+        OtpVerification.purpose == purpose,
+    ).delete(synchronize_session=False)
+
+    expires_at = datetime.utcnow() + timedelta(minutes=expiry_minutes)
+    record = OtpVerification(
+        email=email,
+        otp_code=otp_code,
+        purpose=purpose,
+        user_data=json.dumps(user_data) if user_data else None,
+        expires_at=expires_at,
+        used=False,
+    )
+    db.add(record)
+    db.commit()
 
 
-def verify_otp(stored_otp: str, input_otp: str, created_at: datetime, expiry_minutes: int = 3) -> tuple[bool, str]:
+def verify_otp(
+    db: Session,
+    email: str,
+    input_otp: str,
+    purpose: str = "password_reset",
+) -> Tuple[bool, str]:
     """
-    Verify OTP code and check expiration.
-    
-    Args:
-        stored_otp: OTP stored in database
-        input_otp: OTP entered by user
-        created_at: When OTP was created
-        expiry_minutes: OTP validity period (default 3 minutes)
-    
+    Verify an OTP from the database.
+
     Returns:
-        (is_valid, error_message)
+        (is_valid, error_message)  — error_message is empty on success.
     """
-    if not stored_otp:
+    from app.db.models import OtpVerification
+
+    record: Optional[OtpVerification] = (
+        db.query(OtpVerification)
+        .filter(
+            OtpVerification.email == email,
+            OtpVerification.purpose == purpose,
+            OtpVerification.used == False,  # noqa: E712
+        )
+        .order_by(OtpVerification.created_at.desc())
+        .first()
+    )
+
+    if not record:
         return False, "No OTP found. Please request a new one."
-    
-    # Check if OTP matches
-    if stored_otp != input_otp:
+
+    if record.otp_code != input_otp:
         return False, "Invalid OTP code."
-    
-    # Check if OTP has expired
-    expiry_time = created_at + timedelta(minutes=expiry_minutes)
-    if datetime.now() > expiry_time:
+
+    if datetime.utcnow() > record.expires_at.replace(tzinfo=None):
+        # Clean up expired record
+        db.delete(record)
+        db.commit()
         return False, "OTP has expired. Please request a new one."
-    
-    return True, "OTP verified successfully."
+
+    # Mark as used and commit
+    record.used = True
+    db.commit()
+    return True, ""
+
+
+def get_signup_user_data(db: Session, email: str) -> Optional[dict]:
+    """
+    Retrieve the registration payload stored alongside a signup OTP.
+    Only returns data for a verified (used=True) record.
+    """
+    from app.db.models import OtpVerification
+
+    record: Optional[OtpVerification] = (
+        db.query(OtpVerification)
+        .filter(
+            OtpVerification.email == email,
+            OtpVerification.purpose == "signup",
+            OtpVerification.used == True,  # noqa: E712
+        )
+        .order_by(OtpVerification.created_at.desc())
+        .first()
+    )
+
+    if record and record.user_data:
+        return json.loads(record.user_data)
+    return None
+
+
+def delete_otp(db: Session, email: str, purpose: str = "signup") -> None:
+    """Delete all OTP records for an email+purpose after successful use."""
+    from app.db.models import OtpVerification
+
+    db.query(OtpVerification).filter(
+        OtpVerification.email == email,
+        OtpVerification.purpose == purpose,
+    ).delete(synchronize_session=False)
+    db.commit()
 
 
 def is_otp_expired(created_at: datetime, expiry_minutes: int = 3) -> bool:
-    """
-    Check if OTP has expired.
-    
-    Args:
-        created_at: When OTP was created
-        expiry_minutes: OTP validity period (default 3 minutes)
-    
-    Returns:
-        True if expired, False otherwise
-    """
+    """Legacy helper — kept for compatibility."""
     if not created_at:
         return True
-    
-    expiry_time = created_at + timedelta(minutes=expiry_minutes)
-    return datetime.now() > expiry_time
-
-
-# Simple in-memory OTP storage for password reset
-_otp_storage = {}
-
-def store_otp(db, email: str, otp_code: str, expiry_minutes: int = 3):
-    """
-    Store OTP code for email verification/password reset
-    
-    Args:
-        db: Database session
-        email: User's email
-        otp_code: Generated OTP
-        expiry_minutes: OTP validity period
-    """
-    _otp_storage[email] = {
-        'code': otp_code,
-        'created_at': datetime.now(),
-        'expiry_minutes': expiry_minutes
-    }
-    print(f"Stored OTP for {email}: {otp_code}")
-
-
-def verify_otp(db, email: str, input_otp: str) -> bool:
-    """
-    Verify OTP code from storage
-    
-    Args:
-        db: Database session
-        email: User's email
-        input_otp: OTP entered by user
-    
-    Returns:
-        True if valid, False otherwise
-    """
-    if email not in _otp_storage:
-        print(f"No OTP found for {email}")
-        return False
-    
-    stored_data = _otp_storage[email]
-    stored_otp = stored_data['code']
-    created_at = stored_data['created_at']
-    expiry_minutes = stored_data.get('expiry_minutes', 3)
-    
-    # Check if OTP matches
-    if stored_otp != input_otp:
-        print(f"OTP mismatch for {email}: expected {stored_otp}, got {input_otp}")
-        return False
-    
-    # Check if expired
-    if is_otp_expired(created_at, expiry_minutes):
-        print(f"OTP expired for {email}")
-        del _otp_storage[email]  # Clean up expired OTP
-        return False
-    
-    # Valid OTP - remove from storage
-    del _otp_storage[email]
-    print(f"OTP verified successfully for {email}")
-    return True
+    return datetime.now() > created_at + timedelta(minutes=expiry_minutes)

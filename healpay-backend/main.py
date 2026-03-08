@@ -1,15 +1,45 @@
-from fastapi import FastAPI
-
+import logging
+import threading
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 from app.core.config import settings
+from app.core.limiter import limiter
 from app.api.v1.router import api_router
 from app.db.database import engine
 from app.db import models
+from app.services import index_loader
+
+# ---------------------------------------------------------------------------
+# Logging configuration
+# ---------------------------------------------------------------------------
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
 
+# ---------------------------------------------------------------------------
+# Lifespan – warm up AI indices on startup in a background thread
+# ---------------------------------------------------------------------------
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("Starting AI recommendation index warm-up (background)...")
+    t = threading.Thread(target=index_loader.warm_up, daemon=True)
+    t.start()
+    yield
+    logger.info("HealPay backend shutting down.")
+
+
 app = FastAPI(
+    lifespan=lifespan,
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="AI-Powered Medical Billing System API",
@@ -21,78 +51,72 @@ app = FastAPI(
     ]
 )
 
-# Configure CORS - Allow all origins for development
+# ---------------------------------------------------------------------------
+# CORS – restrict to known frontend origins
+# ---------------------------------------------------------------------------
+allowed_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+]
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins in development
-    allow_credentials=False,  # Set to False when using allow_origins=["*"]
+    allow_origins=allowed_origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include API router with v1 prefix
+# ---------------------------------------------------------------------------
+# Global exception handler
+# ---------------------------------------------------------------------------
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.exception("Unhandled exception on %s %s", request.method, request.url)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An internal server error occurred. Please try again later."},
+    )
+
+# ---------------------------------------------------------------------------
+# API router
+# ---------------------------------------------------------------------------
 app.include_router(api_router, prefix="/api/v1")
 
-# DEBUG: Print all registered routes
-with open("routes.log", "w") as f:
-    f.write("REGISTERED ROUTES:\n")
-    for route in app.routes:
-        if hasattr(route, 'path'):
-            f.write(f"{route.path}\n")
-            print(f"  {route.path}")
+logger.info("HealPay backend started — routes registered.")
+
 
 @app.get("/")
 async def root():
     return {
         "message": "Welcome to HealPay Medical Billing System API",
         "version": settings.APP_VERSION,
-        "docs": "/api/docs"
+        "docs": "/api/docs",
     }
+
 
 @app.get("/health")
 async def health_check():
+    from app.services import index_loader
     return {
         "status": "healthy",
         "app": settings.APP_NAME,
-        "version": settings.APP_VERSION
+        "version": settings.APP_VERSION,
+        "ai_index_ready": index_loader._is_loaded,
     }
 
-# EMERGENCY ROUTE FOR BILLING
-from fastapi import Depends
-from app.core.security import get_current_user
-from app.db.database import get_db
-from sqlalchemy.orm import Session
-from app.db.models import ClinicalEncounter, User
-
-@app.get("/api/v1/billing/encounters/ready")
-def get_ready_to_bill_encounters_direct(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    print("DIRECT ENDPOINT HIT")
-    encounters = db.query(ClinicalEncounter).filter(
-        ClinicalEncounter.status.in_(['coded', 'sent_to_biller'])
-    ).all()
-    results = []
-    for enc in encounters:
-        patient = db.query(User).filter(User.id == enc.patient_id).first()
-        doctor = db.query(User).filter(User.id == enc.doctor_id).first()
-        results.append({
-            "id": enc.id,
-            "encounter_date": enc.encounter_date,
-            "patient_name": f"{patient.first_name} {patient.last_name}" if patient else "Unknown",
-            "doctor_name": f"{doctor.first_name} {doctor.last_name}" if doctor else "Unknown",
-            "type": enc.encounter_type,
-            "status": enc.status
-        })
-    return results
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8001,
-        reload=True
+        port=8000,
+        reload=True,
     )
 

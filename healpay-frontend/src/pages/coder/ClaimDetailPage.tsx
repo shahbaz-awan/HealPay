@@ -31,6 +31,7 @@ const ClaimDetailPage = () => {
     const [loadingRecommendations, setLoadingRecommendations] = useState(false)
     const [showRecommendations, setShowRecommendations] = useState(false)
     const [recommendationError, setRecommendationError] = useState<string | null>(null)
+    const [recommendationErrorType, setRecommendationErrorType] = useState<'validation' | 'service'>('service')
     const [codeSearchQuery, setCodeSearchQuery] = useState('')
     const [selectedCodeType, setSelectedCodeType] = useState<'ICD-10' | 'CPT'>('ICD-10')
     const [searchResults, setSearchResults] = useState<any[]>([])
@@ -79,9 +80,18 @@ const ClaimDetailPage = () => {
             toast.success('AI recommendations loaded successfully!')
         } catch (error: any) {
             console.error('Error loading recommendations:', error)
-            const errorMsg = error?.response?.data?.detail || 'Failed to load AI recommendations. The AI service may need initialization.'
-            setRecommendationError(errorMsg)
-            toast.error(errorMsg)
+            const status = error?.response?.status
+            const detail = error?.response?.data?.detail
+            if (status === 422) {
+                // Invalid / non-medical complaint
+                setRecommendationErrorType('validation')
+                setRecommendationError(detail || 'The chief complaint does not appear to be a valid medical condition.')
+                toast.warn(detail || 'Please enter a valid medical chief complaint.')
+            } else {
+                setRecommendationErrorType('service')
+                setRecommendationError(detail || 'Failed to load AI recommendations. The AI service may need initialization.')
+                toast.error(detail || 'AI service error. Please try again.')
+            }
         } finally {
             setLoadingRecommendations(false)
         }
@@ -339,24 +349,40 @@ const ClaimDetailPage = () => {
 
                     {/* Recommendation Error State */}
                     {recommendationError && (
-                        <Card className="border-2 border-red-200 bg-red-50">
+                        <Card className={`border-2 ${recommendationErrorType === 'validation'
+                            ? 'border-amber-300 bg-amber-50'
+                            : 'border-red-200 bg-red-50'}`}
+                        >
                             <div className="flex items-start justify-between">
                                 <div className="flex-1">
-                                    <h3 className="text-lg font-semibold text-red-900 mb-1">
-                                        ❌ Recommendation Error
+                                    <h3 className={`text-lg font-semibold mb-1 ${recommendationErrorType === 'validation'
+                                        ? 'text-amber-900'
+                                        : 'text-red-900'}`}
+                                    >
+                                        {recommendationErrorType === 'validation' ? '⚠️ Invalid Chief Complaint' : '❌ Recommendation Error'}
                                     </h3>
-                                    <p className="text-sm text-red-700 mb-3">
+                                    <p className={`text-sm mb-3 ${recommendationErrorType === 'validation'
+                                        ? 'text-amber-800'
+                                        : 'text-red-700'}`}
+                                    >
                                         {recommendationError}
                                     </p>
+                                    {recommendationErrorType === 'validation' && (
+                                        <p className="text-xs text-amber-700">
+                                            Examples of valid complaints: <em>chest pain, shortness of breath, fever, headache, abdominal pain</em>
+                                        </p>
+                                    )}
                                 </div>
-                                <Button
-                                    onClick={loadRecommendations}
-                                    className="flex items-center gap-2"
-                                    variant="outline"
-                                    size="sm"
-                                >
-                                    Retry
-                                </Button>
+                                {recommendationErrorType === 'service' && (
+                                    <Button
+                                        onClick={loadRecommendations}
+                                        className="flex items-center gap-2 ml-4"
+                                        variant="outline"
+                                        size="sm"
+                                    >
+                                        Retry
+                                    </Button>
+                                )}
                             </div>
                         </Card>
                     )}

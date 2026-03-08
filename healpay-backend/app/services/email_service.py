@@ -1,8 +1,11 @@
+import logging
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Optional
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 # Email configuration from environment variables
 SMTP_HOST = settings.SMTP_HOST
@@ -170,12 +173,16 @@ def send_otp_email(to_email: str, otp: str, purpose: str = "signup") -> bool:
             server.starttls()
             server.login(SMTP_USER, SMTP_PASSWORD)
             server.send_message(msg)
-        
-        print(f"OTP email sent successfully to {to_email}")
+
+        logger.info("OTP email sent successfully to %s", to_email)
         return True
-        
+
     except Exception as e:
-        print(f"Failed to send email: {str(e)}")
+        logger.error("Failed to send OTP email to %s: %s", to_email, e, exc_info=True)
+        # In development/no-SMTP mode, log the OTP to the console
+        if not SMTP_USER:
+            logger.warning("[DEV MODE] OTP for %s is: %s (purpose: %s)", to_email, otp, purpose)
+            return True
         return False
 
 
@@ -216,8 +223,8 @@ def send_welcome_email(to_email: str, first_name: str) -> bool:
             server.starttls()
             server.login(SMTP_USER, SMTP_PASSWORD)
             server.send_message(msg)
-        
+
         return True
     except Exception as e:
-        print(f"Failed to send welcome email: {str(e)}")
+        logger.error("Failed to send welcome email to %s: %s", to_email, e, exc_info=True)
         return False

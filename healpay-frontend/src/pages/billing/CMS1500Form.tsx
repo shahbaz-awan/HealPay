@@ -1,11 +1,24 @@
-import { useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Printer, Save } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { ArrowLeft, Printer, Save, Loader2, ShieldAlert, ShieldCheck, Shield, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react'
 import Button from '@/components/ui/Button'
+import { getEncounterDetails, getEncounterCodes } from '@/services/clinicalService'
+import { analyzeClaimRisk, createClaim, ClaimRiskResult } from '@/services/billingService'
+import { toast } from 'react-toastify'
 
 const CMS1500Form = () => {
     const navigate = useNavigate()
+    const { encounterId } = useParams<{ encounterId?: string }>()
     const formRef = useRef<HTMLDivElement>(null)
+    const [autoFillLoading, setAutoFillLoading] = useState(false)
+    const [autoFillError, setAutoFillError] = useState<string | null>(null)
+
+    // Risk analyzer state
+    const [riskResult, setRiskResult] = useState<ClaimRiskResult | null>(null)
+    const [riskLoading, setRiskLoading] = useState(false)
+    const [riskError, setRiskError] = useState<string | null>(null)
+    const [showPassedChecks, setShowPassedChecks] = useState(false)
+    const [saveLoading, setSaveLoading] = useState(false)
 
     const [formData, setFormData] = useState({
         // Box 1 - Insurance Type
@@ -156,6 +169,134 @@ const CMS1500Form = () => {
         })
     }
 
+    const handleAnalyzeRisk = async () => {
+        setRiskLoading(true)
+        setRiskError(null)
+        setRiskResult(null)
+        try {
+            const result = await analyzeClaimRisk(formData as Record<string, any>)
+            setRiskResult(result)
+            setShowPassedChecks(false)
+        } catch (err: any) {
+            setRiskError(err?.response?.data?.detail || 'Failed to analyze claim risk. Please try again.')
+        } finally {
+            setRiskLoading(false)
+        }
+    }
+
+    const handleSaveClaim = async () => {
+        if (!encounterId) {
+            toast.error('No encounter linked. Open this form from an encounter.')
+            return
+        }
+        const insurer = formData.insurancePlanName || formData.insuranceType
+        if (!insurer) {
+            toast.error('Please fill in the Insurance Plan Name (Box 11c) before saving.')
+            return
+        }
+        // Sum all service line charges
+        const totalCharge = formData.serviceLines.reduce((sum: number, line: any) => {
+            return sum + (parseFloat(line.charges) || 0)
+        }, 0)
+        if (totalCharge <= 0) {
+            toast.error('Total charges must be greater than zero.')
+            return
+        }
+        try {
+            setSaveLoading(true)
+            await createClaim({
+                encounter_id: Number(encounterId),
+                insurance_provider: insurer,
+                total_amount: totalCharge,
+                notes: `CMS-1500 submitted via billing portal`,
+            })
+            toast.success('Claim saved and submitted successfully!')
+            navigate('/billing/dashboard')
+        } catch (err: any) {
+            const msg = err?.response?.data?.detail || 'Failed to save claim. Please try again.'
+            toast.error(msg)
+        } finally {
+            setSaveLoading(false)
+        }
+    }
+
+    // Auto-populate form when an encounterId is provided in the URL
+    useEffect(() => {
+        if (!encounterId) return
+
+        const autoFill = async () => {
+            setAutoFillLoading(true)
+            setAutoFillError(null)
+            try {
+                const [enc, codes] = await Promise.all([
+                    getEncounterDetails(Number(encounterId)),
+                    getEncounterCodes(Number(encounterId))
+                ])
+
+                // Split patient name (format: "First Last")
+                const nameParts = (enc.patient_name || '').trim().split(' ')
+                const firstName = nameParts.slice(0, -1).join(' ')
+                const lastName = nameParts.slice(-1)[0] || ''
+
+                // Encounter date formatting
+                const encDate = enc.encounter_date
+                    ? new Date(enc.encounter_date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })
+                    : ''
+
+                // Doctor name
+                const doctorName = enc.doctor_name || ''
+
+                // Extract ICD-10 codes (Box 21: up to 12 diagnosis pointers A-L)
+                const icdCodes: string[] = (codes || [])
+                    .filter((c: any) => c.code_type === 'ICD10_CM' || c.code_type === 'ICD-10')
+                    .map((c: any) => c.code)
+                const diagLabels = ['diagnosisA','diagnosisB','diagnosisC','diagnosisD',
+                                    'diagnosisE','diagnosisF','diagnosisG','diagnosisH',
+                                    'diagnosisI','diagnosisJ','diagnosisK','diagnosisL']
+                const diagUpdates: Record<string, string> = {}
+                icdCodes.slice(0, 12).forEach((code, i) => {
+                    diagUpdates[diagLabels[i]] = code
+                })
+
+                // Extract CPT codes (Box 24 service lines: up to 6)
+                const cptCodes: any[] = (codes || [])
+                    .filter((c: any) => c.code_type === 'CPT')
+                const newServiceLines = formData.serviceLines.map((line, i) => {
+                    if (i < cptCodes.length) {
+                        return {
+                            ...line,
+                            cpt: cptCodes[i].code,
+                            dateFrom: encDate,
+                            dateTo: encDate,
+                            units: '1',
+                            // Pointer to first diagnosis by default
+                            diagPointer: 'A',
+                        }
+                    }
+                    return line
+                })
+
+                setFormData(prev => ({
+                    ...prev,
+                    patientFirstName: firstName,
+                    patientLastName: lastName,
+                    dateOfIllness: encDate,
+                    referringProviderName: doctorName,
+                    patientAccountNo: `ENC-${encounterId}`,
+                    serviceLines: newServiceLines,
+                    ...diagUpdates,
+                }))
+            } catch (err) {
+                setAutoFillError('Could not auto-fill form — encounter data unavailable.')
+                console.error('CMS auto-fill error:', err)
+            } finally {
+                setAutoFillLoading(false)
+            }
+        }
+
+        autoFill()
+    }, [encounterId])
+
     return (
         <div className="min-h-screen bg-gray-100 p-4">
             {/* Header - Hidden on print */}
@@ -169,12 +310,156 @@ const CMS1500Form = () => {
                         <Printer className="w-4 h-4 mr-2" />
                         Print Form
                     </Button>
-                    <Button variant="primary">
-                        <Save className="w-4 h-4 mr-2" />
+                    <Button
+                        variant="outline"
+                        onClick={handleAnalyzeRisk}
+                        disabled={riskLoading}
+                        className="border-amber-400 text-amber-700 hover:bg-amber-50"
+                    >
+                        {riskLoading
+                            ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            : <Shield className="w-4 h-4 mr-2" />
+                        }
+                        Analyze Risk
+                    </Button>
+                    <Button variant="primary" onClick={handleSaveClaim} disabled={saveLoading}>
+                        {saveLoading
+                            ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            : <Save className="w-4 h-4 mr-2" />
+                        }
                         Save Claim
                     </Button>
                 </div>
             </div>
+
+            {/* Auto-fill status banner */}
+            {encounterId && (
+                <div className="print:hidden max-w-[900px] mx-auto mb-3">
+                    {autoFillLoading && (
+                        <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 text-blue-700 text-sm">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Auto-filling form from encounter #{encounterId}…
+                        </div>
+                    )}
+                    {!autoFillLoading && !autoFillError && (
+                        <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2 text-green-700 text-sm">
+                            ✓ Form auto-populated from Encounter #{encounterId} — patient info, ICD-10 codes (Box 21) and CPT codes (Box 24) filled in.
+                        </div>
+                    )}
+                    {autoFillError && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2 text-yellow-700 text-sm">
+                            ⚠ {autoFillError}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* ── Claim Risk Analysis Panel ──────────────────────────────── */}
+            {(riskResult || riskLoading || riskError) && (
+                <div className="print:hidden max-w-[900px] mx-auto mb-3">
+                    {riskLoading && (
+                        <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-amber-700 text-sm">
+                            <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                            Analyzing claim for potential rejection risks…
+                        </div>
+                    )}
+                    {riskError && (
+                        <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-700 text-sm">
+                            ⚠ {riskError}
+                        </div>
+                    )}
+                    {riskResult && (
+                        <div className={`rounded-lg border-2 overflow-hidden ${
+                            riskResult.risk_level === 'HIGH'   ? 'border-red-400'    :
+                            riskResult.risk_level === 'MEDIUM' ? 'border-amber-400'  :
+                                                                  'border-green-400'
+                        }`}>
+                            {/* Header bar */}
+                            <div className={`flex items-center gap-3 px-4 py-3 ${
+                                riskResult.risk_level === 'HIGH'   ? 'bg-red-600 text-white'    :
+                                riskResult.risk_level === 'MEDIUM' ? 'bg-amber-500 text-white'  :
+                                                                      'bg-green-600 text-white'
+                            }`}>
+                                {riskResult.risk_level === 'HIGH'
+                                    ? <ShieldAlert className="w-5 h-5 shrink-0" />
+                                    : riskResult.risk_level === 'MEDIUM'
+                                        ? <AlertTriangle className="w-5 h-5 shrink-0" />
+                                        : <ShieldCheck className="w-5 h-5 shrink-0" />
+                                }
+                                <div className="flex-1">
+                                    <span className="font-bold text-base">
+                                        {riskResult.risk_level} RISK
+                                    </span>
+                                    <span className="ml-3 text-sm opacity-90">
+                                        Score: {riskResult.risk_score}/100
+                                    </span>
+                                </div>
+                                <div className="text-sm text-right opacity-90">
+                                    {riskResult.high_count > 0 && <span className="mr-2">🔴 {riskResult.high_count} critical</span>}
+                                    {riskResult.medium_count > 0 && <span className="mr-2">🟡 {riskResult.medium_count} medium</span>}
+                                    {riskResult.low_count > 0 && <span>🔵 {riskResult.low_count} low</span>}
+                                </div>
+                            </div>
+
+                            {/* Summary */}
+                            <div className="px-4 py-3 bg-white border-b border-gray-200 text-sm text-gray-700">
+                                {riskResult.summary}
+                            </div>
+
+                            {/* Issues list */}
+                            {riskResult.issues.length > 0 && (
+                                <div className="bg-white divide-y divide-gray-100">
+                                    {riskResult.issues.map((issue, i) => (
+                                        <div key={i} className="flex gap-3 px-4 py-2.5 items-start">
+                                            <span className={`shrink-0 text-xs font-bold mt-0.5 px-1.5 py-0.5 rounded ${
+                                                issue.severity === 'HIGH'   ? 'bg-red-100 text-red-700'    :
+                                                issue.severity === 'MEDIUM' ? 'bg-amber-100 text-amber-700' :
+                                                                               'bg-blue-100 text-blue-700'
+                                            }`}>
+                                                {issue.severity}
+                                            </span>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+                                                        {issue.box}
+                                                    </span>
+                                                    <span className="text-sm text-gray-800">{issue.message}</span>
+                                                </div>
+                                                <p className="text-xs text-gray-500 mt-0.5">💡 {issue.suggestion}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Passed checks toggle */}
+                            {riskResult.passed_checks.length > 0 && (
+                                <div className="border-t border-gray-200 bg-gray-50">
+                                    <button
+                                        className="flex items-center gap-2 w-full px-4 py-2 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                                        onClick={() => setShowPassedChecks(v => !v)}
+                                    >
+                                        {showPassedChecks
+                                            ? <ChevronUp className="w-3 h-3" />
+                                            : <ChevronDown className="w-3 h-3" />
+                                        }
+                                        {riskResult.passed_checks.length} passed check(s)
+                                    </button>
+                                    {showPassedChecks && (
+                                        <ul className="px-4 pb-3 space-y-1">
+                                            {riskResult.passed_checks.map((check, i) => (
+                                                <li key={i} className="text-xs text-green-700 flex items-center gap-1.5">
+                                                    <ShieldCheck className="w-3 h-3 shrink-0" /> {check}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* CMS-1500 Form */}
             <div ref={formRef} className="max-w-[900px] mx-auto bg-white shadow-lg print:shadow-none">

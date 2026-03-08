@@ -18,14 +18,19 @@ import {
     Heart,
     Droplet,
     Thermometer,
-    Weight
+    Weight,
+    Send,
+    CheckCircle,
+    ClipboardList
 } from 'lucide-react'
 import Card, { CardHeader } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 import { apiGet } from '@/services/api'
+import { getPatientEncounters, submitEncounterForCoding } from '@/services/clinicalService'
 import AddNoteModal from '@/components/modals/AddNoteModal'
 import ScheduleFollowupModal from '@/components/modals/ScheduleFollowupModal'
+import { toast } from 'react-toastify'
 
 const PatientDetailPage = () => {
     const navigate = useNavigate()
@@ -35,14 +40,15 @@ const PatientDetailPage = () => {
     const [patientData, setPatientData] = useState<any>(null)
     const [intakeData, setIntakeData] = useState<any>(null)
     const [isLoading, setIsLoading] = useState(true)
+    const [encounters, setEncounters] = useState<any[]>([])
+    const [submittingId, setSubmittingId] = useState<number | null>(null)
 
     // Fetch patient basic info and intake form
     useEffect(() => {
         const fetchPatientDetails = async () => {
             try {
-                // Fetch user basic info
-                const userResponse = await apiGet(`/v1/admin/users`)
-                const patient = userResponse.find((u: any) => u.id === parseInt(userId || '0'))
+                // Fetch user basic info via doctor-accessible endpoint
+                const patient = await apiGet(`/v1/appointments/patients/${userId}`)
 
                 if (!patient) {
                     console.error('Patient not found')
@@ -59,6 +65,14 @@ const PatientDetailPage = () => {
                 } catch (intakeError: any) {
                     // Intake might not exist yet - that's okay
                     console.log('No intake data found for patient')
+                }
+
+                // Fetch clinical encounters
+                try {
+                    const encs = await getPatientEncounters(parseInt(userId!))
+                    setEncounters(encs || [])
+                } catch {
+                    console.log('No encounters found for patient')
                 }
             } catch (error) {
                 console.error('Error fetching patient details:', error)
@@ -83,9 +97,29 @@ const PatientDetailPage = () => {
         }
     }
 
-    const handleNoteSuccess = () => {
-        // Refresh patient data if needed
-        console.log('Clinical note saved successfully')
+    const handleNoteSuccess = async () => {
+        // Refresh encounters list
+        try {
+            const encs = await getPatientEncounters(parseInt(userId || '0'))
+            setEncounters(encs || [])
+        } catch {
+            console.log('Could not refresh encounters')
+        }
+    }
+
+    const handleSubmitForCoding = async (encounterId: number) => {
+        setSubmittingId(encounterId)
+        try {
+            await submitEncounterForCoding(encounterId)
+            toast.success('Encounter submitted to coding queue!')
+            // Refresh list
+            const encs = await getPatientEncounters(parseInt(userId || '0'))
+            setEncounters(encs || [])
+        } catch (error: any) {
+            toast.error(error.response?.data?.detail || 'Failed to submit for coding')
+        } finally {
+            setSubmittingId(null)
+        }
     }
 
     if (isLoading) {
@@ -408,6 +442,81 @@ const PatientDetailPage = () => {
                     </div>
                 </div>
             )}
+
+            {/* Clinical Encounters Section */}
+            <Card>
+                <CardHeader
+                    title="Clinical Encounters"
+                    subtitle="All visits and their coding status"
+                    icon={<ClipboardList className="w-5 h-5 text-blue-600" />}
+                />
+                {encounters.length === 0 ? (
+                    <div className="text-center py-8">
+                        <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                        <p className="text-secondary-500">No clinical encounters yet. Add a clinical note to get started.</p>
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        {encounters.map((enc: any) => (
+                            <div key={enc.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-3 mb-1">
+                                        <span className="font-medium text-secondary-900">
+                                            {enc.encounter_type || 'Office Visit'}
+                                        </span>
+                                        <Badge
+                                            variant={
+                                                enc.status === 'pending_coding' ? 'warning' :
+                                                enc.status === 'coded' ? 'info' :
+                                                enc.status === 'sent_to_biller' ? 'success' :
+                                                enc.status === 'sent_to_doctor' ? 'success' : 'info'
+                                            }
+                                        >
+                                            {enc.status === 'pending_coding' ? 'Pending Coding' :
+                                             enc.status === 'coded' ? 'Coded' :
+                                             enc.status === 'sent_to_biller' ? 'Sent to Biller' :
+                                             enc.status === 'sent_to_doctor' ? 'Sent to Doctor' :
+                                             enc.status}
+                                        </Badge>
+                                    </div>
+                                    <p className="text-sm text-secondary-600">
+                                        <span className="font-medium">Chief Complaint:</span> {enc.chief_complaint || '—'}
+                                    </p>
+                                    {enc.assessment && (
+                                        <p className="text-sm text-secondary-500 mt-1">
+                                            <span className="font-medium">Assessment:</span> {enc.assessment}
+                                        </p>
+                                    )}
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <Clock className="w-3 h-3 text-gray-400" />
+                                        <span className="text-xs text-gray-400">
+                                            {enc.encounter_date ? new Date(enc.encounter_date).toLocaleDateString() : 'Today'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="ml-4">
+                                    {enc.status === 'pending_coding' ? (
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => handleSubmitForCoding(enc.id)}
+                                            disabled={submittingId === enc.id}
+                                            className="flex items-center gap-2 text-sm"
+                                        >
+                                            <Send className="w-4 h-4" />
+                                            {submittingId === enc.id ? 'Submitting...' : 'Submit for Coding'}
+                                        </Button>
+                                    ) : (
+                                        <div className="flex items-center gap-2 text-green-600 text-sm font-medium">
+                                            <CheckCircle className="w-4 h-4" />
+                                            <span>In Workflow</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </Card>
 
             {/* Add Note Modal */}
             {showAddNoteModal && (

@@ -98,7 +98,7 @@ const DoctorAppointments = () => {
 
     const updateAppointmentStatus = async (appointmentId: number, newStatus: string) => {
         try {
-            await apiPatch(`/v1/appointments/${appointmentId}/status?status=${newStatus}`, {})
+            await apiPatch(`/v1/appointments/${appointmentId}/status?new_status=${newStatus}`, {})
             toast.success(`Appointment marked as ${newStatus}`)
             fetchAppointments()
             setSelectedAppointment(null)

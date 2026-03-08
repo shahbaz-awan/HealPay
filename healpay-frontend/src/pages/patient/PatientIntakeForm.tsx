@@ -168,7 +168,7 @@ const PatientIntakeForm = () => {
     useEffect(() => {
         const fetchExistingIntake = async () => {
             try {
-                const intakeData = await apiGet('/v1/patient-intake/my-intake')
+                const intakeData = await apiGet<any>('/v1/patient-intake/my-intake')
 
                 // If intake exists, switch to edit mode and populate form
                 setIsEditMode(true)

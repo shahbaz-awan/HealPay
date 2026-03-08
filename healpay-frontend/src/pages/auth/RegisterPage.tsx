@@ -65,7 +65,7 @@ const RegisterPage = () => {
         setIsLoading(true)
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
-            const response = await fetch(`${API_BASE_URL}/auth/register/send-otp`, {
+            const response = await fetch(`${API_BASE_URL}/v1/auth/register/send-otp`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -99,8 +99,8 @@ const RegisterPage = () => {
     }
 
     const onVerifyOTP = async () => {
-        if (!otp || otp.length !== 4) {
-            toast.error('Please enter a valid 4-digit OTP')
+        if (!otp || otp.length !== 6) {
+            toast.error('Please enter a valid 6-digit OTP')
             return
         }
 
@@ -108,9 +108,11 @@ const RegisterPage = () => {
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
             const response = await fetch(
-                `${API_BASE_URL}/auth/register/verify-otp?email=${encodeURIComponent(userEmail)}&otp=${encodeURIComponent(otp)}`,
+                `${API_BASE_URL}/v1/auth/register/verify-otp`,
                 {
                     method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail, otp }),
                 }
             )
 
@@ -138,7 +140,7 @@ const RegisterPage = () => {
     }
 
     const handleGoogleLogin = () => {
-        window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google/login`
+        window.location.href = `${import.meta.env.VITE_API_BASE_URL}/v1/auth/google/login`
     }
 
     return (
@@ -251,11 +253,11 @@ const RegisterPage = () => {
                                 <input
                                     id="otp"
                                     type="text"
-                                    maxLength={4}
+                                    maxLength={6}
                                     value={otp}
                                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                                     className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-center text-2xl tracking-widest font-bold"
-                                    placeholder="0000"
+                                    placeholder="000000"
                                 />
                                 <p className="text-xs text-secondary-600">
                                     Check your email for the OTP code. It expires in 3 minutes.

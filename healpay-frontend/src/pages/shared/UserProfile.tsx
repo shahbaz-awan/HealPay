@@ -22,7 +22,8 @@ const UserProfile = () => {
         address: '',
         city: '',
         state: '',
-        zipCode: ''
+        zipCode: '',
+        specialization: ''
     })
 
     // Load user data when component mounts or user changes
@@ -36,7 +37,8 @@ const UserProfile = () => {
                 address: user.address || '',
                 city: user.city || '',
                 state: user.state || '',
-                zipCode: user.zip_code || ''
+                zipCode: user.zip_code || '',
+                specialization: user.specialization || ''
             })
         }
     }, [user])
@@ -45,20 +47,24 @@ const UserProfile = () => {
         setIsLoading(true)
         try {
             // Update profile via API (email cannot be changed)
-            const updateData = {
+            const updateData: Record<string, string | null> = {
                 first_name: formData.firstName,
                 last_name: formData.lastName,
                 phone: formData.phone || null
             }
+            if (user?.role === 'DOCTOR') {
+                updateData.specialization = formData.specialization || null
+            }
 
-            await apiPut(`/auth/me/update`, updateData)
+            await apiPut(`/v1/auth/me/update`, updateData)
 
             // Update local user state
             if (updateUser) {
                 updateUser({
                     firstName: formData.firstName,
                     lastName: formData.lastName,
-                    phone: formData.phone
+                    phone: formData.phone,
+                    specialization: formData.specialization
                 })
             }
 
@@ -84,11 +90,12 @@ const UserProfile = () => {
             firstName: user?.firstName || '',
             lastName: user?.lastName || '',
             email: user?.email || '',
-            phone: '+1 (555) 123-4567',
-            address: '123 Medical Plaza, Suite 100',
-            city: 'New York',
-            state: 'NY',
-            zipCode: '10001'
+            phone: user?.phone || '',
+            address: user?.address || '',
+            city: user?.city || '',
+            state: user?.state || '',
+            zipCode: user?.zipCode || user?.zip_code || '',
+            specialization: user?.specialization || ''
         })
         setIsEditing(false)
     }
@@ -247,6 +254,23 @@ const UserProfile = () => {
                                 </div>
                             )}
                         </div>
+
+                        {user?.role === 'DOCTOR' && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Specialization
+                                </label>
+                                {isEditing ? (
+                                    <Input
+                                        placeholder="e.g. Cardiology, General Practice"
+                                        value={formData.specialization}
+                                        onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
+                                    />
+                                ) : (
+                                    <p className="text-gray-900 py-2">{formData.specialization || <span className="text-gray-400 italic">Not specified</span>}</p>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 

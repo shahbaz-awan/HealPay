@@ -1,9 +1,14 @@
 from pydantic_settings import BaseSettings
 from typing import List
 import os
+import logging
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
+
+_DEFAULT_SECRET = "your-super-secret-key-change-in-production-make-it-long-and-random"
 
 class Settings(BaseSettings):
     # Application
@@ -34,8 +39,9 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "your-google-client-id")
     GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "your-google-client-secret")
     
-    # Frontend URL (for email links)
+    # Frontend URL (for email links and Google SSO callback)
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    BACKEND_URL: str = os.getenv("BACKEND_URL", "http://localhost:8000")
     
     # Encryption
     ENCRYPTION_KEY: str = os.getenv("ENCRYPTION_KEY", "your-encryption-key-32-chars!!")
@@ -53,10 +59,36 @@ class Settings(BaseSettings):
     OTP_EXPIRE_MINUTES: int = 10  # OTP expires in 10 minutes
     OTP_LENGTH: int = 6
     
+    # ---------------------------------------------------------------------------
+    # AI Recommendation Engine
+    # ---------------------------------------------------------------------------
+    EMBEDDING_MODEL: str = "pritamdeka/S-PubMedBert-MS-MARCO"
+    EMBEDDING_FALLBACK_MODEL: str = "all-MiniLM-L6-v2"
+    MAX_ICD_EMBED: int = 5000          # ICD codes sampled for FAISS
+    DENSE_WEIGHT: float = 0.75         # FAISS semantic weight in hybrid score
+    BM25_WEIGHT: float = 0.25          # BM25 lexical weight in hybrid score
+    MEDICAL_VALIDATION_THRESHOLD: float = 0.18  # Min cosine sim for medical check
+    EMBEDDINGS_CACHE_DIR: str = "embeddings_cache"
+    ICD_DATASET_PATH: str = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+        "Recommendation_Dataset", "ICD10codes.csv"
+    )
+    CPT_DATASET_PATH: str = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+        "Recommendation_Dataset", "cpt_codes.csv"
+    )
+
     class Config:
         case_sensitive = True
         env_file = ".env"
         extra = "ignore"  # Allow extra fields from .env
 
 settings = Settings()
+
+# Warn loudly if the default insecure secret key is still in use
+if settings.SECRET_KEY == _DEFAULT_SECRET:
+    logger.warning(
+        "SECURITY WARNING: Using the default SECRET_KEY. "
+        "Set a secure random value in your .env file before deploying to production."
+    )
 

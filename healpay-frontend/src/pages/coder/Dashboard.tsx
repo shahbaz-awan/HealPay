@@ -8,14 +8,15 @@ import {
   ChevronRight,
   Stethoscope,
   CheckCircle,
-  TrendingUp,
   Send,
-  Eye
+  Eye,
+  Activity
 } from 'lucide-react'
 import Card, { CardHeader } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 import { getPendingEncounters, getCompletedEncounters, sendEncounterTo } from '@/services/clinicalService'
+import DashboardSkeleton from '@/components/ui/DashboardSkeleton'
 
 interface PendingEncounter {
   id: number
@@ -86,14 +87,7 @@ const CoderDashboard = () => {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-secondary-600">Loading encounters...</p>
-        </div>
-      </div>
-    )
+    return <DashboardSkeleton statCount={3} />
   }
 
   return (
@@ -128,19 +122,22 @@ const CoderDashboard = () => {
               <CheckCircle className="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-secondary-600">Completed</p>
+              <p className="text-sm text-secondary-600">Coded</p>
               <p className="text-2xl font-bold text-secondary-900">{completedEncounters.length}</p>
             </div>
           </div>
         </Card>
         <Card>
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-purple-600" />
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${encounters.length === 0 && completedEncounters.length > 0 ? 'bg-green-100' : 'bg-blue-100'}`}>
+              <Activity className={`w-6 h-6 ${encounters.length === 0 && completedEncounters.length > 0 ? 'text-green-600' : 'text-blue-600'}`} />
             </div>
             <div>
-              <p className="text-sm text-secondary-600">Accuracy Rate</p>
-              <p className="text-2xl font-bold text-secondary-900">98.5%</p>
+              <p className="text-sm text-secondary-600">Total Processed</p>
+              <p className="text-2xl font-bold text-secondary-900">{encounters.length + completedEncounters.length}</p>
+              <p className="text-xs text-secondary-500 mt-0.5">
+                {encounters.length === 0 ? '✓ Queue cleared' : `${encounters.length} remaining`}
+              </p>
             </div>
           </div>
         </Card>

@@ -27,6 +27,28 @@
     --ring: 221 83% 53%;
     --radius: 0.5rem;
   }
+
+  .dark {
+    --background: 222 47% 7%;
+    --foreground: 210 40% 95%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 95%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 95%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 20% 50%;
+    --secondary-foreground: 210 40% 95%;
+    --muted: 217 33% 18%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 18%;
+    --accent-foreground: 210 40% 95%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 217 33% 25%;
+    --input: 217 33% 25%;
+    --ring: 221 83% 53%;
+  }
 }
 
 @layer base {
@@ -148,12 +170,55 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-blue-50;
+  @apply bg-blue-50 dark:bg-gray-800;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-blue-300 rounded-full hover:bg-blue-400;
+  @apply bg-blue-300 dark:bg-gray-600 rounded-full hover:bg-blue-400 dark:hover:bg-gray-500;
 }
+
+/* Global dark mode for common elements */
+.dark input,
+.dark textarea,
+.dark select {
+  @apply bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400;
+}
+
+.dark table thead,
+.dark thead {
+  @apply bg-gray-700;
+}
+
+.dark table tbody tr,
+.dark tbody tr {
+  @apply border-gray-700;
+}
+
+.dark th {
+  @apply text-gray-300;
+}
+
+.dark td {
+  @apply text-gray-300;
+}
+
+/* Remap secondary color text to be light in dark mode */
+.dark .text-secondary-900 { color: rgb(241 245 249); }
+.dark .text-secondary-800 { color: rgb(226 232 240); }
+.dark .text-secondary-700 { color: rgb(203 213 225); }
+.dark .text-secondary-600 { color: rgb(148 163 184); }
+.dark .text-secondary-500 { color: rgb(100 116 139); }
+
+/* Remap background colors in dark mode */
+.dark .bg-secondary-50 { background-color: rgb(30 41 59); }
+.dark .bg-secondary-100 { background-color: rgb(30 41 59); }
+.dark .bg-white { background-color: rgb(31 41 55); }
+.dark .bg-gray-50 { background-color: rgb(17 24 39); }
+
+/* Remap border colors that need to be lighter in dark mode */
+.dark .border-gray-100 { border-color: rgb(55 65 81); }
+.dark .border-gray-200 { border-color: rgb(55 65 81); }
+.dark .divide-secondary-100 > * + * { border-color: rgb(55 65 81); }
 
 /* Smooth Scroll */
 html {
@@ -165,6 +230,12 @@ html {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(37, 99, 235, 0.1);
+}
+
+.dark .glass {
+  background: rgba(31, 41, 55, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(55, 65, 81, 0.5);
 }
 
 .glass-blue {

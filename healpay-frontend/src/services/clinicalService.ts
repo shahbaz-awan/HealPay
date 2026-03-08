@@ -174,3 +174,14 @@ export const sendEncounterTo = async (encounterId: number, target: 'biller' | 'd
         throw error
     }
 }
+
+// Doctor explicitly submits an encounter for medical coding
+export const submitEncounterForCoding = async (encounterId: number) => {
+    try {
+        const response = await api.put(`/v1/clinical/encounters/${encounterId}/submit-for-coding`)
+        return response.data
+    } catch (error) {
+        console.error('Error submitting encounter for coding:', error)
+        throw error
+    }
+}

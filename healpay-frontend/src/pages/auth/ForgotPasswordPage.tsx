@@ -23,7 +23,8 @@ const ForgotPasswordPage = () => {
 
         try {
             const response = await axios.post(
-                `${API_BASE_URL}/auth/forgot-password/send-code?email=${encodeURIComponent(email)}`
+                `${API_BASE_URL}/v1/auth/forgot-password/send-code`,
+                { email }
             );
             setSuccess(response.data.message || 'OTP sent to your email');
             setStep('otp');
@@ -53,7 +54,8 @@ const ForgotPasswordPage = () => {
 
         try {
             const response = await axios.post(
-                `${API_BASE_URL}/auth/forgot-password/verify-and-reset?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}&new_password=${encodeURIComponent(newPassword)}`
+                `${API_BASE_URL}/v1/auth/forgot-password/verify-and-reset`,
+                { email, otp, new_password: newPassword }
             );
             setSuccess(response.data.message || 'Password reset successful!');
             setTimeout(() => navigate('/login'), 2000);
@@ -136,11 +138,11 @@ const ForgotPasswordPage = () => {
                                 name="otp"
                                 type="text"
                                 required
-                                maxLength={4}
+                                maxLength={6}
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-center text-2xl tracking-widest font-bold"
-                                placeholder="0000"
+                                placeholder="000000"
                             />
                         </div>
 

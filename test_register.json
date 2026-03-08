@@ -1,7 +1,0 @@
-{
-    "email": "smtptest@test.com",
-    "password": "password123",
-    "first_name": "SMTP",
-    "last_name": "Test",
-    "role": "PATIENT"
-}

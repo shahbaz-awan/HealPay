@@ -1,294 +1,360 @@
 """
-Medical Code Recommendation Service
-Uses Sentence Transformers (embeddings) for semantic similarity matching
-Provides accurate, fast, and explainable code recommendations
+Recommendation Service – Step 4 of the AI Recommendation Engine
+================================================================
+Implements the complete 8-step pipeline:
+
+  Step 1  Data loading        ← data_pipeline.py
+  Step 2  Text preprocessing  ← data_pipeline.preprocess_query()
+  Step 3  Embedding lookup    ← embedding_engine + index_loader (FAISS)
+  Step 4  Similarity search   ← index_loader.dense_search()  (cosine via IP)
+  Step 5  Ranking layer       ← hybrid score + keyword overlap + specificity
+  Step 6  Business rules      ← configurable mutual-exclusion + category cap
+  Step 7  Hybrid enhancement  ← BM25 + dense weighted combination
+  Step 8  Explainability      ← matched phrases, score, confidence label
+
+All ICD/CPT knowledge comes from the CSV files – no hardcoded code values.
 """
 import os
 
-# Disable TensorFlow backend to avoid Keras 3 compatibility issues
-os.environ['TRANSFORMERS_NO_TF'] = '1'
-os.environ['USE_TORCH'] = '1'
-
-import numpy as np
-import pickle
-from typing import List, Dict, Tuple
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
+import re
 import logging
+from collections import defaultdict
+from typing import Dict, List, Optional, Tuple
 
-from app.db.models import CodeLibrary, ClinicalEncounter
-from sqlalchemy.orm import Session
+from app.services.data_pipeline import preprocess_query, tokenize_query
+from app.services import index_loader
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class RecommendationService:
-    """
-    Embedding-based medical code recommendation service
-    Features: Accurate, Fast, Professional, Explainable
-    """
-    
-    def __init__(self):
-        self.model = None
-        self.code_library_icd = []  # List of ICD-10 codes
-        self.code_library_cpt = []  # List of CPT codes
-        self.embeddings_icd = None  # ICD-10 embeddings
-        self.embeddings_cpt = None  # CPT embeddings
-        self.embeddings_cache_dir = "embeddings_cache"
-        
-        # Create cache directory
-        os.makedirs(self.embeddings_cache_dir, exist_ok=True)
-        
-    def load_model(self):
-        """Load pre-trained medical embedding model"""
-        if self.model is None:
-            logger.info("Loading embedding model...")
-            # Using medical domain-specific model for better accuracy
-            # Options: 'pritamdeka/S-PubMedBert-MS-MARCO' or 'emilyalsentzer/Bio_ClinicalBERT'
-            try:
-                self.model = SentenceTransformer('pritamdeka/S-PubMedBert-MS-MARCO')
-                logger.info("✓ Model loaded successfully")
-            except Exception as e:
-                logger.warning(f"Failed to load medical model, using general model: {e}")
-                # Fallback to general model
-                self.model = SentenceTransformer('all-MiniLM-L6-v2')
-                logger.info("✓ Fallback model loaded")
-        return self.model
-    
-    def load_code_library(self, db: Session, force_recompute: bool = False):
-        """
-        Load code library and pre-compute embeddings
-        Args:
-            db: Database session
-            force_recompute: If True, recompute embeddings even if cached
-        """
-        logger.info("Loading code library...")
-        
-        # Load codes from database
-        all_codes = db.query(CodeLibrary).all()
-        
-        # Separate ICD and CPT codes
-        self.code_library_icd = [
-            {
-                'id': code.id,
-                'code': code.code,
-                'code_type': code.code_type,
-                'short_description': code.short_description,
-                'long_description': code.long_description,
-                'search_text': code.search_text
-            }
-            for code in all_codes if code.code_type == 'ICD10_CM'
-        ]
-        
-        self.code_library_cpt = [
-            {
-                'id': code.id,
-                'code': code.code,
-                'code_type': code.code_type,
-                'short_description': code.short_description,
-                'long_description': code.long_description,
-                'search_text': code.search_text
-            }
-            for code in all_codes if code.code_type == 'CPT'
-        ]
-        
-        logger.info(f"✓ Loaded {len(self.code_library_icd)} ICD-10 codes")
-        logger.info(f"✓ Loaded {len(self.code_library_cpt)} CPT codes")
-        
-        # Load or compute embeddings
-        self._load_or_compute_embeddings(force_recompute)
-    
-    def _load_or_compute_embeddings(self, force_recompute: bool = False):
-        """Load embeddings from cache or compute if not cached"""
-        icd_cache_path = os.path.join(self.embeddings_cache_dir, 'icd_embeddings.pkl')
-        cpt_cache_path = os.path.join(self.embeddings_cache_dir, 'cpt_embeddings.pkl')
-        
-        # Try to load from cache
-        if not force_recompute and os.path.exists(icd_cache_path) and os.path.exists(cpt_cache_path):
-            logger.info("Loading embeddings from cache...")
-            with open(icd_cache_path, 'rb') as f:
-                self.embeddings_icd = pickle.load(f)
-            with open(cpt_cache_path, 'rb') as f:
-                self.embeddings_cpt = pickle.load(f)
-            logger.info("✓ Embeddings loaded from cache")
+
+# ---------------------------------------------------------------------------
+# Hybrid retrieval weights  (configurable)
+# ---------------------------------------------------------------------------
+DENSE_WEIGHT = 0.75   # semantic similarity weight
+BM25_WEIGHT = 0.25    # keyword relevance weight
+CANDIDATE_POOL = 30   # candidates fetched from each system before merge
+
+
+# ---------------------------------------------------------------------------
+# Business rule configuration  (data-driven, not hardcoded codes)
+# ---------------------------------------------------------------------------
+
+MAX_PER_CATEGORY_PREFIX = 2   # ICD-10 3-char prefix cap
+MAX_SAME_CPT_CATEGORY = 2     # CPT category cap
+
+MIN_CONFIDENCE_ICD = 0.10
+MIN_CONFIDENCE_CPT = 0.10
+
+# Pairs of ICD CATEGORY KEYWORDS that are mutually exclusive
+MUTUALLY_EXCLUSIVE_CATEGORY_PAIRS: List[frozenset] = [
+    frozenset({"type 1 diabetes", "type 2 diabetes"}),
+    frozenset({"acute hepatitis", "chronic hepatitis"}),
+    frozenset({"primary hypertension", "secondary hypertension"}),
+]
+
+_MATCH_STOPWORDS = {
+    "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
+    "of", "with", "is", "was", "are", "were", "been", "be", "have", "has",
+    "had", "during", "documented", "encounter", "clinical", "patient",
+    "including", "such", "as", "when", "performed", "other", "without",
+    "not", "from", "by", "this", "that", "which", "its", "their", "type",
+    "due", "any", "all", "each", "per", "more", "less", "than",
+}
+
+
+# ---------------------------------------------------------------------------
+# Step 2 – Query preprocessing
+# ---------------------------------------------------------------------------
+
+def _preprocess_query(text: str) -> str:
+    return preprocess_query(text)
+
+
+# ---------------------------------------------------------------------------
+# Steps 3 + 4 + 7 – Hybrid candidate retrieval (FAISS + BM25)
+# ---------------------------------------------------------------------------
+
+def _fetch_candidates(query_clean: str, code_type: str, pool: int = CANDIDATE_POOL) -> List[Dict]:
+    dense_results = index_loader.dense_search(code_type, query_clean, top_k=pool)
+    bm25_results = index_loader.bm25_search(code_type, query_clean, top_k=pool)
+
+    merged: Dict[str, Dict] = {}
+    for rec in dense_results:
+        code = rec["code"]
+        merged[code] = dict(rec)
+        merged[code]["dense_score"] = rec.get("dense_score", 0.0)
+        merged[code].setdefault("bm25_score", 0.0)
+
+    for rec in bm25_results:
+        code = rec["code"]
+        if code in merged:
+            merged[code]["bm25_score"] = rec.get("bm25_score", 0.0)
         else:
-            # Compute embeddings
-            logger.info("Computing embeddings (this may take 30-60 seconds)...")
-            self.load_model()
-            
-            # Encode ICD-10 codes
-            icd_texts = [code['search_text'] for code in self.code_library_icd]
-            self.embeddings_icd = self.model.encode(icd_texts, show_progress_bar=True, batch_size=32)
-            logger.info(f"✓ Computed {len(self.embeddings_icd)} ICD-10 embeddings")
-            
-            # Encode CPT codes
-            cpt_texts = [code['search_text'] for code in self.code_library_cpt]
-            self.embeddings_cpt = self.model.encode(cpt_texts, show_progress_bar=True, batch_size=32)
-            logger.info(f"✓ Computed {len(self.embeddings_cpt)} CPT embeddings")
-            
-            # Save to cache for faster loading next time
-            with open(icd_cache_path, 'wb') as f:
-                pickle.dump(self.embeddings_icd, f)
-            with open(cpt_cache_path, 'wb') as f:
-                pickle.dump(self.embeddings_cpt, f)
-            logger.info("✓ Embeddings cached to disk")
-    
-    def get_clinical_text(self, encounter: ClinicalEncounter) -> str:
-        """
-        Extract and combine clinical text from encounter
-        Combines all relevant fields for better matching
-        """
-        text_parts = []
-        
-        if encounter.chief_complaint:
-            text_parts.append(f"Chief Complaint: {encounter.chief_complaint}")
-        if encounter.subjective_notes:
-            text_parts.append(f"Subjective: {encounter.subjective_notes}")
-        if encounter.objective_findings:
-            text_parts.append(f"Objective: {encounter.objective_findings}")
-        if encounter.assessment:
-            text_parts.append(f"Assessment: {encounter.assessment}")
-        if encounter.plan:
-            text_parts.append(f"Plan: {encounter.plan}")
-        
-        return " ".join(text_parts)
-    
-    def _find_matching_keywords(self, clinical_text: str, code_description: str) -> List[str]:
-        """
-        Find matching keywords between clinical text and code description
-        Used for explainability
-        """
-        # Simple keyword extraction for explanation
-        clinical_words = set(clinical_text.lower().split())
-        description_words = set(code_description.lower().split())
-        
-        # Find common meaningful words (filter out stop words)
-        stop_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 
-                      'of', 'with', 'is', 'was', 'are', 'were', 'been', 'be', 'have', 'has', 'had',
-                      'during', 'patient', 'documented', 'clinical', 'encounter'}
-        
-        matching = (clinical_words & description_words) - stop_words
-        
-        # Return most relevant matches (longer words tend to be more meaningful)
-        return sorted(matching, key=len, reverse=True)[:5]
-    
-    def get_recommendations(
-        self, 
-        encounter: ClinicalEncounter, 
-        code_type: str = 'ICD10_CM', 
-        top_n: int = 5
-    ) -> List[Dict]:
-        """
-        Get code recommendations for a clinical encounter
-        
-        Args:
-            encounter: ClinicalEncounter object
-            code_type: 'ICD10_CM' or 'CPT'
-            top_n: Number of recommendations to return
-            
-        Returns:
-            List of recommendations with code, description, confidence, and explanation
-        """
-        # Ensure model and embeddings are loaded
-        if self.model is None:
-            self.load_model()
-        
-        # Get clinical text
+            entry = dict(rec)
+            entry.setdefault("dense_score", 0.0)
+            entry["bm25_score"] = rec.get("bm25_score", 0.0)
+            merged[code] = entry
+
+    return list(merged.values())
+
+
+# ---------------------------------------------------------------------------
+# Step 5 – Ranking layer
+# ---------------------------------------------------------------------------
+
+def _keyword_overlap_score(query_tokens: List[str], description: str) -> float:
+    desc_tokens = set(w for w in description.lower().split() if w not in _MATCH_STOPWORDS and len(w) > 1)
+    query_set = set(query_tokens)
+    if not query_set or not desc_tokens:
+        return 0.0
+    return len(query_set & desc_tokens) / len(query_set | desc_tokens)
+
+
+def _code_specificity_bonus(code: str, code_type: str) -> float:
+    if code_type == "ICD10_CM":
+        return min(len(code), 7) / 7 * 0.05
+    return 0.02
+
+
+def _compute_hybrid_score(rec: Dict, query_tokens: List[str]) -> float:
+    dense = rec.get("dense_score", 0.0)
+    bm25 = rec.get("bm25_score", 0.0)
+    hybrid = DENSE_WEIGHT * dense + BM25_WEIGHT * bm25
+    combined_desc = f"{rec.get('short_description', '')} {rec.get('long_description', '')}"
+    overlap = _keyword_overlap_score(query_tokens, combined_desc)
+    specificity = _code_specificity_bonus(rec["code"], rec["code_type"])
+    return hybrid + 0.05 * overlap + specificity
+
+
+def _rank_candidates(candidates: List[Dict], query_tokens: List[str]) -> List[Dict]:
+    for rec in candidates:
+        rec["hybrid_score"] = _compute_hybrid_score(rec, query_tokens)
+    return sorted(candidates, key=lambda r: r["hybrid_score"], reverse=True)
+
+
+# ---------------------------------------------------------------------------
+# Step 6 – Business rule validation
+# ---------------------------------------------------------------------------
+
+def _icd_prefix(code: str) -> str:
+    return re.sub(r"[.\-]", "", code)[:3]
+
+
+def _apply_business_rules(ranked: List[Dict], code_type: str, top_n: int) -> List[Dict]:
+    min_conf = MIN_CONFIDENCE_ICD if code_type == "ICD10_CM" else MIN_CONFIDENCE_CPT
+    filtered = [r for r in ranked if r.get("hybrid_score", 0) >= min_conf]
+
+    prefix_count: Dict[str, int] = defaultdict(int)
+    category_count: Dict[str, int] = defaultdict(int)
+    capped: List[Dict] = []
+
+    for rec in filtered:
+        if code_type == "ICD10_CM":
+            pfx = _icd_prefix(rec["code"])
+            if prefix_count[pfx] >= MAX_PER_CATEGORY_PREFIX:
+                continue
+            prefix_count[pfx] += 1
+        else:
+            cat = rec.get("category", "unknown")
+            if category_count[cat] >= MAX_SAME_CPT_CATEGORY:
+                continue
+            category_count[cat] += 1
+        capped.append(rec)
+
+    if code_type == "ICD10_CM":
+        final: List[Dict] = []
+        removed_codes: set = set()
+        for rec in capped:
+            if rec["code"] in removed_codes:
+                continue
+            cat_lower = rec.get("category", "").lower()
+            drop = False
+            for excl_set in MUTUALLY_EXCLUSIVE_CATEGORY_PAIRS:
+                if any(kw in cat_lower for kw in excl_set):
+                    matching_kw = next(kw for kw in excl_set if kw in cat_lower)
+                    conflict_kw = next(iter(excl_set - {matching_kw}))
+                    if any(conflict_kw in r.get("category", "").lower() for r in final):
+                        drop = True
+                        break
+            if not drop:
+                final.append(rec)
+        capped = final
+
+    return capped[:top_n]
+
+
+# ---------------------------------------------------------------------------
+# Step 8 – Explainability
+# ---------------------------------------------------------------------------
+
+def _matched_phrases(query_tokens: List[str], description: str, max_phrases: int = 5) -> List[str]:
+    desc_tokens = {w for w in description.lower().split() if w not in _MATCH_STOPWORDS and len(w) > 1}
+    query_set = {w for w in query_tokens if w not in _MATCH_STOPWORDS and len(w) > 1}
+    return sorted(query_set & desc_tokens, key=len, reverse=True)[:max_phrases]
+
+
+def _confidence_label(score: float) -> str:
+    if score >= 0.70:
+        return "Very High"
+    if score >= 0.55:
+        return "High"
+    if score >= 0.40:
+        return "Moderate"
+    if score >= 0.25:
+        return "Low"
+    return "Marginal"
+
+
+def _build_explanation(rec: Dict, matched: List[str], score: float) -> str:
+    label = _confidence_label(score)
+    explanation = f"{label} confidence ({score:.2f})"
+    if matched:
+        explanation += f" – matched terms: {', '.join(matched[:3])}"
+    if rec.get("category"):
+        explanation += f" | Category: {rec['category']}"
+    return explanation
+
+
+# ---------------------------------------------------------------------------
+# Step 7 + Full pipeline entry point
+# ---------------------------------------------------------------------------
+
+def get_recommendations(clinical_text: str, code_type: str = "ICD10_CM", top_n: int = 5) -> List[Dict]:
+    """
+    Full 8-step recommendation pipeline.
+    Returns list of dicts with: code, code_type, description, confidence_score,
+    explanation, matched_keywords, dense_score, bm25_score, long_description, category.
+    """
+    query_clean = _preprocess_query(clinical_text)
+    query_tokens = tokenize_query(query_clean)
+
+    if not query_clean.strip():
+        raise ValueError("Clinical text is empty after preprocessing.")
+
+    candidates = _fetch_candidates(query_clean, code_type, pool=CANDIDATE_POOL)
+    if not candidates:
+        raise ValueError(
+            f"No {code_type} codes found in the index. "
+            "Ensure dataset CSVs are present and the index was built successfully."
+        )
+
+    ranked = _rank_candidates(candidates, query_tokens)
+    final_codes = _apply_business_rules(ranked, code_type, top_n)
+
+    results = []
+    for rec in final_codes:
+        score = rec.get("hybrid_score", 0.0)
+        combined_desc = f"{rec.get('short_description', '')} {rec.get('long_description', '')}"
+        matched = _matched_phrases(query_tokens, combined_desc)
+        results.append({
+            "code": rec["code"],
+            "code_type": rec["code_type"],
+            "description": rec.get("short_description", ""),
+            "long_description": rec.get("long_description", ""),
+            "category": rec.get("category", ""),
+            "confidence_score": round(score, 3),
+            "dense_score": round(rec.get("dense_score", 0.0), 3),
+            "bm25_score": round(rec.get("bm25_score", 0.0), 3),
+            "explanation": _build_explanation(rec, matched, score),
+            "matched_keywords": matched[:5],
+        })
+
+    return results
+
+
+# ---------------------------------------------------------------------------
+# Medical text validation
+# ---------------------------------------------------------------------------
+
+_MEDICAL_SIGNAL_WORDS = {
+    "pain", "fever", "infection", "disease", "disorder", "syndrome",
+    "injury", "fracture", "failure", "ache", "swelling", "bleeding",
+    "cough", "nausea", "vomiting", "fatigue", "dizziness", "rash",
+    "hypertension", "diabetes", "asthma", "copd", "cancer", "tumor",
+    "anxiety", "depression", "seizure", "stroke", "infarction", "chest",
+    "headache", "shortness", "breath", "dyspnea", "edema", "sepsis",
+    "urinary", "kidney", "liver", "cardiac", "pneumonia", "bronchitis",
+    "arthritis", "neuropathy", "anemia", "obesity", "malnutrition",
+    "appendicitis", "cholecystitis", "pancreatitis", "colitis", "gastritis",
+    "hypothyroid", "hyperthyroid", "thyroid", "allergy", "eczema",
+    "numbness", "weakness", "confusion", "dementia", "alzheimer",
+    "parkinson", "epilepsy", "migraine", "vertigo", "cellulitis",
+    "abscess", "wound", "laceration", "burn", "trauma", "contusion",
+    "sprain", "dislocation", "osteoporosis", "gout", "lupus",
+}
+
+
+def validate_medical_text(text: str) -> Tuple[bool, str]:
+    """
+    Lightweight heuristic gate for non-medical inputs.
+    Returns (is_valid: bool, reason: str).
+    """
+    if not text or len(text.strip()) < 3:
+        return False, (
+            "Chief complaint is too short. Please describe the patient's "
+            "symptoms or condition (minimum 3 characters)."
+        )
+
+    clean = preprocess_query(text)
+    tokens = set(clean.split())
+
+    if tokens & _MEDICAL_SIGNAL_WORDS:
+        return True, ""
+
+    if len(tokens) >= 8:
+        return True, ""
+
+    return (
+        False,
+        f"The complaint '{text[:80]}' does not appear to describe a medical "
+        "symptom or condition. Please enter a valid clinical complaint "
+        "(e.g. 'uncontrolled diabetes with neuropathy', 'chest pain and "
+        "shortness of breath', 'hypertension with elevated blood pressure').",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Compatibility shim – keeps clinical.py unchanged
+# ---------------------------------------------------------------------------
+
+class RecommendationService:
+    """Thin compatibility shim – all heavy lifting is in the module-level functions."""
+
+    def get_clinical_text(self, encounter) -> str:
+        parts = []
+        for field in ("chief_complaint", "subjective_notes", "objective_findings", "assessment", "plan"):
+            val = getattr(encounter, field, None)
+            if val:
+                parts.append(val)
+        return " ".join(parts)
+
+    def validate_medical_text(self, text: str) -> Tuple[bool, str]:
+        return validate_medical_text(text)
+
+    def get_recommendations(self, encounter, code_type: str = "ICD10_CM", top_n: int = 5) -> List[Dict]:
         clinical_text = self.get_clinical_text(encounter)
-        
         if not clinical_text.strip():
-            logger.warning("No clinical text available for recommendations")
-            return []
-        
-        # Encode clinical text
-        query_embedding = self.model.encode([clinical_text])[0]
-        
-        # Select appropriate code library and embeddings
-        if code_type == 'ICD10_CM':
-            code_library = self.code_library_icd
-            embeddings = self.embeddings_icd
-        else:  # CPT
-            code_library = self.code_library_cpt
-            embeddings = self.embeddings_cpt
-        
-        if embeddings is None or len(embeddings) == 0:
-            logger.error(f"No embeddings available for {code_type}")
-            return []
-        
-        # Compute cosine similarity
-        query_embedding = query_embedding.reshape(1, -1)
-        similarities = cosine_similarity(query_embedding, embeddings)[0]
-        
-        # Get top N indices
-        top_indices = np.argsort(similarities)[-top_n:][::-1]
-        
-        # Build recommendations with explanations
-        recommendations = []
-        for idx in top_indices:
-            code_data = code_library[idx]
-            similarity_score = float(similarities[idx])
-            
-            # Find matching keywords for explanation
-            matching_keywords = self._find_matching_keywords(
-                clinical_text, 
-                code_data['search_text']
+            raise ValueError(
+                "No clinical text available. Please fill in at least the chief complaint."
             )
-            
-            # Generate explanation
-            explanation = self._generate_explanation(
-                code_data, 
-                similarity_score, 
-                matching_keywords
-            )
-            
-            recommendations.append({
-                'code': code_data['code'],
-                'code_type': code_data['code_type'],
-                'description': code_data['short_description'],
-                'confidence_score': round(similarity_score, 3),
-                'explanation': explanation,
-                'matched_keywords': matching_keywords[:3]  # Top 3 keywords
-            })
-        
-        return recommendations
-    
-    def _generate_explanation(
-        self, 
-        code_data: Dict, 
-        similarity_score: float, 
-        keywords: List[str]
-    ) -> str:
-        """
-        Generate human-readable explanation for why code was recommended
-        Makes the system explainable and trustworthy
-        """
-        confidence_level = "High" if similarity_score > 0.7 else "Medium" if similarity_score > 0.5 else "Low"
-        
-        explanation_parts = [
-            f"{confidence_level} confidence match ({similarity_score:.1%})"
-        ]
-        
-        if keywords:
-            keywords_str = ", ".join(keywords)
-            explanation_parts.append(f"matching terms: {keywords_str}")
-        
-        return " - ".join(explanation_parts)
+        index_loader.ensure_loaded()
+        return get_recommendations(clinical_text=clinical_text, code_type=code_type, top_n=top_n)
+
+    def load_code_library(self, db=None, force_recompute: bool = False):
+        """No-op: library is loaded from CSV files by index_loader.warm_up()."""
+        index_loader.warm_up(force_rebuild=force_recompute)
 
 
-# Global instance (singleton pattern for efficiency)
-_recommendation_service = None
+# ---------------------------------------------------------------------------
+# Singleton factory (backwards-compatible)
+# ---------------------------------------------------------------------------
 
-def get_recommendation_service(db: Session = None) -> RecommendationService:
-    """
-    Get singleton instance of recommendation service
-    Initializes on first call, reuses on subsequent calls (FAST)
-    """
-    global _recommendation_service
-    
-    if _recommendation_service is None:
-        _recommendation_service = RecommendationService()
-        if db:
-            _recommendation_service.load_code_library(db)
-    
-    return _recommendation_service
+_service_instance: Optional[RecommendationService] = None
+
+
+def get_recommendation_service(db=None) -> RecommendationService:
+    """Return (or create) the singleton RecommendationService."""
+    global _service_instance
+    if _service_instance is None:
+        _service_instance = RecommendationService()
+    return _service_instance

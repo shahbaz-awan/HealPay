@@ -94,6 +94,7 @@ class UserResponse(BaseModel):
     state: Optional[str] = None
     zip_code: Optional[str] = None
     role: UserRole
+    specialization: Optional[str] = None
     is_active: bool
     is_verified: bool
     avatar: Optional[str] = None
@@ -114,6 +115,7 @@ class UserUpdate(BaseModel):
     city: Optional[str] = None
     state: Optional[str] = None
     zip_code: Optional[str] = None
+    specialization: Optional[str] = None
     is_active: Optional[bool] = None
     role: Optional[UserRole] = None
     

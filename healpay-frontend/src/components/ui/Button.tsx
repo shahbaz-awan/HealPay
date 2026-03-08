@@ -30,11 +30,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants = {
       primary: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-blue hover:shadow-glow-lg hover:scale-105 transition-all',
-      secondary: 'bg-secondary-100 text-secondary-900 hover:bg-secondary-200 focus:ring-secondary-300 hover:scale-105 border border-secondary-200',
+      secondary: 'bg-secondary-100 dark:bg-gray-700 text-secondary-900 dark:text-gray-100 hover:bg-secondary-200 dark:hover:bg-gray-600 focus:ring-secondary-300 hover:scale-105 border border-secondary-200 dark:border-gray-600',
       success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 shadow-lg hover:shadow-xl hover:scale-105',
       danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-lg hover:shadow-xl hover:scale-105',
-      ghost: 'bg-transparent hover:bg-blue-50 text-blue-600 hover:text-blue-700 border border-transparent hover:border-blue-200',
-      outline: 'border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white focus:ring-primary-500 transition-all',
+      ghost: 'bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:text-blue-700 border border-transparent hover:border-blue-200 dark:hover:border-blue-800',
+      outline: 'border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white focus:ring-primary-500 transition-all dark:border-primary-500 dark:text-primary-400 dark:hover:bg-primary-600 dark:hover:text-white',
     }
 
     const sizes = {
@@ -49,7 +49,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         whileTap={{ scale: 0.95 }}
         className={cn(baseStyles, variants[variant], sizes[size], className)}
         disabled={disabled || isLoading}
-        {...props}
+        {...(props as any)}
       >
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {!isLoading && leftIcon && <span className="mr-2">{leftIcon}</span>}
