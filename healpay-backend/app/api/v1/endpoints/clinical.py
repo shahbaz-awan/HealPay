@@ -126,6 +126,44 @@ def submit_encounter_for_coding(
     return encounter
 
 
+# Patient views their own medical records (encounters + assigned codes)
+@router.get("/encounters/my-records")
+def get_my_medical_records(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Patient views their own encounter history with ICD-10 / CPT codes."""
+    encounters = (
+        db.query(ClinicalEncounter)
+        .filter(ClinicalEncounter.patient_id == current_user.id)
+        .order_by(ClinicalEncounter.encounter_date.desc())
+        .all()
+    )
+    result = []
+    for enc in encounters:
+        doctor = db.query(User).filter(User.id == enc.doctor_id).first()
+        codes = db.query(MedicalCode).filter(MedicalCode.encounter_id == enc.id).all()
+        result.append({
+            "id": enc.id,
+            "encounter_date": enc.encounter_date,
+            "encounter_type": enc.encounter_type,
+            "chief_complaint": enc.chief_complaint,
+            "assessment": enc.assessment,
+            "plan": enc.plan,
+            "status": enc.status,
+            "doctor_name": f"Dr. {doctor.first_name} {doctor.last_name}" if doctor else "Unknown",
+            "icd_codes": [
+                {"code": c.code, "description": c.description}
+                for c in codes if c.code_type == "ICD-10"
+            ],
+            "cpt_codes": [
+                {"code": c.code, "description": c.description}
+                for c in codes if c.code_type == "CPT"
+            ],
+        })
+    return result
+
+
 # Get pending encounters for coding (for medical coder)
 @router.get("/encounters/pending-coding", response_model=List[EncounterForCoding])
 def get_pending_encounters(

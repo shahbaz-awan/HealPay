@@ -9,9 +9,11 @@ import PatientDashboard from '@/pages/patient/Dashboard'
 import PatientIntakeForm from '@/pages/patient/PatientIntakeForm'
 import PatientAppointments from '@/pages/patient/Appointments'
 import PatientBills from '@/pages/patient/Bills'
+import MedicalRecords from '@/pages/patient/MedicalRecords'
 import DoctorDashboard from '@/pages/doctor/Dashboard'
 import DoctorPatients from '@/pages/doctor/Patients'
 import DoctorAppointments from '@/pages/doctor/Appointments'
+import DoctorBillingPage from '@/pages/doctor/BillingPage'
 import PatientDetailPage from '@/pages/doctor/PatientDetailPage'
 import CoderDashboard from '@/pages/coder/Dashboard'
 import ClaimDetailPage from '@/pages/coder/ClaimDetailPage'
@@ -25,6 +27,7 @@ import CMS1500Form from '@/pages/billing/CMS1500Form'
 import AdminDashboard from '@/pages/admin/Dashboard'
 import AdminUsers from '@/pages/admin/Users'
 import AdminSettings from '@/pages/admin/Settings'
+import Analytics from '@/pages/admin/Analytics'
 import UserProfile from '@/pages/shared/UserProfile'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { UserRole } from '@/types'
@@ -50,6 +53,7 @@ const AppRoutes = () => {
                 <Route path="intake-form" element={<PatientIntakeForm />} />
                 <Route path="appointments" element={<PatientAppointments />} />
                 <Route path="bills" element={<PatientBills />} />
+                <Route path="records" element={<MedicalRecords />} />
                 <Route path="profile" element={<UserProfile />} />
                 <Route path="*" element={<Navigate to="/patient/dashboard" replace />} />
               </Routes>
@@ -69,6 +73,7 @@ const AppRoutes = () => {
                 <Route path="patients" element={<DoctorPatients />} />
                 <Route path="patients/:id" element={<PatientDetailPage />} />
                 <Route path="appointments" element={<DoctorAppointments />} />
+                <Route path="billing" element={<DoctorBillingPage />} />
                 <Route path="profile" element={<UserProfile />} />
                 <Route path="*" element={<Navigate to="/doctor/dashboard" replace />} />
               </Routes>
@@ -126,6 +131,7 @@ const AppRoutes = () => {
               <Routes>
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="users" element={<AdminUsers />} />
+                <Route path="analytics" element={<Analytics />} />
                 <Route path="settings" element={<AdminSettings />} />
                 <Route path="profile" element={<UserProfile />} />
                 <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />

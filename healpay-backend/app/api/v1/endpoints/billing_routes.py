@@ -35,6 +35,44 @@ def get_billing_dashboard_stats(
     """
     return billing_service.get_dashboard_stats(db)
 
+
+@router.get("/doctor-encounters")
+def get_doctor_encounter_billing(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Doctor views billing/claim status for each of their encounters."""
+    if current_user.role not in [UserRole.DOCTOR, UserRole.ADMIN]:
+        raise HTTPException(status_code=403, detail="Doctors and admins only")
+
+    query = db.query(ClinicalEncounter)
+    if current_user.role == UserRole.DOCTOR:
+        query = query.filter(ClinicalEncounter.doctor_id == current_user.id)
+
+    encounters = query.order_by(ClinicalEncounter.encounter_date.desc()).all()
+    result = []
+    for enc in encounters:
+        patient = db.query(User).filter(User.id == enc.patient_id).first()
+        invoice = db.query(Invoice).filter(Invoice.encounter_id == enc.id).first()
+        claim   = db.query(Claim).filter(Claim.encounter_id == enc.id).first()
+        result.append({
+            "id": enc.id,
+            "encounter_date": enc.encounter_date,
+            "encounter_type": enc.encounter_type,
+            "status": enc.status,
+            "patient_name": f"{patient.first_name} {patient.last_name}" if patient else "Unknown",
+            "patient_id": enc.patient_id,
+            "invoice_id": invoice.id if invoice else None,
+            "invoice_number": invoice.invoice_number if invoice else None,
+            "invoice_amount": float(invoice.total_amount) if invoice else None,
+            "invoice_status": invoice.status if invoice else None,
+            "amount_paid": float(invoice.amount_paid or 0) if invoice else None,
+            "balance_due": float(invoice.balance_due or 0) if invoice else None,
+            "claim_number": claim.claim_number if claim else None,
+            "claim_status": claim.status if claim else None,
+        })
+    return result
+
 @router.get("/invoices/recent")
 def get_recent_invoices(
     limit: int = 10,
