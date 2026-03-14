@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.db.database import get_db
-from app.db.models import Appointment, User, UserRole
+from app.db.models import Appointment, User, UserRole, ClinicalEncounter, Notification, AppointmentStatus, EncounterStatus
 from app.schemas.appointment import AppointmentCreate, AppointmentResponse
 from app.core.security import get_current_user
 
@@ -220,7 +220,7 @@ async def create_appointment(
         appointment_type=appointment.appointment_type,
         reason=appointment.reason,
         patient_dob=appointment.patient_dob,
-        status="scheduled"
+        status=AppointmentStatus.SCHEDULED,
     )
     
     db.add(db_appointment)
@@ -313,10 +313,11 @@ async def update_appointment_status(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Update appointment status (for doctors/admins)
+    Update appointment status (for doctors/admins).
+    When marked 'completed', automatically creates a draft ClinicalEncounter
+    for the coding team.
     """
-    # Validate new_status values
-    valid_statuses = ["scheduled", "in-progress", "completed", "cancelled", "no-show"]
+    valid_statuses = ["scheduled", "completed", "cancelled", "no_show"]
     if new_status not in valid_statuses:
         raise HTTPException(
             status_code=http_status.HTTP_400_BAD_REQUEST,
@@ -324,22 +325,62 @@ async def update_appointment_status(
         )
 
     appointment = db.query(Appointment).filter(Appointment.id == appointment_id).first()
-
     if not appointment:
-        raise HTTPException(
-            status_code=http_status.HTTP_404_NOT_FOUND,
-            detail="Appointment not found"
-        )
+        raise HTTPException(status_code=http_status.HTTP_404_NOT_FOUND, detail="Appointment not found")
 
-    # Only doctor, admin, or the patient can update
     if current_user.role not in [UserRole.ADMIN, UserRole.DOCTOR] and current_user.id != appointment.user_id:
-        raise HTTPException(
-            status_code=http_status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to update this appointment"
-        )
+        raise HTTPException(status_code=http_status.HTTP_403_FORBIDDEN, detail="Not authorized to update this appointment")
 
-    appointment.status = new_status
+    try:
+        appointment.status = AppointmentStatus(new_status)
+    except ValueError:
+        raise HTTPException(status_code=http_status.HTTP_400_BAD_REQUEST, detail=f"Invalid status value: {new_status}")
+
+    # ── Appointment Completed → Auto-create ClinicalEncounter ──────────────────
+    encounter_created = None
+    if new_status == "completed":
+        # Only create encounter if one doesn't already exist for this appointment
+        existing_enc = db.query(ClinicalEncounter).filter(
+            ClinicalEncounter.patient_id == appointment.user_id,
+            ClinicalEncounter.doctor_id == appointment.doctor_id,
+        ).first()
+
+        # Check more specifically by matching appointment type/date to avoid duplication
+        existing_today = db.query(ClinicalEncounter).filter(
+            ClinicalEncounter.patient_id == appointment.user_id,
+            ClinicalEncounter.doctor_id == appointment.doctor_id,
+            ClinicalEncounter.encounter_type == appointment.appointment_type,
+        ).order_by(ClinicalEncounter.created_at.desc()).first()
+
+        if not existing_today:
+            encounter = ClinicalEncounter(
+                patient_id=appointment.user_id,
+                doctor_id=appointment.doctor_id,
+                encounter_type=appointment.appointment_type or "Office Visit",
+                chief_complaint=appointment.reason or "See appointment notes",
+                status=EncounterStatus.PENDING_CODING,
+            )
+            db.add(encounter)
+            db.flush()  # Get encounter ID before commit
+
+            # Notify coder team
+            from app.db.models import User as UserModel
+            coders = db.query(UserModel).filter(UserModel.role == UserRole.CODER).all()
+            for coder in coders:
+                db.add(Notification(
+                    user_id=coder.id,
+                    title="New Encounter Ready for Coding",
+                    message=f"Appointment completed for patient ID {appointment.user_id}. Encounter #{encounter.id} is ready for medical coding.",
+                    type="info",
+                    link="/coder/dashboard",
+                ))
+            encounter_created = encounter.id
+            logger.info("Auto-created ClinicalEncounter #%d from completed appointment #%d", encounter.id, appointment_id)
+
     db.commit()
     db.refresh(appointment)
 
-    return AppointmentResponse.from_orm(appointment)
+    response = AppointmentResponse.from_orm(appointment)
+    if encounter_created:
+        response.encounter_id = encounter_created  # Attach created encounter ID if model supports it
+    return response

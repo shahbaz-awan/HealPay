@@ -1,5 +1,5 @@
 import logging
-import threading
+import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,9 +32,9 @@ models.Base.metadata.create_all(bind=engine)
 # ---------------------------------------------------------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Starting AI recommendation index warm-up (background)...")
-    t = threading.Thread(target=index_loader.warm_up, daemon=True)
-    t.start()
+    logger.info("Starting AI recommendation index warm-up (async executor)...")
+    loop = asyncio.get_event_loop()
+    loop.run_in_executor(None, index_loader.warm_up)
     yield
     logger.info("HealPay backend shutting down.")
 
@@ -44,22 +44,24 @@ app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="AI-Powered Medical Billing System API",
-    docs_url="/api/docs",
-    redoc_url="/api/redoc",
-    openapi_url="/api/openapi.json",
+    docs_url=None if settings.ENVIRONMENT == "production" else "/api/docs",
+    redoc_url=None if settings.ENVIRONMENT == "production" else "/api/redoc",
+    openapi_url=None if settings.ENVIRONMENT == "production" else "/api/openapi.json",
     servers=[
-        {"url": "http://localhost:8000", "description": "Local development server"}
+        {"url": settings.BACKEND_URL, "description": "API server"}
     ]
 )
 
 # ---------------------------------------------------------------------------
-# CORS – restrict to known frontend origins
+# CORS – driven by FRONTEND_URL env var so Vercel URL is automatically included
 # ---------------------------------------------------------------------------
-allowed_origins = [
+_dev_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:3000",
 ]
+_prod_origins = [settings.FRONTEND_URL] if settings.FRONTEND_URL else []
+allowed_origins = list(set(_dev_origins + _prod_origins))
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -102,14 +104,24 @@ async def root():
     }
 
 
-@app.get("/health")
+@app.get("/health", tags=["System"])
+@app.get("/api/v1/health", tags=["System"])   # Also at /api/v1/health for Render health checks
 async def health_check():
     from app.services import index_loader
+    from app.db.database import engine
+    db_ok = True
+    try:
+        with engine.connect() as conn:
+            conn.execute(__import__('sqlalchemy').text("SELECT 1"))
+    except Exception:
+        db_ok = False
     return {
-        "status": "healthy",
+        "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
+        "environment": settings.ENVIRONMENT,
         "ai_index_ready": index_loader._is_loaded,
+        "database": "ok" if db_ok else "error",
     }
 
 

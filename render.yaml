@@ -1,0 +1,62 @@
+services:
+  # ── Backend API (FastAPI) ────────────────────────────────────────────────────
+  - type: web
+    name: healpay-backend
+    runtime: python
+    region: oregon           # us-west-2
+    plan: starter            # Free tier
+    rootDir: healpay-backend
+    buildCommand: >
+      pip install -r requirements.txt &&
+      alembic upgrade head &&
+      python seed_code_library.py || true
+    startCommand: gunicorn main:app -w 2 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT --timeout 120 --keep-alive 5
+    healthCheckPath: /api/v1/health
+
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: healpay-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true      # Render auto-generates a secure random value
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "7"
+      - key: FRONTEND_URL
+        value: https://healpay.vercel.app  # Update after Vercel deployment
+      - key: BACKEND_URL
+        fromService:
+          type: web
+          name: healpay-backend
+          property: host
+      - key: GOOGLE_CLIENT_ID
+        sync: false              # Set manually in Render dashboard
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: SMTP_HOST
+        value: "smtp.gmail.com"
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM_EMAIL
+        sync: false
+      - key: MOCK_ADJUDICATION_DELAY_SECONDS
+        value: "120"           # 2-min auto-adjudication in demo mode
+      - key: MOCK_APPROVAL_RATE
+        value: "0.82"
+
+# ── PostgreSQL Database ─────────────────────────────────────────────────────
+databases:
+  - name: healpay-db
+    databaseName: healpay
+    user: healpay_admin
+    plan: starter              # Free 90-day trial, then $7/mo
+    region: oregon
+    postgresMajorVersion: "16"

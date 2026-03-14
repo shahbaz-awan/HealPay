@@ -20,6 +20,7 @@ import { getBillingStats, getRecentInvoices, getReadyToBillEncounters, createInv
 import RecordPaymentModal from '@/components/modals/RecordPaymentModal'
 import DashboardSkeleton from '@/components/ui/DashboardSkeleton'
 import { toast } from 'react-toastify'
+import { ARAgingWidget } from '@/components/ui/ARAgingWidget'
 
 const BillingDashboard = () => {
   const navigate = useNavigate()
@@ -261,6 +262,9 @@ const BillingDashboard = () => {
           </motion.div>
         ))}
       </div>
+
+      {/* AR Aging Report */}
+      <ARAgingWidget />
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

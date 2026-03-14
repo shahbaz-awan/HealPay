@@ -14,20 +14,24 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = "HealPay Medical Billing System"
     APP_VERSION: str = "1.0.0"
-    DEBUG: bool = True
-    
-    # Database
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")  # development | production
+
+    @property
+    def DEBUG(self) -> bool:
+        return self.ENVIRONMENT == "development"
+
+    # Database — SQLite for dev, Postgres for production
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
-        "sqlite:///./healpay.db"
+        "sqlite:///./healpay.db"  # Override with postgres:// in production .env
     )
-    
+
     # JWT
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "your-super-secret-key-change-in-production-make-it-long-and-random")
+    SECRET_KEY: str = os.getenv("SECRET_KEY", _DEFAULT_SECRET)
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
-    
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+    REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
+
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:5173",
@@ -38,36 +42,44 @@ class Settings(BaseSettings):
     # Google OAuth
     GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "your-google-client-id")
     GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "your-google-client-secret")
-    
-    # Frontend URL (for email links and Google SSO callback)
+
+    # Frontend / Backend URLs (for email links and Google SSO callback)
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
     BACKEND_URL: str = os.getenv("BACKEND_URL", "http://localhost:8000")
-    
-    # Encryption
+
+    # Field-level encryption key (PHI: SSN, DOB, insurance numbers)
     ENCRYPTION_KEY: str = os.getenv("ENCRYPTION_KEY", "your-encryption-key-32-chars!!")
-    
+
     # Email Configuration (SMTP)
-    # Leave empty for development mode (OTPs will be logged to console)
+    # Leave SMTP_USER empty for development mode (OTPs logged to console)
     SMTP_HOST: str = os.getenv("SMTP_HOST", "smtp.gmail.com")
     SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
-    SMTP_USER: str = os.getenv("SMTP_USER", "")  # Empty = Development Mode
-    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")  # Empty = Development Mode
+    SMTP_USER: str = os.getenv("SMTP_USER", "")
+    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
     SMTP_FROM_EMAIL: str = os.getenv("SMTP_FROM_EMAIL", "noreply@healpay.com")
     SMTP_FROM_NAME: str = "HealPay System"
-    
+
     # OTP Configuration
-    OTP_EXPIRE_MINUTES: int = 10  # OTP expires in 10 minutes
+    OTP_EXPIRE_MINUTES: int = 10
     OTP_LENGTH: int = 6
-    
+
+    # ---------------------------------------------------------------------------
+    # Mock Services Configuration
+    # ---------------------------------------------------------------------------
+    # Delay (seconds) before a submitted claim is auto-adjudicated in demo mode
+    MOCK_ADJUDICATION_DELAY_SECONDS: int = int(os.getenv("MOCK_ADJUDICATION_DELAY_SECONDS", "120"))
+    # Approval rate for mock clearinghouse (0.0 - 1.0)
+    MOCK_APPROVAL_RATE: float = float(os.getenv("MOCK_APPROVAL_RATE", "0.82"))
+
     # ---------------------------------------------------------------------------
     # AI Recommendation Engine
     # ---------------------------------------------------------------------------
     EMBEDDING_MODEL: str = "pritamdeka/S-PubMedBert-MS-MARCO"
     EMBEDDING_FALLBACK_MODEL: str = "all-MiniLM-L6-v2"
-    MAX_ICD_EMBED: int = 5000          # ICD codes sampled for FAISS
-    DENSE_WEIGHT: float = 0.75         # FAISS semantic weight in hybrid score
-    BM25_WEIGHT: float = 0.25          # BM25 lexical weight in hybrid score
-    MEDICAL_VALIDATION_THRESHOLD: float = 0.18  # Min cosine sim for medical check
+    MAX_ICD_EMBED: int = 5000
+    DENSE_WEIGHT: float = 0.75
+    BM25_WEIGHT: float = 0.25
+    MEDICAL_VALIDATION_THRESHOLD: float = 0.18
     EMBEDDINGS_CACHE_DIR: str = "embeddings_cache"
     ICD_DATASET_PATH: str = os.path.join(
         os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
@@ -81,7 +93,7 @@ class Settings(BaseSettings):
     class Config:
         case_sensitive = True
         env_file = ".env"
-        extra = "ignore"  # Allow extra fields from .env
+        extra = "ignore"
 
 settings = Settings()
 
@@ -92,3 +104,8 @@ if settings.SECRET_KEY == _DEFAULT_SECRET:
         "Set a secure random value in your .env file before deploying to production."
     )
 
+if settings.ENVIRONMENT == "production" and "sqlite" in settings.DATABASE_URL:
+    logger.warning(
+        "CONFIGURATION WARNING: SQLite is not suitable for production. "
+        "Set DATABASE_URL to a PostgreSQL connection string."
+    )

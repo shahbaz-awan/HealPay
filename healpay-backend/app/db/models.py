@@ -4,6 +4,35 @@ from sqlalchemy.sql import func
 from app.db.database import Base
 import enum
 
+# ── Status Enums (enforced at DB level) ──────────────────────────────────────
+class EncounterStatus(str, enum.Enum):
+    PENDING_CODING = "pending_coding"
+    CODED = "coded"
+    SENT_TO_BILLER = "sent_to_biller"
+    CLAIM_SUBMITTED = "claim_submitted"
+    BILLED = "billed"
+    SENT_TO_DOCTOR = "sent_to_doctor"
+
+class ClaimStatus(str, enum.Enum):
+    SUBMITTED = "submitted"
+    APPROVED = "approved"
+    DENIED = "denied"
+    PAID = "paid"
+    CORRECTED = "corrected"
+    APPEALING = "appealing"
+
+class InvoiceStatus(str, enum.Enum):
+    ISSUED = "issued"
+    PAID = "paid"
+    OVERDUE = "overdue"
+    CANCELLED = "cancelled"
+
+class AppointmentStatus(str, enum.Enum):
+    SCHEDULED = "scheduled"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+    NO_SHOW = "no_show"
+
 class UserRole(str, enum.Enum):
     PATIENT = "PATIENT"
     DOCTOR = "DOCTOR"
@@ -84,11 +113,11 @@ class PatientIntake(Base):
     
     # Medical History
     primary_care_physician = Column(String, nullable=True)
-    allergies = Column(String, nullable=True)  # JSON string
-    current_medications = Column(String, nullable=True)  # JSON string
-    past_surgeries = Column(String, nullable=True)  # JSON string
-    chronic_conditions = Column(String, nullable=True)  # JSON string
-    family_medical_history = Column(String, nullable=True)  # JSON string
+    allergies = Column(JSON, nullable=True)           # List of allergy strings
+    current_medications = Column(JSON, nullable=True) # List of medication strings
+    past_surgeries = Column(JSON, nullable=True)      # List of surgery strings
+    chronic_conditions = Column(JSON, nullable=True)  # List of condition strings
+    family_medical_history = Column(JSON, nullable=True)  # Dict of family conditions
     
     # Social History
     tobacco_use = Column(String, nullable=True)  # never, former, current
@@ -140,10 +169,8 @@ class ClinicalEncounter(Base):
     assessment = Column(Text, nullable=True)  # Diagnosis
     plan = Column(Text, nullable=True)  # Treatment plan
     
-    # Status
-    status = Column(String, default="pending_coding")
-    # Valid values: pending_coding, coded, sent_to_biller, sent_to_doctor,
-    #               claim_submitted, billed
+    # Status — enforced at DB level
+    status = Column(SQLEnum(EncounterStatus), default=EncounterStatus.PENDING_CODING, nullable=False)
 
     # US Billing context fields
     place_of_service_code = Column(String(2), nullable=True, default="11")  # 11=Office, 21=Inpatient
@@ -217,7 +244,8 @@ class Claim(Base):
     # Full CMS-1500 form data snapshot (JSON)
     cms1500_data = Column(JSON, nullable=True)
 
-    status = Column(String, default="submitted")  # submitted, approved, denied, paid
+    status = Column(SQLEnum(ClaimStatus), default=ClaimStatus.SUBMITTED, nullable=False)
+    appeal_status = Column(String, default="none")  # none, appealing, resubmitted, appeal_denied
     
     submitted_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -242,7 +270,7 @@ class Appointment(Base):
     reason = Column(Text, nullable=True)  # Optional reason/notes
     patient_dob = Column(String, nullable=True)  # DOB from intake form
     
-    status = Column(String, default="scheduled")  # scheduled, completed, cancelled, no-show
+    status = Column(SQLEnum(AppointmentStatus), default=AppointmentStatus.SCHEDULED, nullable=False)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -296,7 +324,7 @@ class Invoice(Base):
     adjustment_amount = Column(Float, default=0.0)  # Contractual write-off
     notes = Column(Text, nullable=True)
 
-    status = Column(String, default="issued")  # issued, paid, overdue, cancelled
+    status = Column(SQLEnum(InvoiceStatus), default=InvoiceStatus.ISSUED, nullable=False)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

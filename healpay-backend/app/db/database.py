@@ -3,18 +3,28 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from app.core.config import settings
 
-# Determine connection arguments based on DB type
 connect_args = {}
 if settings.DATABASE_URL.startswith("sqlite"):
     connect_args["check_same_thread"] = False
 
 # Create database engine
-engine = create_engine(
-    settings.DATABASE_URL,
-    pool_pre_ping=True,
-    echo=settings.DEBUG,
-    connect_args=connect_args,
-)
+if settings.DATABASE_URL.startswith("sqlite"):
+    from sqlalchemy.pool import StaticPool
+    engine = create_engine(
+        settings.DATABASE_URL,
+        connect_args=connect_args,
+        poolclass=StaticPool,
+        echo=settings.DEBUG,
+    )
+else:
+    engine = create_engine(
+        settings.DATABASE_URL,
+        pool_size=10,
+        max_overflow=20,
+        pool_recycle=1800,
+        pool_pre_ping=True,
+        echo=settings.DEBUG,
+    )
 
 # Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

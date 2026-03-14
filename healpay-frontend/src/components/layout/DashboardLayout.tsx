@@ -11,20 +11,21 @@ import {
   LogOut,
   Menu,
   X,
-  Search,
   ChevronDown,
   User,
   ClipboardList,
   Activity,
   DollarSign,
   Shield,
-  BarChart3
+  BarChart3,
+  AlertTriangle,
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { UserRole } from '@/types'
 import { Logo } from '@/components/ui/Logo'
 import ThemeToggle from '@/components/ui/ThemeToggle'
 import NotificationsPanel from '@/components/ui/NotificationsPanel'
+import { GlobalSearch } from '@/components/ui/GlobalSearch'
 
 interface NavItem {
   name: string
@@ -66,10 +67,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         ]
       case UserRole.BILLING:
         return [
-          { name: 'Dashboard', path: '/billing/dashboard', icon: LayoutDashboard, roles: [UserRole.BILLING] },
-          { name: 'Invoices', path: '/billing/invoices', icon: FileText, roles: [UserRole.BILLING] },
-          { name: 'Payments', path: '/billing/payments', icon: CreditCard, roles: [UserRole.BILLING] },
-          { name: 'Reports', path: '/billing/reports', icon: BarChart3, roles: [UserRole.BILLING] },
+          { name: 'Dashboard',      path: '/billing/dashboard', icon: LayoutDashboard, roles: [UserRole.BILLING] },
+          { name: 'Invoices',       path: '/billing/invoices',  icon: FileText,        roles: [UserRole.BILLING] },
+          { name: 'Payments',       path: '/billing/payments',  icon: CreditCard,      roles: [UserRole.BILLING] },
+          { name: 'Denial Queue',   path: '/billing/denials',   icon: AlertTriangle,   roles: [UserRole.BILLING] },
+          { name: 'Reports',        path: '/billing/reports',   icon: BarChart3,       roles: [UserRole.BILLING] },
         ]
       case UserRole.ADMIN:
         return [
@@ -236,16 +238,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 <Menu className="w-6 h-6 text-gray-600 dark:text-gray-400" />
               </button>
 
-              {/* Search Bar */}
-              <div className="hidden md:flex flex-1 max-w-xl mx-4">
-                <div className="relative w-full">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
-                  <input
-                    type="text"
-                    placeholder="Search patients, bills, appointments..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  />
-                </div>
+              {/* Global Search (Ctrl+K) */}
+              <div className="hidden md:flex">
+                <GlobalSearch />
               </div>
             </div>
 

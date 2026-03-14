@@ -24,6 +24,7 @@ import InvoicesPage from '@/pages/billing/InvoicesPage'
 import PaymentsPage from '@/pages/billing/PaymentsPage'
 import ReportsPage from '@/pages/billing/ReportsPage'
 import CMS1500Form from '@/pages/billing/CMS1500Form'
+import DenialQueuePage from '@/pages/billing/DenialQueuePage'
 import AdminDashboard from '@/pages/admin/Dashboard'
 import AdminUsers from '@/pages/admin/Users'
 import AdminSettings from '@/pages/admin/Settings'
@@ -113,6 +114,7 @@ const AppRoutes = () => {
                 <Route path="cms1500/:encounterId" element={<CMS1500Form />} />
                 <Route path="invoices" element={<InvoicesPage />} />
                 <Route path="payments" element={<PaymentsPage />} />
+                <Route path="denials" element={<DenialQueuePage />} />
                 <Route path="reports" element={<ReportsPage />} />
                 <Route path="profile" element={<UserProfile />} />
                 <Route path="*" element={<Navigate to="/billing/dashboard" replace />} />

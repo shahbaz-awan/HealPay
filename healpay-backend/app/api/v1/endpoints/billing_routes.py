@@ -4,7 +4,8 @@ from app.db.database import get_db
 from app.services.billing import BillingService
 from app.services.claim_risk_analyzer import analyze_claim_risk
 from app.core.security import get_current_user, require_roles
-from app.db.models import User, UserRole, ClinicalEncounter, MedicalCode, Invoice, Claim, Notification
+from app.db.models import (User, UserRole, ClinicalEncounter, MedicalCode, Invoice, Claim, Notification,
+                           EncounterStatus, ClaimStatus, InvoiceStatus, Payment)
 from app.schemas.billing import InvoiceCreate, PaymentCreate, ClaimCreate
 from typing import List, Optional, Any, Dict
 import secrets
@@ -114,35 +115,7 @@ def get_my_invoices(
         for inv in invoices
     ]
 
-@router.get("/invoices/my")
-def get_my_invoices(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Get all invoices for the currently authenticated patient.
-    Must be defined BEFORE /invoices/{invoice_id} to avoid shadowing.
-    """
-    invoices = (
-        db.query(Invoice)
-        .filter(Invoice.patient_id == current_user.id)
-        .order_by(Invoice.created_at.desc())
-        .all()
-    )
-    today = __import__('datetime').date.today().isoformat()
-    return [
-        {
-            "id": inv.id,
-            "invoice_number": inv.invoice_number,
-            "total_amount": inv.total_amount,
-            "amount_paid": inv.amount_paid,
-            "balance_due": inv.balance_due,
-            "status": inv.status if not (inv.status == "issued" and inv.due_date and inv.due_date < today) else "overdue",
-            "issue_date": inv.issue_date,
-            "due_date": inv.due_date,
-        }
-        for inv in invoices
-    ]
+
 
 
 @router.get("/invoices")
@@ -324,7 +297,7 @@ def create_invoice_from_encounter(
     new_invoice = billing_service.create_invoice(db, invoice_data)
 
     # Update encounter status to sent_to_biller (it's now been invoiced)
-    encounter.status = "sent_to_biller"
+    encounter.status = EncounterStatus.SENT_TO_BILLER
     db.commit()
 
     patient = db.query(User).filter(User.id == encounter.patient_id).first()
@@ -405,7 +378,7 @@ def get_ready_to_bill_encounters(
         db.query(ClinicalEncounter, PatientUser, DoctorUser)
         .join(PatientUser, PatientUser.id == ClinicalEncounter.patient_id)
         .join(DoctorUser,  DoctorUser.id  == ClinicalEncounter.doctor_id)
-        .filter(ClinicalEncounter.status.in_(['coded', 'sent_to_biller']))
+        .filter(ClinicalEncounter.status.in_([EncounterStatus.CODED, EncounterStatus.SENT_TO_BILLER]))
         .all()
     )
 
@@ -512,13 +485,13 @@ def create_claim(
         insurance_provider=claim_data.insurance_provider,
         total_amount=claim_data.total_amount,
         patient_responsibility=patient_resp,
-        status="submitted",
-        cms1500_data=claim_data.cms1500_data,  # Persist full CMS-1500 snapshot
+        status=ClaimStatus.SUBMITTED,
+        cms1500_data=claim_data.cms1500_data,
     )
     db.add(new_claim)
 
     # Update encounter status
-    encounter.status = "claim_submitted"
+    encounter.status = EncounterStatus.CLAIM_SUBMITTED
     db.commit()
     db.refresh(new_claim)
 
@@ -583,10 +556,11 @@ def update_claim_status(
     if not claim:
         raise HTTPException(status_code=404, detail="Claim not found")
 
-    allowed = {"submitted", "approved", "denied", "paid"}
-    new_status = body.get("status", "").lower()
-    if new_status not in allowed:
-        raise HTTPException(status_code=400, detail=f"Invalid status. Allowed: {allowed}")
+    allowed = {ClaimStatus.SUBMITTED, ClaimStatus.APPROVED, ClaimStatus.DENIED, ClaimStatus.PAID, ClaimStatus.APPEALING}
+    try:
+        new_status = ClaimStatus(body.get("status", "").lower())
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid status. Allowed: {[s.value for s in allowed]}")
 
     old_status = claim.status
     claim.status = new_status
@@ -596,18 +570,16 @@ def update_claim_status(
         claim.denial_reason_code = body["denial_reason_code"]
 
     # ── Adjudication date on final decision ─────────────────────────────────
-    if new_status in ("approved", "denied", "paid"):
+    if new_status in (ClaimStatus.APPROVED, ClaimStatus.DENIED, ClaimStatus.PAID):
         from datetime import datetime as _dt
         claim.adjudication_date = _dt.utcnow()
 
-    # ── Invoice reconciliation when claim is paid ───────────────────────────
-    # When insurance marks a claim "paid", automatically reduce the patient's
-    # invoice balance by the insurer's portion (total - patient_responsibility).
-    if new_status == "paid" and old_status != "paid":
+    # Auto-post insurance payment when claim is paid
+    if new_status == ClaimStatus.PAID and old_status != ClaimStatus.PAID:
         invoice = db.query(Invoice).filter(Invoice.claim_id == claim.id).first()
         if not invoice and claim.encounter_id:
             invoice = db.query(Invoice).filter(Invoice.encounter_id == claim.encounter_id).first()
-        if invoice and invoice.status not in ("paid", "cancelled"):
+        if invoice and invoice.status not in (InvoiceStatus.PAID, InvoiceStatus.CANCELLED):
             insurer_payment = round(
                 claim.total_amount - (claim.patient_responsibility or 0.0), 2
             )
@@ -624,7 +596,7 @@ def update_claim_status(
                 invoice.amount_paid = round(invoice.amount_paid + insurer_payment, 2)
                 invoice.balance_due = max(round(invoice.total_amount - invoice.amount_paid, 2), 0.0)
                 if invoice.balance_due == 0.0:
-                    invoice.status = "paid"
+                    invoice.status = InvoiceStatus.PAID
 
     db.commit()
 
@@ -663,3 +635,104 @@ def analyze_claim_risk_endpoint(
     result = analyze_claim_risk(form_data)
     return result
 
+
+# ── Reports ─────────────────────────────────────────────────────────────────
+
+from datetime import datetime, timedelta
+from sqlalchemy import func
+
+
+@router.get("/reports/summary")
+def get_reports_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(_billing_staff),
+):
+    """High-level financial KPIs: revenue, collection rate, denial rate, avg days to payment."""
+    total_billed = db.query(func.coalesce(func.sum(Invoice.total_amount), 0)).scalar() or 0
+    total_paid   = db.query(func.coalesce(func.sum(Invoice.amount_paid), 0)).scalar() or 0
+    total_claims = db.query(func.count(Claim.id)).scalar() or 0
+    denied       = db.query(func.count(Claim.id)).filter(Claim.status == ClaimStatus.DENIED).scalar() or 0
+    approved     = db.query(func.count(Claim.id)).filter(Claim.status == ClaimStatus.APPROVED).scalar() or 0
+    paid_claims  = db.query(func.count(Claim.id)).filter(Claim.status == ClaimStatus.PAID).scalar() or 0
+    outstanding  = total_billed - total_paid
+
+    collection_rate = round((total_paid / total_billed * 100), 1) if total_billed > 0 else 0.0
+    denial_rate     = round((denied / total_claims * 100), 1) if total_claims > 0 else 0.0
+    approval_rate   = round(((approved + paid_claims) / total_claims * 100), 1) if total_claims > 0 else 0.0
+
+    return {
+        "total_billed":      round(total_billed, 2),
+        "total_paid":        round(total_paid, 2),
+        "outstanding":       round(outstanding, 2),
+        "collection_rate":   collection_rate,
+        "denial_rate":       denial_rate,
+        "approval_rate":     approval_rate,
+        "total_claims":      total_claims,
+        "denied_claims":     denied,
+        "approved_claims":   approved + paid_claims,
+        "generated_at":      datetime.utcnow().date().isoformat(),
+    }
+
+
+@router.get("/reports/monthly-trend")
+def get_monthly_trend(
+    months: int = 6,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(_billing_staff),
+):
+    """Monthly revenue trend for the last N months (chart data)."""
+    results = []
+    for i in range(months - 1, -1, -1):
+        start = (datetime.utcnow().replace(day=1) - timedelta(days=i * 30)).replace(day=1)
+        if i == 0:
+            end = datetime.utcnow()
+        else:
+            end = (start.replace(day=28) + timedelta(days=4)).replace(day=1)
+
+        billed = db.query(func.coalesce(func.sum(Invoice.total_amount), 0)).filter(
+            Invoice.created_at >= start, Invoice.created_at < end
+        ).scalar() or 0
+        paid = db.query(func.coalesce(func.sum(Invoice.amount_paid), 0)).filter(
+            Invoice.created_at >= start, Invoice.created_at < end
+        ).scalar() or 0
+
+        results.append({
+            "month": start.strftime("%b %Y"),
+            "billed": round(float(billed), 2),
+            "paid":   round(float(paid), 2),
+        })
+    return {"trend": results, "months": months}
+
+
+@router.get("/reports/top-payers")
+def get_top_payers(
+    limit: int = 10,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(_billing_staff),
+):
+    """Top insurance payers by claim volume and total amount."""
+    rows = (
+        db.query(
+            Claim.insurance_provider,
+            func.count(Claim.id).label("claim_count"),
+            func.coalesce(func.sum(Claim.total_amount), 0).label("total_amount"),
+            func.coalesce(func.sum(Claim.approved_amount), 0).label("approved_amount"),
+        )
+        .group_by(Claim.insurance_provider)
+        .order_by(func.count(Claim.id).desc())
+        .limit(limit)
+        .all()
+    )
+    return {
+        "payers": [
+            {
+                "payer": r.insurance_provider,
+                "claim_count": r.claim_count,
+                "total_amount": round(float(r.total_amount), 2),
+                "approved_amount": round(float(r.approved_amount), 2),
+                "approval_rate": round(float(r.approved_amount) / float(r.total_amount) * 100, 1)
+                    if r.total_amount else 0.0,
+            }
+            for r in rows
+        ]
+    }
