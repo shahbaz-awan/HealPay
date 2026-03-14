@@ -156,15 +156,7 @@ The frontend will be available at: **http://localhost:5173**
 
 ---
 
-## 👥 Default Users
 
-After running `create_fresh_db.py`, the following test users are available:
-
-| Email | Password | Role |
-|-------|----------|------|
-| admin@healpay.com | admin123 | Admin |
-| doctor@healpay.com | doctor123 | Doctor |
-| patient@healpay.com | patient123 | Patient |
 
 ---
 
