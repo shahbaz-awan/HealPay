@@ -36,11 +36,13 @@ except Exception as e:
 # ---------------------------------------------------------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Auto-seed medical codes if necessary (safe, checks for existing data)
+    # Auto-seed initial system data if necessary
     try:
         from seed_code_library import seed_data
+        from seed_users import seed_users
         seed_data()
-        logger.info("Medical code library verified/seeded.")
+        seed_users()
+        logger.info("System data (codes & actors) verified/seeded.")
     except Exception as e:
         logger.error(f"Auto-seeding failed: {e}")
 
