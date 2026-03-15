@@ -4,7 +4,7 @@ services:
     name: healpay-backend
     runtime: python
     region: oregon           # us-west-2
-    plan: starter            # Free tier
+    plan: free            # No card required
     rootDir: healpay-backend
     buildCommand: >
       pip install -r requirements.txt &&
