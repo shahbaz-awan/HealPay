@@ -8,13 +8,7 @@ if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from app.db.models import CodeLibrary, Base
-
-DB_PATH = os.path.join(os.path.dirname(__file__), "healpay.db")
-engine = create_engine(f"sqlite:///{DB_PATH}", connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(bind=engine)
+from app.db.database import SessionLocal, engine
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ICD-10-CM codes  (code, short_description, long_description, category)
@@ -150,47 +144,58 @@ CPT_CODES = [
 ]
 
 
-def seed(db):
-    existing = db.query(CodeLibrary).count()
-    if existing > 0:
-        print(f"[SKIP] CodeLibrary already has {existing} codes. Delete them first to re-seed.")
-        return
+def seed_data(db=None):
+    if db is None:
+        db = SessionLocal()
+        own_session = True
+    else:
+        own_session = False
 
-    records = []
-    for code, short_desc, long_desc, category in ICD10_CODES:
-        search = f"{code} {short_desc} {long_desc}".lower()
-        records.append(CodeLibrary(
-            code=code,
-            code_type="ICD10_CM",
-            short_description=short_desc,
-            long_description=long_desc,
-            category=category,
-            search_text=search,
-            is_active=True,
-            billable=True,
-        ))
+    try:
+        existing = db.query(CodeLibrary).count()
+        if existing > 0:
+            print(f"[SKIP] CodeLibrary already has {existing} codes. Delete them first to re-seed.")
+            return
 
-    for code, short_desc, long_desc, category in CPT_CODES:
-        search = f"{code} {short_desc} {long_desc}".lower()
-        records.append(CodeLibrary(
-            code=code,
-            code_type="CPT",
-            short_description=short_desc,
-            long_description=long_desc,
-            category=category,
-            search_text=search,
-            is_active=True,
-            billable=True,
-        ))
+        records = []
+        for code, short_desc, long_desc, category in ICD10_CODES:
+            search = f"{code} {short_desc} {long_desc}".lower()
+            records.append(CodeLibrary(
+                code=code,
+                code_type="ICD10_CM",
+                short_description=short_desc,
+                long_description=long_desc,
+                category=category,
+                search_text=search,
+                is_active=True,
+                billable=True,
+            ))
 
-    db.bulk_save_objects(records)
-    db.commit()
+        for code, short_desc, long_desc, category in CPT_CODES:
+            search = f"{code} {short_desc} {long_desc}".lower()
+            records.append(CodeLibrary(
+                code=code,
+                code_type="CPT",
+                short_description=short_desc,
+                long_description=long_desc,
+                category=category,
+                search_text=search,
+                is_active=True,
+                billable=True,
+            ))
+
+        db.bulk_save_objects(records)
+        db.commit()
+    finally:
+        if own_session:
+            db.close()
+
     print(f"[OK] Seeded {len(records)} codes  ({len(ICD10_CODES)} ICD-10 + {len(CPT_CODES)} CPT)")
 
 
 if __name__ == "__main__":
     db = SessionLocal()
     try:
-        seed(db)
+        seed_data(db)
     finally:
         db.close()
