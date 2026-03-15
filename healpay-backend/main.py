@@ -24,8 +24,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Create database tables
-models.Base.metadata.create_all(bind=engine)
+# Create database tables (only in dev/test - Production uses Alembic)
+if settings.ENVIRONMENT != "production":
+    models.Base.metadata.create_all(bind=engine)
 
 # ---------------------------------------------------------------------------
 # Lifespan – warm up AI indices on startup in a background thread
