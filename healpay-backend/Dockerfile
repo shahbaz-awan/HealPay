@@ -46,8 +46,5 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Expose port (Koyeb uses 8000 by default)
 EXPOSE 8000
 
-# Start command: Run migrations, then seed, then start gunicorn
-# We use '|| true' on seed to skip if data already exists
-CMD alembic upgrade head && \
-    python seed_code_library.py || true && \
-    gunicorn main:app -w 2 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 --timeout 120
+# Start command: The app now handles migrations/seeding internally via main.py
+CMD ["gunicorn", "main:app", "-w", "2", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "--timeout", "120"]
