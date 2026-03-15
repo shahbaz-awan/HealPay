@@ -65,14 +65,20 @@ app = FastAPI(
 )
 
 # ---------------------------------------------------------------------------
-# CORS – driven by FRONTEND_URL env var so Vercel URL is automatically included
+# CORS – driven by FRONTEND_URL env var
 # ---------------------------------------------------------------------------
 _dev_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:3000",
 ]
-_prod_origins = [settings.FRONTEND_URL] if settings.FRONTEND_URL else []
+
+# Robustly handle FRONTEND_URL (remove trailing slash and add both variants if needed)
+_prod_origins = []
+if settings.FRONTEND_URL:
+    base_url = settings.FRONTEND_URL.rstrip("/")
+    _prod_origins.extend([base_url, f"{base_url}/"])
+
 allowed_origins = list(set(_dev_origins + _prod_origins))
 
 app.state.limiter = limiter
