@@ -39,12 +39,17 @@ async def lifespan(app: FastAPI):
     # Auto-seed initial system data if necessary
     try:
         from seed_code_library import seed_data
-        from seed_users import seed_users
         seed_data()
-        seed_users()
-        logger.info("System data (codes & actors) verified/seeded.")
     except Exception as e:
-        logger.error(f"Auto-seeding failed: {e}")
+        logger.error(f"Medical code seeding failed: {e}")
+
+    try:
+        from seed_users import seed_users
+        seed_users()
+    except Exception as e:
+        logger.error(f"User actor seeding failed: {e}")
+
+    logger.info("System data verification complete.")
 
     logger.info("Starting AI recommendation index warm-up (async executor)...")
     loop = asyncio.get_event_loop()

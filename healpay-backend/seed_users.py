@@ -25,7 +25,6 @@ def seed_users(db=None):
         seeded_count = 0
         
         for user_data in USERS_TO_SEED:
-            # Check if user already exists
             existing_user = db.query(User).filter(User.email == user_data["email"]).first()
             if not existing_user:
                 new_user = User(
@@ -39,12 +38,18 @@ def seed_users(db=None):
                 )
                 db.add(new_user)
                 seeded_count += 1
+                logger.info(f"Created system actor: {user_data['email']}")
+            else:
+                # Force reset password and role to ensure they match our test credentials
+                existing_user.hashed_password = password_hash
+                existing_user.role = user_data["role"]
+                existing_user.is_verified = True
+                existing_user.is_active = True
+                logger.info(f"Verified/Reset system actor: {user_data['email']}")
+                seeded_count += 1
         
         db.commit()
-        if seeded_count > 0:
-            logger.info(f"Seeded {seeded_count} system actors.")
-        else:
-            logger.info("System actors already exist, skipping seeding.")
+        logger.info(f"Successfully processed {seeded_count} system actors.")
             
     except Exception as e:
         logger.error(f"Error seeding users: {e}")
