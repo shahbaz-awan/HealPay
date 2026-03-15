@@ -21,8 +21,11 @@ from typing import Dict, List, Tuple
 
 logger = logging.getLogger(__name__)
 
-# Dataset paths (relative to healpay-backend root)
+# Dataset paths: try relative to this file first, then absolute container path
 _DATASET_DIR = Path(__file__).resolve().parent.parent.parent / "Recommendation_Dataset"
+if not _DATASET_DIR.exists():
+    _DATASET_DIR = Path("/app/Recommendation_Dataset")
+
 ICD_CSV_PATH = _DATASET_DIR / "ICD10codes.csv"
 CPT_CSV_PATH = _DATASET_DIR / "cpt_codes.csv"
 
