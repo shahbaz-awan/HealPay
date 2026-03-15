@@ -57,6 +57,6 @@ databases:
   - name: healpay-db
     databaseName: healpay
     user: healpay_admin
-    plan: starter              # Free 90-day trial, then $7/mo
+    plan: free                 # Free 90-day trial, then $7/mo
     region: oregon
     postgresMajorVersion: "16"
