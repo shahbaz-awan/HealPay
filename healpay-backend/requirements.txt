@@ -58,10 +58,10 @@ requests==2.32.5
 rich==14.3.3
 rsa==4.9.1
 safetensors==0.7.0
-scikit-learn
+scikit-learn==1.6.1
 psycopg2-binary==2.9.10
-scipy
-sentence-transformers
+scipy==1.13.1
+sentence-transformers==3.4.1
 setuptools==82.0.0
 shellingham==1.5.4
 six==1.17.0
@@ -73,7 +73,7 @@ threadpoolctl==3.6.0
 tokenizers==0.22.2
 # torch managed in Dockerfile
 tqdm==4.67.3
-transformers
+transformers==4.49.1
 typer==0.24.1
 typer-slim==0.24.0
 typing-inspection==0.4.2

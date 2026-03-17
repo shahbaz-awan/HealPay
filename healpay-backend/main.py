@@ -24,18 +24,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Create database tables (Safe for production: won't touch existing data)
-try:
-    models.Base.metadata.create_all(bind=engine)
-    logger.info("Database tables created/verified.")
-except Exception as e:
-    logger.warning(f"Database table verification skipped/failed: {e}")
-
-# ---------------------------------------------------------------------------
-# Lifespan – warm up AI indices on startup in a background thread
-# ---------------------------------------------------------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Ensure database tables exist before traffic starts
+    try:
+        models.Base.metadata.create_all(bind=engine)
+        logger.info("Database tables created/verified via lifespan.")
+    except Exception as e:
+        logger.error(f"Database initialization failed: {e}")
+
     # Auto-seed initial system data if necessary
     try:
         from seed_code_library import seed_data

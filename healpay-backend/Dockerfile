@@ -35,8 +35,10 @@ COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy application code
-# We assume the root of the build context is healpay-backend/
 COPY . .
+
+# Explicitly copy dataset to ensure it's in the right place for AI services
+COPY Recommendation_Dataset /app/Recommendation_Dataset
 
 # Environment variables
 ENV PYTHONUNBUFFERED=1
