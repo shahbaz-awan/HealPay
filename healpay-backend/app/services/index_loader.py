@@ -145,6 +145,7 @@ def warm_up(force_rebuild: bool = False) -> None:
         except Exception as e:
             logger.error("❌ CRITICAL: Index Loader warm-up failed: %s", e)
             _is_loaded = False # Ensure we can retry on next request
+            raise e
 
 
 def ensure_loaded() -> None:
