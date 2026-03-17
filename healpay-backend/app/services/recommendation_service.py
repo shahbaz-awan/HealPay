@@ -117,9 +117,19 @@ def _code_specificity_bonus(code: str, code_type: str) -> float:
 
 
 def _compute_hybrid_score(rec: Dict, query_tokens: List[str]) -> float:
+    # Check status
+    status = index_loader.get_status()
+    dense_available = status.get("dense_available", True)
+
     dense = rec.get("dense_score", 0.0)
     bm25 = rec.get("bm25_score", 0.0)
-    hybrid = DENSE_WEIGHT * dense + BM25_WEIGHT * bm25
+    
+    if dense_available:
+        hybrid = DENSE_WEIGHT * dense + BM25_WEIGHT * bm25
+    else:
+        # BM25-only mode: use BM25 as the primary signal
+        hybrid = bm25 
+
     combined_desc = f"{rec.get('short_description', '')} {rec.get('long_description', '')}"
     overlap = _keyword_overlap_score(query_tokens, combined_desc)
     specificity = _code_specificity_bonus(rec["code"], rec["code_type"])
@@ -141,7 +151,15 @@ def _icd_prefix(code: str) -> str:
 
 
 def _apply_business_rules(ranked: List[Dict], code_type: str, top_n: int) -> List[Dict]:
-    min_conf = MIN_CONFIDENCE_ICD if code_type == "ICD10_CM" else MIN_CONFIDENCE_CPT
+    # Check if we are in low-memory/BM25-only mode
+    dense_available = index_loader.get_status().get("dense_available", True)
+    
+    # If dense is missing, we relax the confidence a bit since BM25 maxes at 0.25 in hybrid mode
+    # OR we use a different threshold. 0.05 is safe for BM25-only detections.
+    min_conf = (MIN_CONFIDENCE_ICD if code_type == "ICD10_CM" else MIN_CONFIDENCE_CPT)
+    if not dense_available:
+        min_conf = 0.05  # Relax threshold for pure BM25 top candidates
+        
     filtered = [r for r in ranked if r.get("hybrid_score", 0) >= min_conf]
 
     prefix_count: Dict[str, int] = defaultdict(int)

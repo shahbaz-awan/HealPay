@@ -137,12 +137,17 @@ async def health_check():
             conn.execute(__import__('sqlalchemy').text("SELECT 1"))
     except Exception:
         db_ok = False
+    status_info = index_loader.get_status()
     return {
         "status": "healthy" if db_ok else "degraded",
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
         "environment": settings.ENVIRONMENT,
-        "ai_index_ready": index_loader._is_loaded,
+        "ai_status": {
+            "ready": status_info.get("is_loaded", False),
+            "dense_search": status_info.get("dense_available", False),
+            "mode": "hybrid" if status_info.get("dense_available") else "keyword-only (low-memory)"
+        },
         "database": "ok" if db_ok else "error",
     }
 

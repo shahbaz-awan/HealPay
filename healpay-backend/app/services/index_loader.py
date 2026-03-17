@@ -52,8 +52,8 @@ _icd_bm25_meta: Optional[List[Dict]] = None
 _cpt_bm25: Optional[BM25Okapi] = None
 _cpt_bm25_meta: Optional[List[Dict]] = None
 
-_is_loaded = False
 _dataset_hash: str = ""
+_dense_available = False  # Track if semantic search is actually ready
 
 
 # ---------------------------------------------------------------------------
@@ -102,16 +102,24 @@ def warm_up(force_rebuild: bool = False) -> None:
         # 2. Load raw codes from CSV
         all_icd, sampled_icd, all_cpt, _ = load_all_codes()
 
-        # 3. Build / load FAISS indices
-        logger.info("--- ICD dense index ---")
-        _icd_faiss_index, _icd_faiss_meta = build_or_load_index(
-            sampled_icd, "icd", current_hash, force_rebuild
-        )
-
-        logger.info("--- CPT dense index ---")
-        _cpt_faiss_index, _cpt_faiss_meta = build_or_load_index(
-            all_cpt, "cpt", current_hash, force_rebuild
-        )
+        # 3. Build / load FAISS indices (Heavy - might fail on low RAM)
+        logger.info("--- Dense index initialization ---")
+        try:
+            _icd_faiss_index, _icd_faiss_meta = build_or_load_index(
+                sampled_icd, "icd", current_hash, force_rebuild
+            )
+            _cpt_faiss_index, _cpt_faiss_meta = build_or_load_index(
+                all_cpt, "cpt", current_hash, force_rebuild
+            )
+            
+            # Pre-load the embedding model into memory
+            logger.info("Pre-loading embedding model into memory …")
+            get_model()
+            _dense_available = True
+            logger.info("✓ Semantic search (Dense) is ready.")
+        except Exception as e:
+            logger.warning("⚠️ Low-Memory detected or model failure. Semantic search disabled: %s", e)
+            _dense_available = False
 
         # 4. Build BM25 indices (fast, no model required)
         logger.info("--- ICD BM25 index ---")
@@ -122,11 +130,6 @@ def warm_up(force_rebuild: bool = False) -> None:
 
         _dataset_hash = current_hash
         _is_loaded = True
-
-        # Pre-load the embedding model into memory so the first query
-        # does not trigger a cold-start re-download of the tokenizer.
-        logger.info("Pre-loading embedding model into memory …")
-        get_model()
 
         logger.info(
             "═══ Index Loader: ready  "
@@ -161,6 +164,9 @@ def dense_search(code_type: str, query_text: str, top_k: int = 20) -> List[Dict]
     Returns a list of result dicts with 'dense_score' field.
     """
     ensure_loaded()
+    if not _dense_available:
+        return []
+
     if code_type == "ICD10_CM":
         return search_index(_icd_faiss_index, _icd_faiss_meta, query_text, top_k)
     else:
@@ -211,6 +217,7 @@ def get_status() -> Dict:
     """Return a summary of the loaded indices (used by health-check / debug)."""
     return {
         "is_loaded": _is_loaded,
+        "dense_available": _dense_available,
         "dataset_hash": _dataset_hash,
         "icd_dense_count": _icd_faiss_index.ntotal if _icd_faiss_index else 0,
         "cpt_dense_count": _cpt_faiss_index.ntotal if _cpt_faiss_index else 0,
