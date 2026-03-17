@@ -9,6 +9,7 @@ if sys.platform == "win32":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 from app.db.database import SessionLocal, engine
+from app.db.models import CodeLibrary
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ICD-10-CM codes  (code, short_description, long_description, category)

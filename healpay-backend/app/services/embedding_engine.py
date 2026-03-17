@@ -57,14 +57,16 @@ def get_model():
 
     from sentence_transformers import SentenceTransformer
 
+    # Prioritize smaller model for memory-constrained production environments
     models_to_try = [
-        "pritamdeka/S-PubMedBert-MS-MARCO",   # Clinical domain – best quality
-        "all-MiniLM-L6-v2",                   # Fast general model – fallback
+        "all-MiniLM-L6-v2",                   # Fast general model – Best for 512MB RAM
+        "pritamdeka/S-PubMedBert-MS-MARCO",   # Clinical domain – heavy
     ]
 
     for model_name in models_to_try:
         try:
             logger.info("Loading embedding model: %s", model_name)
+            # Use low_cpu_mem_usage if available in the SentenceTransformer version
             _model = SentenceTransformer(model_name)
             logger.info("✓ Model loaded: %s", model_name)
             return _model
