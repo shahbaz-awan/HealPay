@@ -52,6 +52,7 @@ _icd_bm25_meta: Optional[List[Dict]] = None
 _cpt_bm25: Optional[BM25Okapi] = None
 _cpt_bm25_meta: Optional[List[Dict]] = None
 
+_is_loaded = False
 _dataset_hash: str = ""
 _dense_available = False  # Track if semantic search is actually ready
 
