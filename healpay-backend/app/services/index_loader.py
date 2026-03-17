@@ -65,13 +65,19 @@ def _build_bm25_index(
     codes: List[Dict],
     label: str,
 ) -> Tuple[BM25Okapi, List[Dict]]:
-    """Build a BM25Okapi index from the bm25_tokens field of each code dict."""
+    """Build a BM25Okapi index and return optimized metadata."""
     corpus = [c["bm25_tokens"] for c in codes]
     # Replace empty token lists with a placeholder so BM25Okapi doesn't crash
     corpus = [toks if toks else ["__empty__"] for toks in corpus]
     logger.info("Building BM25 index for %d %s codes …", len(corpus), label)
     bm25 = BM25Okapi(corpus)
-    meta = [{k: v for k, v in c.items() if k != "bm25_tokens"} for c in codes]
+    
+    # Strip heavy strings that aren't needed for display or ranking after index is built
+    # We keep 'code', 'code_type', 'short_description', 'long_description', 'category'
+    meta = [
+        {k: v for k, v in c.items() if k not in ("bm25_tokens", "search_text")} 
+        for c in codes
+    ]
     return bm25, meta
 
 
@@ -95,51 +101,50 @@ def warm_up(force_rebuild: bool = False) -> None:
             return
 
         logger.info("═══ Index Loader: warm-up started ═══")
-
-        # 1. Compute current dataset hash
-        current_hash = compute_dataset_hash()
-        logger.info("Dataset hash: %s", current_hash)
-
-        # 2. Load raw codes from CSV
-        all_icd, sampled_icd, all_cpt, _ = load_all_codes()
-
-        # 3. Build / load FAISS indices (Heavy - might fail on low RAM)
-        logger.info("--- Dense index initialization ---")
         try:
-            _icd_faiss_index, _icd_faiss_meta = build_or_load_index(
-                sampled_icd, "icd", current_hash, force_rebuild
+            # 1. Compute current dataset hash
+            current_hash = compute_dataset_hash()
+            logger.info("Step 1: Dataset hash compute: %s", current_hash)
+
+            # 2. Load raw codes from CSV (Protected)
+            logger.info("Step 2: Loading raw codes from CSV …")
+            all_icd, sampled_icd, all_cpt, _ = load_all_codes()
+            logger.info("✓ Loaded ICD (%d) and CPT (%d)", len(all_icd), len(all_cpt))
+
+            # 3. Build / load FAISS indices (Heavy)
+            logger.info("Step 3: Dense index initialization (Sample Size: %d) …", len(sampled_icd))
+            try:
+                _icd_faiss_index, _icd_faiss_meta = build_or_load_index(
+                    sampled_icd, "icd", current_hash, force_rebuild
+                )
+                _cpt_faiss_index, _cpt_faiss_meta = build_or_load_index(
+                    all_cpt, "cpt", current_hash, force_rebuild
+                )
+                
+                # Pre-load the embedding model into memory
+                logger.info("Pre-loading embedding model …")
+                get_model()
+                _dense_available = True
+                logger.info("✓ Semantic search (Dense) is ready.")
+            except Exception as e:
+                logger.warning("⚠️ Semantic search disabled (Memory or Model error): %s", e)
+                _dense_available = False
+
+            # 4. Build BM25 indices
+            logger.info("Step 4: BM25 index initialization …")
+            _icd_bm25, _icd_bm25_meta = _build_bm25_index(all_icd, "ICD")
+            _cpt_bm25, _cpt_bm25_meta = _build_bm25_index(all_cpt, "CPT")
+
+            _dataset_hash = current_hash
+            _is_loaded = True
+
+            logger.info(
+                "═══ Index Loader: Ready! (ICD=%d CPT=%d Dense=%s) ═══",
+                len(_icd_bm25_meta), len(_cpt_bm25_meta), _dense_available
             )
-            _cpt_faiss_index, _cpt_faiss_meta = build_or_load_index(
-                all_cpt, "cpt", current_hash, force_rebuild
-            )
-            
-            # Pre-load the embedding model into memory
-            logger.info("Pre-loading embedding model into memory …")
-            get_model()
-            _dense_available = True
-            logger.info("✓ Semantic search (Dense) is ready.")
         except Exception as e:
-            logger.warning("⚠️ Low-Memory detected or model failure. Semantic search disabled: %s", e)
-            _dense_available = False
-
-        # 4. Build BM25 indices (fast, no model required)
-        logger.info("--- ICD BM25 index ---")
-        _icd_bm25, _icd_bm25_meta = _build_bm25_index(all_icd, "ICD")
-
-        logger.info("--- CPT BM25 index ---")
-        _cpt_bm25, _cpt_bm25_meta = _build_bm25_index(all_cpt, "CPT")
-
-        _dataset_hash = current_hash
-        _is_loaded = True
-
-        logger.info(
-            "═══ Index Loader: ready  "
-            "(ICD dense=%d  CPT dense=%d  ICD bm25=%d  CPT bm25=%d) ═══",
-            _icd_faiss_index.ntotal if _icd_faiss_index else 0,
-            _cpt_faiss_index.ntotal if _cpt_faiss_index else 0,
-            len(_icd_bm25_meta) if _icd_bm25_meta else 0,
-            len(_cpt_bm25_meta) if _cpt_bm25_meta else 0,
-        )
+            logger.error("❌ CRITICAL: Index Loader warm-up failed: %s", e)
+            _is_loaded = False # Ensure we can retry on next request
 
 
 def ensure_loaded() -> None:
