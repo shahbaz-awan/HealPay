@@ -37,9 +37,6 @@ ENV PATH="/opt/venv/bin:$PATH"
 # Copy application code
 COPY . .
 
-# Explicitly copy dataset to ensure it's in the right place for AI services
-COPY Recommendation_Dataset /app/Recommendation_Dataset
-
 # Environment variables
 ENV PYTHONUNBUFFERED=1
 ENV ENVIRONMENT=production
