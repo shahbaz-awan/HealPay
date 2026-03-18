@@ -37,6 +37,11 @@ ENV PATH="/opt/venv/bin:$PATH"
 # Copy application code
 COPY . .
 
+# ── Pre-build AI Indices ────────────────────────────────────────────────────
+# Building indices at build-time ensures they are available instantly at runtime
+# with ZERO startup delay or CPU/Memory spikes on production (Koyeb).
+RUN ENVIRONMENT=production python build_indices.py --force
+
 # Environment variables
 ENV PYTHONUNBUFFERED=1
 ENV ENVIRONMENT=production
