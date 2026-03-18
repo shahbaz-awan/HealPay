@@ -26,32 +26,15 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Ensure database tables exist before traffic starts
-    try:
-        models.Base.metadata.create_all(bind=engine)
-        logger.info("Database tables created/verified via lifespan.")
-    except Exception as e:
-        logger.error(f"Database initialization failed: {e}")
-
-    # Auto-seed initial system data if necessary
-    try:
-        from seed_code_library import seed_data
-        seed_data()
-    except Exception as e:
-        logger.error(f"Medical code seeding failed: {e}")
-
-    try:
-        from seed_users import seed_users
-        seed_users()
-    except Exception as e:
-        logger.error(f"User actor seeding failed: {e}")
-
-    logger.info("System data verification complete.")
-
-    logger.info("Starting AI recommendation index warm-up (async executor)...")
-    loop = asyncio.get_event_loop()
-    loop.run_in_executor(None, index_loader.warm_up)
+    # Consolidate all bootstrapping (DB, Seeding, AI) into a single ordered sequence
+    from app.core.initialization import initialize_system
+    
+    # Run initialization in the main thread during lifespan to ensure readiness
+    # AI Indexing will handle its own backgrounding if needed
+    initialize_system()
+    
     yield
+    logger.info("HealPay backend shutting down.")
     logger.info("HealPay backend shutting down.")
 
 

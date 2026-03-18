@@ -85,67 +85,63 @@ def _build_bm25_index(
 # Public warm-up function  (called once at startup from main.py lifespan)
 # ---------------------------------------------------------------------------
 
+def _full_background_warmup(force_rebuild: bool):
+    """Heavy lifted data loading and indexing performed in a background thread."""
+    global _icd_faiss_index, _icd_faiss_meta, _cpt_faiss_index, _cpt_faiss_meta
+    global _icd_bm25, _icd_bm25_meta, _cpt_bm25, _cpt_bm25_meta
+    global _is_loaded, _dense_available, _dataset_hash
+    
+    try:
+        logger.info("Background AI: Starting full initialization...")
+        current_hash = compute_dataset_hash()
+        
+        # 1. Load raw data
+        all_icd, sampled_icd, all_cpt, _ = load_all_codes()
+        
+        # 2. Build BM25 indices
+        logger.info("Background AI: Building BM25 keyword indices...")
+        _icd_bm25, _icd_bm25_meta = _build_bm25_index(all_icd, "ICD")
+        _cpt_bm25, _cpt_bm25_meta = _build_bm25_index(all_cpt, "CPT")
+        
+        # 3. Build Dense FAISS indices
+        logger.info("Background AI: Building Dense FAISS indices...")
+        try:
+            _icd_faiss_index, _icd_faiss_meta = build_or_load_index(
+                sampled_icd, "icd", current_hash, force_rebuild
+            )
+            _cpt_faiss_index, _cpt_faiss_meta = build_or_load_index(
+                all_cpt, "cpt", current_hash, force_rebuild
+            )
+            get_model()
+            _dense_available = True
+        except Exception as e:
+            logger.warning("⚠️ Background AI: Semantic search failed (Memory/Model): %s", e)
+            _dense_available = False
+
+        _dataset_hash = current_hash
+        _is_loaded = True
+        logger.info("═══ Background AI: Engine is now fully READY. ═══")
+        
+    except Exception as e:
+        logger.error("❌ Background AI: Critical failure: %s", e)
+        _is_loaded = False
+
 def warm_up(force_rebuild: bool = False) -> None:
     """
-    Load (or build) all indices.  Safe to call multiple times – re-entrant
-    guard ensures work is done only once unless force_rebuild=True.
+    Triggers the AI engine warm-up in the background.
+    Instant return ensures the server starts immediately.
     """
-    global _icd_faiss_index, _icd_faiss_meta
-    global _cpt_faiss_index, _cpt_faiss_meta
-    global _icd_bm25, _icd_bm25_meta
-    global _cpt_bm25, _cpt_bm25_meta
-    global _is_loaded, _dataset_hash
-
-    with _lock:
-        if _is_loaded and not force_rebuild:
-            return
-
-        logger.info("═══ Index Loader: warm-up started ═══")
-        try:
-            # 1. Compute current dataset hash
-            current_hash = compute_dataset_hash()
-            logger.info("Step 1: Dataset hash compute: %s", current_hash)
-
-            # 2. Load raw codes from CSV (Protected)
-            logger.info("Step 2: Loading raw codes from CSV …")
-            all_icd, sampled_icd, all_cpt, _ = load_all_codes()
-            logger.info("✓ Loaded ICD (%d) and CPT (%d)", len(all_icd), len(all_cpt))
-
-            # 3. Build / load FAISS indices (Heavy)
-            logger.info("Step 3: Dense index initialization (Sample Size: %d) …", len(sampled_icd))
-            try:
-                _icd_faiss_index, _icd_faiss_meta = build_or_load_index(
-                    sampled_icd, "icd", current_hash, force_rebuild
-                )
-                _cpt_faiss_index, _cpt_faiss_meta = build_or_load_index(
-                    all_cpt, "cpt", current_hash, force_rebuild
-                )
-                
-                # Pre-load the embedding model into memory
-                logger.info("Pre-loading embedding model …")
-                get_model()
-                _dense_available = True
-                logger.info("✓ Semantic search (Dense) is ready.")
-            except Exception as e:
-                logger.warning("⚠️ Semantic search disabled (Memory or Model error): %s", e)
-                _dense_available = False
-
-            # 4. Build BM25 indices
-            logger.info("Step 4: BM25 index initialization …")
-            _icd_bm25, _icd_bm25_meta = _build_bm25_index(all_icd, "ICD")
-            _cpt_bm25, _cpt_bm25_meta = _build_bm25_index(all_cpt, "CPT")
-
-            _dataset_hash = current_hash
-            _is_loaded = True
-
-            logger.info(
-                "═══ Index Loader: Ready! (ICD=%d CPT=%d Dense=%s) ═══",
-                len(_icd_bm25_meta), len(_cpt_bm25_meta), _dense_available
-            )
-        except Exception as e:
-            logger.error("❌ CRITICAL: Index Loader warm-up failed: %s", e)
-            _is_loaded = False # Ensure we can retry on next request
-            raise e
+    global _is_initialized_trigger
+    
+    # We use a simple flag to ensure we only spawn ONE background thread
+    if not hasattr(warm_up, "_triggered"):
+        warm_up._triggered = True
+        logger.info("═══ AI Engine: Triggering background initialization ═══")
+        threading.Thread(
+            target=_full_background_warmup,
+            args=(force_rebuild,),
+            daemon=True
+        ).start()
 
 
 def ensure_loaded() -> None:
