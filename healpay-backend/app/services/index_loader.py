@@ -10,11 +10,7 @@ Responsibility:
 
 import logging
 import threading
-import time
 from typing import Dict, List, Optional, Tuple
-
-import faiss
-from rank_bm25 import BM25Okapi
 
 from app.services.data_pipeline import (
     load_all_codes,
@@ -30,17 +26,18 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 _lock = threading.Lock()
 
-_icd_faiss_index: Optional[faiss.IndexFlatIP] = None
+# These are typed as Optional[Any] because faiss is imported lazily
+_icd_faiss_index = None
 _icd_faiss_meta: Optional[List[Dict]] = None
 
-_cpt_faiss_index: Optional[faiss.IndexFlatIP] = None
+_cpt_faiss_index = None
 _cpt_faiss_meta: Optional[List[Dict]] = None
 
 # BM25 covers ALL codes
-_icd_bm25: Optional[BM25Okapi] = None
+_icd_bm25 = None
 _icd_bm25_meta: Optional[List[Dict]] = None
 
-_cpt_bm25: Optional[BM25Okapi] = None
+_cpt_bm25 = None
 _cpt_bm25_meta: Optional[List[Dict]] = None
 
 _is_loaded = False
@@ -50,6 +47,9 @@ _dense_available = False
 # Thread-safe event to signal when initialization is COMPLETE
 _ready_event = threading.Event()
 
+# Flag to prevent launching duplicate background threads
+_warmup_thread_running = False
+
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
@@ -57,8 +57,9 @@ _ready_event = threading.Event()
 def _build_bm25_index(
     codes: List[Dict],
     label: str,
-) -> Tuple[BM25Okapi, List[Dict]]:
+) -> Tuple:
     """Build a BM25Okapi index and return optimized metadata."""
+    from rank_bm25 import BM25Okapi  # lazy import – safe if package missing
     corpus = [c["bm25_tokens"] for c in codes]
     corpus = [toks if toks else ["__empty__"] for toks in corpus]
     logger.info("Building BM25 index for %d %s codes …", len(corpus), label)
@@ -74,7 +75,7 @@ def _full_background_warmup(force_rebuild: bool):
     """Heavy lifted data loading and indexing performed in a background thread."""
     global _icd_faiss_index, _icd_faiss_meta, _cpt_faiss_index, _cpt_faiss_meta
     global _icd_bm25, _icd_bm25_meta, _cpt_bm25, _cpt_bm25_meta
-    global _is_loaded, _dense_available, _dataset_hash
+    global _is_loaded, _dense_available, _dataset_hash, _warmup_thread_running
     
     try:
         logger.info("Background AI: Starting full initialization...")
@@ -91,6 +92,7 @@ def _full_background_warmup(force_rebuild: bool):
         # 3. Build Dense FAISS indices
         logger.info("Background AI: Building Dense FAISS indices...")
         try:
+            # faiss is imported inside build_or_load_index
             _icd_faiss_index, _icd_faiss_meta = build_or_load_index(
                 sampled_icd, "icd", current_hash, force_rebuild
             )
@@ -110,22 +112,37 @@ def _full_background_warmup(force_rebuild: bool):
         logger.error("❌ Background AI: Critical failure: %s", e)
         _is_loaded = False
     finally:
+        _warmup_thread_running = False
         _ready_event.set()
 
 def warm_up(force_rebuild: bool = False) -> None:
-    """Triggers the AI engine warm-up in the background."""
-    if not hasattr(warm_up, "_triggered"):
-        warm_up._triggered = True
-        _ready_event.clear()
-        logger.info("═══ AI Engine: Triggering background initialization ═══")
-        threading.Thread(
-            target=_full_background_warmup,
-            args=(force_rebuild,),
-            daemon=True
-        ).start()
+    """Triggers the AI engine warm-up in the background.
 
-def ensure_loaded(timeout_seconds: float = 30.0) -> bool:
-    """Wait for background initialization to complete."""
+    Uses _is_loaded and _warmup_thread_running to avoid duplicate threads.
+    Safe to call from multiple Gunicorn workers – each process has its own
+    state and will independently initialise its in-process indices.
+    """
+    global _warmup_thread_running
+
+    with _lock:
+        if _is_loaded or _warmup_thread_running:
+            return
+        _warmup_thread_running = True
+        _ready_event.clear()
+
+    logger.info("═══ AI Engine: Triggering background initialization ═══")
+    threading.Thread(
+        target=_full_background_warmup,
+        args=(force_rebuild,),
+        daemon=True
+    ).start()
+
+def ensure_loaded(timeout_seconds: float = 120.0) -> bool:
+    """Wait for background initialization to complete.
+    
+    Default timeout increased to 120 s to handle cold-start model downloads
+    on memory-constrained hosts like Koyeb free tier.
+    """
     if _is_loaded:
         return True
     warm_up()

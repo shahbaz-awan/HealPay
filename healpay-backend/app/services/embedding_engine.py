@@ -21,8 +21,9 @@ import pickle
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 
-import faiss
-import numpy as np
+import numpy as np  # always available, safe at top-level
+# faiss is imported lazily inside functions – prevents crash if faiss-cpu
+# fails to install on memory-constrained hosts (Koyeb free tier)
 
 logger = logging.getLogger(__name__)
 
@@ -105,8 +106,9 @@ def _encode_batch(
     return _normalise(vectors.astype(np.float32))
 
 
-def _build_faiss_index(vectors: np.ndarray) -> faiss.IndexFlatIP:
+def _build_faiss_index(vectors: np.ndarray):
     """Build a flat inner-product FAISS index from pre-normalised vectors."""
+    import faiss  # lazy import
     dim = vectors.shape[1]
     index = faiss.IndexFlatIP(dim)
     index.add(vectors)
@@ -122,13 +124,15 @@ def _cache_path(code_type: str, dataset_hash: str, ext: str) -> Path:
     return CACHE_DIR / f"{code_type}_{dataset_hash}.{ext}"
 
 
-def _save_index(index: faiss.IndexFlatIP, code_type: str, dataset_hash: str):
+def _save_index(index, code_type: str, dataset_hash: str):
+    import faiss  # lazy import
     path = _cache_path(code_type, dataset_hash, "index")
     faiss.write_index(index, str(path))
     logger.info("Saved FAISS index → %s", path.name)
 
 
-def _load_index(code_type: str, dataset_hash: str) -> Optional[faiss.IndexFlatIP]:
+def _load_index(code_type: str, dataset_hash: str) -> Optional[object]:
+    import faiss  # lazy import
     path = _cache_path(code_type, dataset_hash, "index")
     if path.exists():
         logger.info("Loading cached FAISS index ← %s", path.name)
@@ -178,7 +182,7 @@ def build_or_load_index(
     code_type: str,          # "icd" or "cpt"
     dataset_hash: str,
     force_rebuild: bool = False,
-) -> Tuple[faiss.IndexFlatIP, List[Dict]]:
+) -> Tuple[object, List[Dict]]:
     """
     Return (faiss_index, metadata_list) for the given code list.
 
@@ -225,7 +229,7 @@ def build_or_load_index(
 
 
 def search_index(
-    index: faiss.IndexFlatIP,
+    index,
     meta: List[Dict],
     query_text: str,
     top_k: int = 20,

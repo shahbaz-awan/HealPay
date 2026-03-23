@@ -35,7 +35,6 @@ async def lifespan(app: FastAPI):
     
     yield
     logger.info("HealPay backend shutting down.")
-    logger.info("HealPay backend shutting down.")
 
 
 app = FastAPI(

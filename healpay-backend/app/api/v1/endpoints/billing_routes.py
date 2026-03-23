@@ -566,7 +566,7 @@ def update_claim_status(
     claim.status = new_status
 
     # ── Denial reason code ──────────────────────────────────────────────────
-    if new_status == "denied" and body.get("denial_reason_code"):
+    if new_status == ClaimStatus.DENIED and body.get("denial_reason_code"):
         claim.denial_reason_code = body["denial_reason_code"]
 
     # ── Adjudication date on final decision ─────────────────────────────────
@@ -604,16 +604,16 @@ def update_claim_status(
     enc = db.query(ClinicalEncounter).filter(ClinicalEncounter.id == claim.encounter_id).first()
     if enc:
         status_messages = {
-            "approved": ("Claim Approved", "success"),
-            "denied": ("Claim Denied", "error"),
-            "paid": ("Claim Paid", "success"),
+            ClaimStatus.APPROVED: ("Claim Approved", "success"),
+            ClaimStatus.DENIED: ("Claim Denied", "error"),
+            ClaimStatus.PAID: ("Claim Paid", "success"),
         }
         if new_status in status_messages:
             title, ntype = status_messages[new_status]
             _create_notification(
                 db, enc.patient_id,
                 title=f"Insurance {title}",
-                message=f"Your claim #{claim.claim_number} has been {new_status}.",
+                message=f"Your claim #{claim.claim_number} has been {new_status.value}.",
                 ntype=ntype,
                 link="/patient/dashboard",
             )
@@ -716,7 +716,7 @@ def get_top_payers(
             Claim.insurance_provider,
             func.count(Claim.id).label("claim_count"),
             func.coalesce(func.sum(Claim.total_amount), 0).label("total_amount"),
-            func.coalesce(func.sum(Claim.approved_amount), 0).label("approved_amount"),
+            func.coalesce(func.sum(Claim.patient_responsibility), 0).label("patient_responsibility"),
         )
         .group_by(Claim.insurance_provider)
         .order_by(func.count(Claim.id).desc())
@@ -729,9 +729,10 @@ def get_top_payers(
                 "payer": r.insurance_provider,
                 "claim_count": r.claim_count,
                 "total_amount": round(float(r.total_amount), 2),
-                "approved_amount": round(float(r.approved_amount), 2),
-                "approval_rate": round(float(r.approved_amount) / float(r.total_amount) * 100, 1)
-                    if r.total_amount else 0.0,
+                "patient_responsibility": round(float(r.patient_responsibility), 2),
+                "insurance_coverage_rate": round(
+                    (1 - float(r.patient_responsibility) / float(r.total_amount)) * 100, 1
+                ) if r.total_amount else 0.0,
             }
             for r in rows
         ]

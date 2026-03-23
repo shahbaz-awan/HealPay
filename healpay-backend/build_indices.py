@@ -37,8 +37,13 @@ def build_production_indices():
         _full_background_warmup(force_rebuild=True)
         logger.info("✅ Build Complete: All indices persisted to disk.")
     except Exception as e:
-        logger.error(f"❌ Index build failed: {e}")
-        sys.exit(1)
+        # Non-fatal: if build-time indexing fails (e.g. network, OOM), the app will
+        # still start successfully and rebuild indices at runtime in BM25-only mode.
+        logger.warning(
+            "⚠️ Build-time index pre-computation failed: %s\n"
+            "   The app will still start, but BM25-only mode will be used until the "
+            "AI engine finishes warming up at runtime.", e
+        )
 
 if __name__ == "__main__":
     # Prevent this from running accidentally in development if not desired
