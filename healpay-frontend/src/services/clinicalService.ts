@@ -91,13 +91,38 @@ export const completeCoding = async (encounterId: number) => {
 }
 
 // Get AI-powered code recommendations for an encounter
+// Polls with retries to handle cold-start warm-up (can take 60-120s on Koyeb)
 export const getCodeRecommendations = async (encounterId: number) => {
-    try {
-        const response = await api.get(`/v1/clinical/encounters/${encounterId}/recommendations`)
-        return response.data
-    } catch (error) {
-        console.error('Error fetching code recommendations:', error)
-        throw error
+    const MAX_RETRIES = 12       // 12 × 15 s = 3 minutes max wait
+    const RETRY_DELAY_MS = 15000 // 15 seconds between retries
+
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        try {
+            const response = await api.get(
+                `/v1/clinical/encounters/${encounterId}/recommendations`,
+                { timeout: 25000 }  // short per-request timeout; we retry on 503
+            )
+            return response.data
+        } catch (error: any) {
+            const status = error?.response?.status
+            const isInitializing =
+                status === 503 &&
+                (error?.response?.data?.status === 'initializing' ||
+                 error?.response?.data?.detail?.toLowerCase().includes('warming'))
+
+            if (isInitializing && attempt < MAX_RETRIES - 1) {
+                // AI engine still warming up — wait and retry silently
+                console.info(
+                    `AI engine warming up, retrying in 15 s… (attempt ${attempt + 1}/${MAX_RETRIES})`
+                )
+                await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS))
+                continue
+            }
+
+            // Real error or exhausted retries — surface to caller
+            console.error('Error fetching code recommendations:', error)
+            throw error
+        }
     }
 }
 

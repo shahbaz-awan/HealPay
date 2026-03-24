@@ -644,6 +644,22 @@ def get_code_recommendations(
                    "Please add a chief complaint to the encounter first.",
         )
 
+    # ── Check AI engine readiness (non-blocking) ─────────────────────────────
+    # Don't block the HTTP request for up to 120 s waiting for model download.
+    # Return 503 immediately so the frontend can poll/retry cleanly.
+    from app.services.index_loader import warm_up, _is_loaded as _ai_loaded
+    if not _ai_loaded:
+        warm_up()   # ensure background thread is running (idempotent)
+        from fastapi.responses import JSONResponse
+        return JSONResponse(
+            status_code=503,
+            headers={"Retry-After": "15"},
+            content={
+                "detail": "AI engine is warming up. Please retry in 15-30 seconds.",
+                "status": "initializing",
+            },
+        )
+
     # Get recommendation service (loads library + model on first call)
     try:
         rec_service = get_recommendation_service(db)

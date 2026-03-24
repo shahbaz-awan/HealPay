@@ -392,7 +392,10 @@ const ClaimDetailPage = () => {
                         <Card className="border-2 border-blue-200">
                             <div className="flex items-center gap-3 text-blue-600">
                                 <Sparkles className="w-5 h-5 animate-pulse" />
-                                <span>AI is analyzing clinical notes...</span>
+                                <div>
+                                    <span className="font-medium">AI engine is loading…</span>
+                                    <p className="text-xs text-blue-500 mt-0.5">First load can take up to 2 minutes. Please wait.</p>
+                                </div>
                             </div>
                         </Card>
                     )}
@@ -514,7 +517,10 @@ const ClaimDetailPage = () => {
                         <Card className="border-2 border-blue-200">
                             <div className="flex items-center gap-3 text-blue-600">
                                 <Sparkles className="w-5 h-5 animate-pulse" />
-                                <span>AI is analyzing clinical notes...</span>
+                                <div>
+                                    <span className="font-medium">AI engine is loading…</span>
+                                    <p className="text-xs text-blue-500 mt-0.5">First load can take up to 2 minutes. Please wait.</p>
+                                </div>
                             </div>
                         </Card>
                     )}
