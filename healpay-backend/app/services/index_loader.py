@@ -50,6 +50,18 @@ _ready_event = threading.Event()
 # Flag to prevent launching duplicate background threads
 _warmup_thread_running = False
 
+
+def is_ready() -> bool:
+    """Return True when the AI engine has finished loading.
+
+    IMPORTANT: Always use this function — never import ``_is_loaded`` directly.
+    Python's ``from module import var`` copies the *value* at import time, so
+    a direct import of ``_is_loaded`` will always be ``False`` even after the
+    background thread sets it to ``True``.
+    """
+    return _is_loaded
+
+
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------

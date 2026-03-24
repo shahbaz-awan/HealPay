@@ -647,8 +647,10 @@ def get_code_recommendations(
     # ── Check AI engine readiness (non-blocking) ─────────────────────────────
     # Don't block the HTTP request for up to 120 s waiting for model download.
     # Return 503 immediately so the frontend can poll/retry cleanly.
-    from app.services.index_loader import warm_up, _is_loaded as _ai_loaded
-    if not _ai_loaded:
+    # NOTE: use is_ready() — never import _is_loaded directly; Python copies
+    # the boolean value at import time so it would always be False.
+    from app.services.index_loader import warm_up, is_ready
+    if not is_ready():
         warm_up()   # ensure background thread is running (idempotent)
         from fastapi.responses import JSONResponse
         return JSONResponse(
