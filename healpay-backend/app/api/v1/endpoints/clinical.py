@@ -26,6 +26,29 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+@router.get("/ai-health", tags=["AI"])
+def ai_health_check():
+    """
+    Check the AI recommendation engine status.
+    Returns ready state, search mode, error message, and code counts.
+    No authentication required — safe for monitoring tools.
+    """
+    from app.services.index_loader import get_status
+    s = get_status()
+    return {
+        "ready": s["is_loaded"],
+        "mode": "dense+bm25" if s["dense_available"] else ("bm25_only" if s["is_loaded"] else "initializing"),
+        "error": s.get("error"),
+        "counts": {
+            "icd_dense": s["icd_dense_count"],
+            "cpt_dense": s["cpt_dense_count"],
+            "icd_bm25": s["icd_bm25_count"],
+            "cpt_bm25": s["cpt_bm25_count"],
+        },
+    }
+
+
+
 def _calculate_age(dob_str: Optional[str]) -> int:
     """Calculate age in years from a date-of-birth string (YYYY-MM-DD). Returns 0 if unparseable."""
     if not dob_str:

@@ -355,12 +355,16 @@ class RecommendationService:
             raise ValueError(
                 "No clinical text available. Please fill in at least the chief complaint."
             )
-        index_loader.ensure_loaded()
+        if not index_loader.is_ready():
+            index_loader.warm_up()
+            raise ValueError(
+                "AI engine is still initializing. Please retry in a few seconds."
+            )
         return get_recommendations(clinical_text=clinical_text, code_type=code_type, top_n=top_n)
 
     def load_code_library(self, db=None, force_recompute: bool = False):
-        """No-op: library is loaded from CSV files by index_loader.warm_up()."""
-        index_loader.warm_up(force_rebuild=force_recompute)
+        """No-op: library is loaded from precomputed files at startup."""
+        index_loader.warm_up()
 
 
 # ---------------------------------------------------------------------------

@@ -74,12 +74,15 @@ class Settings(BaseSettings):
     # ---------------------------------------------------------------------------
     # AI Recommendation Engine
     # ---------------------------------------------------------------------------
-    EMBEDDING_MODEL: str = "pritamdeka/S-PubMedBert-MS-MARCO"
-    EMBEDDING_FALLBACK_MODEL: str = "all-MiniLM-L6-v2"
-    MAX_ICD_EMBED: int = 5000
+    # paraphrase-MiniLM-L3-v2: 3-layer model, ~60MB, 384 dims
+    # Significantly lighter than L6 or PubMedBert; fits Koyeb 512MB RAM
+    EMBEDDING_MODEL: str = "paraphrase-MiniLM-L3-v2"
+    # Maximum codes per type to embed (memory budget: 5k × 384 × 4B ≈ 7.7MB each)
+    MAX_CODES_PER_TYPE: int = 5000
     DENSE_WEIGHT: float = 0.75
     BM25_WEIGHT: float = 0.25
     MEDICAL_VALIDATION_THRESHOLD: float = 0.18
+    # Deterministic directory for precomputed index files (baked into Docker image)
     EMBEDDINGS_CACHE_DIR: str = "embeddings_cache"
     ICD_DATASET_PATH: str = os.path.join(
         os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),

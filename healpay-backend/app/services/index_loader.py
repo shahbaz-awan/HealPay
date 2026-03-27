@@ -1,138 +1,189 @@
 """
-Index Loader – Step 3 of the AI Recommendation Engine
-=======================================================
-Responsibility:
-  • Single source of truth for all loaded indices.
-  • Thread-safe background initialization.
-  • Exposes both the FAISS dense index and the BM25 lexical index.
-  • Provides a clean search interface used by recommendation_service.py.
+Index Loader  –  Runtime initialization (load-only, no model)
+==============================================================
+Loads precomputed artifacts from embeddings_cache/ at startup:
+  • icd_index.faiss / cpt_index.faiss   → FAISS dense search
+  • icd_meta.pkl / cpt_meta.pkl         → aligned metadata
+  • icd_bm25_corpus.pkl / cpt_bm25_corpus.pkl → BM25 keyword search
+  • word_vocab.pkl + word_embeddings.npy → lightweight query encoding
+
+Expected startup time: 3–10 seconds  (no model download, no encoding)
+Memory footprint: ~60–100MB
+
+The model (SentenceTransformer) is NEVER loaded here.
 """
 
 import logging
+import pickle
 import threading
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from app.services.data_pipeline import (
-    load_all_codes,
-    compute_dataset_hash,
-    tokenize_query,
-)
-from app.services.embedding_engine import build_or_load_index, search_index, get_model
+import numpy as np
 
 logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Paths
+# ---------------------------------------------------------------------------
+_BACKEND_ROOT = Path(__file__).resolve().parent.parent.parent
+CACHE_DIR = _BACKEND_ROOT / "embeddings_cache"
 
 # ---------------------------------------------------------------------------
 # Singleton state
 # ---------------------------------------------------------------------------
 _lock = threading.Lock()
 
-# These are typed as Optional[Any] because faiss is imported lazily
 _icd_faiss_index = None
-_icd_faiss_meta: Optional[List[Dict]] = None
+_icd_meta: Optional[List[Dict]] = None
 
 _cpt_faiss_index = None
-_cpt_faiss_meta: Optional[List[Dict]] = None
+_cpt_meta: Optional[List[Dict]] = None
 
-# BM25 covers ALL codes
 _icd_bm25 = None
 _icd_bm25_meta: Optional[List[Dict]] = None
 
 _cpt_bm25 = None
 _cpt_bm25_meta: Optional[List[Dict]] = None
 
-_is_loaded = False
-_dataset_hash: str = ""
-_dense_available = False
-
-# Thread-safe event to signal when initialization is COMPLETE
+_is_loaded: bool = False
+_dense_available: bool = False
+_init_error: Optional[str] = None          # surfaced via /ai-health endpoint
+_warmup_thread_running: bool = False
 _ready_event = threading.Event()
 
-# Flag to prevent launching duplicate background threads
-_warmup_thread_running = False
 
+# ---------------------------------------------------------------------------
+# Public status helpers
+# ---------------------------------------------------------------------------
 
 def is_ready() -> bool:
-    """Return True when the AI engine has finished loading.
-
-    IMPORTANT: Always use this function — never import ``_is_loaded`` directly.
-    Python's ``from module import var`` copies the *value* at import time, so
-    a direct import of ``_is_loaded`` will always be ``False`` even after the
-    background thread sets it to ``True``.
-    """
+    """Return True when all indices are loaded and ready to serve."""
     return _is_loaded
 
 
+def get_status() -> Dict:
+    """Return a dict describing the current engine state.
+    Used by the /ai-health endpoint and internal diagnostics.
+    """
+    return {
+        "is_loaded": _is_loaded,
+        "dense_available": _dense_available,
+        "error": _init_error,
+        "icd_dense_count": _icd_faiss_index.ntotal if _icd_faiss_index else 0,
+        "cpt_dense_count": _cpt_faiss_index.ntotal if _cpt_faiss_index else 0,
+        "icd_bm25_count": len(_icd_bm25_meta) if _icd_bm25_meta else 0,
+        "cpt_bm25_count": len(_cpt_bm25_meta) if _cpt_bm25_meta else 0,
+    }
+
+
 # ---------------------------------------------------------------------------
-# Internal helpers
+# Internal: BM25 index builder (fast — no model, just text processing)
 # ---------------------------------------------------------------------------
 
-def _build_bm25_index(
-    codes: List[Dict],
-    label: str,
-) -> Tuple:
-    """Build a BM25Okapi index and return optimized metadata."""
-    from rank_bm25 import BM25Okapi  # lazy import – safe if package missing
-    corpus = [c["bm25_tokens"] for c in codes]
-    corpus = [toks if toks else ["__empty__"] for toks in corpus]
+def _build_bm25(corpus: List[List[str]], label: str):
+    from rank_bm25 import BM25Okapi  # lazy import
     logger.info("Building BM25 index for %d %s codes …", len(corpus), label)
-    bm25 = BM25Okapi(corpus)
-    
-    meta = [
-        {k: v for k, v in c.items() if k not in ("bm25_tokens", "search_text")} 
-        for c in codes
-    ]
-    return bm25, meta
+    return BM25Okapi(corpus)
 
-def _full_background_warmup(force_rebuild: bool):
-    """Heavy lifted data loading and indexing performed in a background thread."""
-    global _icd_faiss_index, _icd_faiss_meta, _cpt_faiss_index, _cpt_faiss_meta
+
+# ---------------------------------------------------------------------------
+# Internal: background initialization
+# ---------------------------------------------------------------------------
+
+def _load_all_indices():
+    """Load all precomputed artifacts from disk. Fast (no model, no encoding)."""
+    global _icd_faiss_index, _icd_meta, _cpt_faiss_index, _cpt_meta
     global _icd_bm25, _icd_bm25_meta, _cpt_bm25, _cpt_bm25_meta
-    global _is_loaded, _dense_available, _dataset_hash, _warmup_thread_running
-    
-    try:
-        logger.info("Background AI: Starting full initialization...")
-        current_hash = compute_dataset_hash()
-        
-        # 1. Load raw data
-        all_icd, sampled_icd, all_cpt, _ = load_all_codes()
-        
-        # 2. Build BM25 indices
-        logger.info("Background AI: Building BM25 keyword indices...")
-        _icd_bm25, _icd_bm25_meta = _build_bm25_index(all_icd, "ICD")
-        _cpt_bm25, _cpt_bm25_meta = _build_bm25_index(all_cpt, "CPT")
-        
-        # 3. Build Dense FAISS indices
-        logger.info("Background AI: Building Dense FAISS indices...")
-        try:
-            # faiss is imported inside build_or_load_index
-            _icd_faiss_index, _icd_faiss_meta = build_or_load_index(
-                sampled_icd, "icd", current_hash, force_rebuild
-            )
-            _cpt_faiss_index, _cpt_faiss_meta = build_or_load_index(
-                all_cpt, "cpt", current_hash, force_rebuild
-            )
-            get_model()
-            _dense_available = True
-        except Exception as e:
-            logger.warning("⚠️ Background AI: Semantic search failed (Memory/Model): %s", e)
-            _dense_available = False
+    global _is_loaded, _dense_available, _init_error, _warmup_thread_running
 
-        _dataset_hash = current_hash
+    try:
+        logger.info("═══ AI Engine: Starting initialization from precomputed files ═══")
+
+        # ── 1. Load word vocabulary for lightweight query encoding ─────────────
+        from app.services.embedding_engine import load_word_vocab
+        vocab_ok = load_word_vocab()
+
+        # ── 2. Load FAISS indices ──────────────────────────────────────────────
+        _dense_available = False
+        if vocab_ok:
+            try:
+                import faiss  # lazy import
+                icd_path = CACHE_DIR / "icd_index.faiss"
+                cpt_path = CACHE_DIR / "cpt_index.faiss"
+
+                if not icd_path.exists() or not cpt_path.exists():
+                    raise FileNotFoundError(
+                        f"FAISS index files missing in {CACHE_DIR}. "
+                        "Run build_indices.py to generate them."
+                    )
+
+                _icd_faiss_index = faiss.read_index(str(icd_path))
+                logger.info("✓ ICD FAISS index loaded: %d vectors", _icd_faiss_index.ntotal)
+
+                _cpt_faiss_index = faiss.read_index(str(cpt_path))
+                logger.info("✓ CPT FAISS index loaded: %d vectors", _cpt_faiss_index.ntotal)
+
+                _dense_available = True
+            except Exception as exc:
+                logger.warning("⚠️ Dense search unavailable (FAISS load failed): %s", exc)
+                _dense_available = False
+
+        # ── 3. Load metadata ───────────────────────────────────────────────────
+        if _dense_available:
+            with open(CACHE_DIR / "icd_meta.pkl", "rb") as f:
+                _icd_meta = pickle.load(f)
+            with open(CACHE_DIR / "cpt_meta.pkl", "rb") as f:
+                _cpt_meta = pickle.load(f)
+            logger.info("✓ Metadata loaded: %d ICD, %d CPT", len(_icd_meta), len(_cpt_meta))
+
+        # ── 4. Load BM25 corpora and build indices ─────────────────────────────
+        icd_bm25_path = CACHE_DIR / "icd_bm25_corpus.pkl"
+        cpt_bm25_path = CACHE_DIR / "cpt_bm25_corpus.pkl"
+
+        if not icd_bm25_path.exists() or not cpt_bm25_path.exists():
+            raise FileNotFoundError(
+                "BM25 corpus files missing. Run build_indices.py."
+            )
+
+        with open(icd_bm25_path, "rb") as f:
+            icd_data = pickle.load(f)
+        _icd_bm25 = _build_bm25(icd_data["corpus"], "ICD")
+        _icd_bm25_meta = icd_data["meta"]
+        logger.info("✓ ICD BM25 index built: %d codes", len(_icd_bm25_meta))
+
+        with open(cpt_bm25_path, "rb") as f:
+            cpt_data = pickle.load(f)
+        _cpt_bm25 = _build_bm25(cpt_data["corpus"], "CPT")
+        _cpt_bm25_meta = cpt_data["meta"]
+        logger.info("✓ CPT BM25 index built: %d codes", len(_cpt_bm25_meta))
+
+        _init_error = None
         _is_loaded = True
-        logger.info("═══ Background AI: Engine is now fully READY. ═══")
-    except Exception as e:
-        logger.error("❌ Background AI: Critical failure: %s", e)
+
+        logger.info(
+            "═══ AI Engine READY — dense=%s, ICD_bm25=%d, CPT_bm25=%d ═══",
+            _dense_available,
+            len(_icd_bm25_meta),
+            len(_cpt_bm25_meta),
+        )
+
+    except Exception as exc:
+        _init_error = str(exc)
         _is_loaded = False
+        logger.error("❌ AI Engine initialization failed: %s", exc)
     finally:
         _warmup_thread_running = False
         _ready_event.set()
 
-def warm_up(force_rebuild: bool = False) -> None:
-    """Triggers the AI engine warm-up in the background.
 
-    Uses _is_loaded and _warmup_thread_running to avoid duplicate threads.
-    Safe to call from multiple Gunicorn workers – each process has its own
-    state and will independently initialise its in-process indices.
+# ---------------------------------------------------------------------------
+# Public: launch / await
+# ---------------------------------------------------------------------------
+
+def warm_up() -> None:
+    """Launch background initialization if not already running.
+    Safe to call multiple times — idempotent.
     """
     global _warmup_thread_running
 
@@ -142,48 +193,47 @@ def warm_up(force_rebuild: bool = False) -> None:
         _warmup_thread_running = True
         _ready_event.clear()
 
-    logger.info("═══ AI Engine: Triggering background initialization ═══")
-    threading.Thread(
-        target=_full_background_warmup,
-        args=(force_rebuild,),
-        daemon=True
-    ).start()
+    logger.info("═══ AI Engine: Launching background initialization ═══")
+    threading.Thread(target=_load_all_indices, daemon=True).start()
 
-def ensure_loaded(timeout_seconds: float = 120.0) -> bool:
-    """Wait for background initialization to complete.
-    
-    Default timeout increased to 120 s to handle cold-start model downloads
-    on memory-constrained hosts like Koyeb free tier.
+
+def ensure_loaded(timeout_seconds: float = 30.0) -> bool:
+    """Block until engine is ready (or timeout).
+    With precomputed indices, loading takes 3–10 seconds — 30s is generous.
     """
     if _is_loaded:
         return True
     warm_up()
-    logger.info("AI Engine: Search request waiting for initialization...")
     return _ready_event.wait(timeout=timeout_seconds)
+
 
 # ---------------------------------------------------------------------------
 # Public search functions
 # ---------------------------------------------------------------------------
 
-def dense_search(code_type: str, query_text: str, top_k: int = 20) -> List[Dict]:
-    """Semantic search via FAISS."""
-    if not ensure_loaded():
-        raise ValueError("AI Engine is still initializing. Please try again in a few seconds.")
+def _tokenize(text: str) -> List[str]:
+    """Simple tokenizer matching the BM25 corpus tokenization."""
+    import re
+    return re.findall(r"[a-z]+", text.lower())
 
+
+def dense_search(code_type: str, query_text: str, top_k: int = 20) -> List[Dict]:
+    """Semantic search via FAISS + lightweight query encoding.
+    Returns [] immediately if dense search is unavailable (BM25 fallback kicks in).
+    """
     if not _dense_available:
         return []
 
+    from app.services.embedding_engine import search_index
     if code_type == "ICD10_CM":
-        return search_index(_icd_faiss_index, _icd_faiss_meta, query_text, top_k)
+        return search_index(_icd_faiss_index, _icd_meta, query_text, top_k)
     else:
-        return search_index(_cpt_faiss_index, _cpt_faiss_meta, query_text, top_k)
+        return search_index(_cpt_faiss_index, _cpt_meta, query_text, top_k)
+
 
 def bm25_search(code_type: str, query_text: str, top_k: int = 20) -> List[Dict]:
-    """Lexical keyword search via BM25."""
-    if not ensure_loaded():
-        raise ValueError("AI Engine is still initializing. Please try again in a few seconds.")
-
-    tokens = tokenize_query(query_text)
+    """Keyword search via BM25Okapi."""
+    tokens = _tokenize(query_text)
     if not tokens:
         return []
 
@@ -192,30 +242,24 @@ def bm25_search(code_type: str, query_text: str, top_k: int = 20) -> List[Dict]:
     else:
         bm25, meta = _cpt_bm25, _cpt_bm25_meta
 
-    if bm25 is None: return []
+    if bm25 is None or meta is None:
+        return []
 
     scores = bm25.get_scores(tokens)
     max_score = float(scores.max()) if scores.max() > 0 else 1.0
     norm_scores = (scores / max_score).tolist()
 
-    top_indices = sorted(range(len(norm_scores)), key=lambda i: norm_scores[i], reverse=True)[:top_k]
+    top_indices = sorted(
+        range(len(norm_scores)),
+        key=lambda i: norm_scores[i],
+        reverse=True,
+    )[:top_k]
 
     results = []
     for idx in top_indices:
-        if norm_scores[idx] <= 0: break
+        if norm_scores[idx] <= 0:
+            break
         rec = dict(meta[idx])
         rec["bm25_score"] = norm_scores[idx]
         results.append(rec)
     return results
-
-def get_status() -> Dict:
-    """Return a summary of the loaded indices (used by health-check / debug)."""
-    return {
-        "is_loaded": _is_loaded,
-        "dense_available": _dense_available,
-        "dataset_hash": _dataset_hash,
-        "icd_dense_count": _icd_faiss_index.ntotal if _icd_faiss_index else 0,
-        "cpt_dense_count": _cpt_faiss_index.ntotal if _cpt_faiss_index else 0,
-        "icd_bm25_count": len(_icd_bm25_meta) if _icd_bm25_meta else 0,
-        "cpt_bm25_count": len(_cpt_bm25_meta) if _cpt_bm25_meta else 0,
-    }
