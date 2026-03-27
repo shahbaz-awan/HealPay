@@ -77,7 +77,10 @@ def build(force: bool = False):
 
     # ── 1. Load datasets ──────────────────────────────────────────────────────
     logger.info("Step 1/5 — Loading datasets …")
-    all_icd, sampled_icd, all_cpt, _ = load_all_codes()
+    _raw = load_all_codes()
+    all_icd: list = list(_raw[0])
+    sampled_icd: list = list(_raw[1])
+    all_cpt: list = list(_raw[2])
     logger.info("  ICD: %d total, %d sampled for dense index", len(all_icd), len(sampled_icd))
     logger.info("  CPT: %d codes", len(all_cpt))
 

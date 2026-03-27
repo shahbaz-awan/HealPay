@@ -1,4 +1,5 @@
 {
   "source_directories": ["."],
-  "venvfs": "venv"
+  "venv": "venv",
+  "search_path": ["."]
 }
