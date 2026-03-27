@@ -14,7 +14,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def get_password_hash(password: str) -> str:
     """Hash a password"""
-    salt = bcrypt.gensalt()
+    # Use 4 rounds on Koeyb to prevent >15s synchronous CPU locking during login
+    salt = bcrypt.gensalt(rounds=4)
     hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
     return hashed.decode('utf-8')
 
