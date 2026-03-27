@@ -199,6 +199,35 @@ async def login(request: Request, response: Response, credentials: UserLogin, db
         refreshToken=refresh_token
     )
 
+@router.post("/test-login")
+async def test_login(request: Request, response: Response):
+    """
+    Mock login to test if Koyeb's Proxy drops the connection due to cookies or headers.
+    Bypasses DB and Bcrypt.
+    """
+    token_data = {"sub": "admin@healpay.com", "role": "ADMIN"}
+    access_token = create_access_token(data=token_data)
+    refresh_token = create_refresh_token(data=token_data)
+    
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=settings.ENVIRONMENT == "production",
+        samesite="none",
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
+        path="/"
+    )
+    return {"token": access_token, "refreshToken": refresh_token}
+
+@router.get("/benchmark-bcrypt")
+async def benchmark_bcrypt():
+    import time
+    start = time.time()
+    get_password_hash("password")
+    duration = time.time() - start
+    return {"duration": duration, "message": "Bcrypt execution time"}
+
 @router.get("/me", response_model=UserResponse)
 async def read_users_me(current_user: User = Depends(get_current_user)):
     """
