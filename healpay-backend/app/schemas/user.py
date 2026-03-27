@@ -169,7 +169,7 @@ class TokenData(BaseModel):
 class AuthResponse(BaseModel):
     user: UserResponse
     token: str
-    refreshToken: str
+    refreshToken: Optional[str] = None
 
     class Config:
         from_attributes = True

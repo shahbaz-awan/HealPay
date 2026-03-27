@@ -38,7 +38,7 @@ const LoginPage = () => {
     setIsLoading(true)
     try {
       const response = await authService.login(data)
-      setAuth(response.user, response.token, response.refreshToken)
+      setAuth(response.user, response.token)
       toast.success('Login successful!')
 
       // Redirect based on role

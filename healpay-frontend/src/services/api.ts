@@ -2,11 +2,16 @@ import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 import { useAuthStore } from '@/store/authStore'
 import { toast } from 'react-toastify'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+
+if (!API_BASE_URL) {
+  console.error('VITE_API_BASE_URL environment variable is not set!')
+}
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -28,11 +33,10 @@ api.interceptors.request.use(
 
 // Track if a refresh is already in progress to prevent concurrent refreshes
 let _refreshing = false
-let _refreshQueue: Array<(token: string) => void> = []
+let _refreshQueue: Array<(token: string | null) => void> = []
 
 const _tryRefresh = async (): Promise<string | null> => {
-  const { refreshToken, setAuth, logout, user } = useAuthStore.getState()
-  if (!refreshToken) return null
+  const { setAuth, logout, user } = useAuthStore.getState()
 
   if (_refreshing) {
     // Wait for the in-progress refresh
@@ -45,17 +49,20 @@ const _tryRefresh = async (): Promise<string | null> => {
   try {
     const { data } = await axios.post(
       `${API_BASE_URL}/v1/auth/refresh`,
-      { refresh_token: refreshToken },
-      { headers: { 'Content-Type': 'application/json' } }
+      {},
+      { 
+        withCredentials: true,
+        headers: { 'Content-Type': 'application/json' } 
+      }
     )
     const newToken: string = data.token
-    const newRefresh: string = data.refreshToken
-    if (user) setAuth(user, newToken, newRefresh)
+    if (user) setAuth(user, newToken)
     _refreshQueue.forEach((cb) => cb(newToken))
     _refreshQueue = []
     return newToken
   } catch {
     logout()
+    _refreshQueue.forEach((cb) => cb(null))
     _refreshQueue = []
     return null
   } finally {

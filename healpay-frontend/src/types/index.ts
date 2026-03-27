@@ -60,7 +60,7 @@ export interface RegisterData {
 export interface AuthResponse {
   user: User
   token: string
-  refreshToken: string
+  refreshToken?: string
 }
 
 // Patient Types

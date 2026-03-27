@@ -54,7 +54,7 @@ export const authService = {
         return apiPost('/v1/auth/logout')
     },
 
-    refreshToken: async (refreshToken: string): Promise<AuthResponse> => {
-        return apiPost<AuthResponse>('/v1/auth/refresh', { refresh_token: refreshToken })
+    refreshToken: async (): Promise<AuthResponse> => {
+        return apiPost<AuthResponse>('/v1/auth/refresh', {})
     },
 }

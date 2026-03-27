@@ -1,5 +1,5 @@
 import logging
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from app.db.database import get_db
@@ -139,15 +139,16 @@ async def verify_signup_otp(body: OtpVerifyRequest, db: Session = Depends(get_db
 
 @router.post("/login", response_model=AuthResponse)
 @limiter.limit("10/minute")
-async def login(request: Request, credentials: UserLogin, db: Session = Depends(get_db)):
+async def login(request: Request, response: Response, credentials: UserLogin, db: Session = Depends(get_db)):
     """
     Login endpoint for all user types
-    Returns JWT tokens and user information
+    Returns JWT tokens and user information, sets refresh token HttpOnly cookie.
     """
     # Find user by email
     user = db.query(User).filter(User.email == credentials.email).first()
     
     if not user or not verify_password(credentials.password, user.hashed_password):
+        logger.warning("Failed login attempt for: %s", credentials.email)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
@@ -158,6 +159,19 @@ async def login(request: Request, credentials: UserLogin, db: Session = Depends(
     token_data = {"sub": user.email, "role": user.role.value}
     access_token = create_access_token(data=token_data)
     refresh_token = create_refresh_token(data=token_data)
+    
+    # Store refresh_token in an HttpOnly cookie
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=settings.ENVIRONMENT == "production",
+        samesite="none",
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
+        path="/"
+    )
+    
+    logger.info("User logged in successfully: %s", user.email)
     
     # Create user response
     user_response = UserResponse(
@@ -325,12 +339,27 @@ async def verify_and_reset(body: PasswordResetRequest, db: Session = Depends(get
 # Token Refresh
 # ---------------------------------------------------------------------------
 @router.post("/refresh")
-async def refresh_access_token(body: TokenRefreshRequest, db: Session = Depends(get_db)):
+async def refresh_access_token(request: Request, response: Response, db: Session = Depends(get_db)):
     """
-    Exchange a valid refresh token for a new access token
+    Exchange a valid refresh token (from HttpOnly cookie) for a new access token
     """
+    refresh_token = request.cookies.get("refresh_token")
+    if not refresh_token:
+        # Fallback to body if present
+        try:
+            body = await request.json()
+            refresh_token = body.get("refresh_token")
+        except Exception:
+            pass
+
+    if not refresh_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token missing from cookies"
+        )
+
     try:
-        payload = decode_token(body.refresh_token)
+        payload = decode_token(refresh_token)
     except HTTPException:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -351,7 +380,48 @@ async def refresh_access_token(body: TokenRefreshRequest, db: Session = Depends(
     token_data = {"sub": user.email, "role": user.role.value}
     new_access_token = create_access_token(data=token_data)
     new_refresh_token = create_refresh_token(data=token_data)
+    
+    response.set_cookie(
+        key="refresh_token",
+        value=new_refresh_token,
+        httponly=True,
+        secure=settings.ENVIRONMENT == "production",
+        samesite="none",
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
+        path="/"
+    )
+    
+    logger.info("Token refreshed successfully for: %s", user.email)
+    
     return {"token": new_access_token, "refreshToken": new_refresh_token}
+
+@router.post("/logout")
+async def logout(response: Response):
+    """
+    Logout user by clearing the HttpOnly refresh token cookie
+    """
+    response.delete_cookie(
+        key="refresh_token",
+        httponly=True,
+        secure=settings.ENVIRONMENT == "production",
+        samesite="none",
+        path="/"
+    )
+    return {"message": "Successfully logged out"}
+
+@router.get("/debug")
+async def auth_debug(request: Request, current_user: User = Depends(get_current_user)):
+    """
+    Debug endpoint to verify JWT extraction and cookie presence.
+    Requires a valid Access Token (Bearer) to succeed.
+    """
+    return {
+        "user": current_user.email,
+        "role": current_user.role,
+        "token_valid": True,
+        "has_refresh_cookie": "refresh_token" in request.cookies,
+        "error": None
+    }
 
 
 # Google SSO Configuration
