@@ -30,11 +30,12 @@ router = APIRouter()
 def ai_health_check():
     """
     Check the AI recommendation engine status.
-    Returns ready state, search mode, error message, and code counts.
+    Returns ready state, search mode, error message, code counts, and manifest metadata.
     No authentication required — safe for monitoring tools.
     """
     from app.services.index_loader import get_status
     s = get_status()
+    manifest = s.get("manifest") or {}
     return {
         "ready": s["is_loaded"],
         "mode": "dense+bm25" if s["dense_available"] else ("bm25_only" if s["is_loaded"] else "initializing"),
@@ -44,6 +45,11 @@ def ai_health_check():
             "cpt_dense": s["cpt_dense_count"],
             "icd_bm25": s["icd_bm25_count"],
             "cpt_bm25": s["cpt_bm25_count"],
+        },
+        "artifact": {
+            "version": manifest.get("version"),
+            "model": manifest.get("model"),
+            "built_at": manifest.get("built_at"),
         },
     }
 
