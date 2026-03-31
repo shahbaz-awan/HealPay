@@ -126,7 +126,9 @@ const ClaimDetailPage = () => {
 
     const handleAssignCode = async (code: string, description: string, isAiSuggested: boolean = false, overrideCodeType?: string) => {
         try {
-            const finalCodeType = overrideCodeType || (isAiSuggested ? (selectedCodeType === 'ICD-10' ? 'ICD10_CM' : 'CPT') : (selectedCodeType === 'ICD-10' ? 'ICD10_CM' : 'CPT'))
+            // Normalize code_type → backend schema expects 'ICD-10' or 'CPT'
+            const rawType = overrideCodeType || (selectedCodeType === 'ICD-10' ? 'ICD-10' : 'CPT')
+            const finalCodeType = rawType === 'ICD10_CM' ? 'ICD-10' : rawType
 
             const newCodeData = {
                 encounter_id: Number(id),
@@ -444,7 +446,7 @@ const ClaimDetailPage = () => {
                                             </div>
                                             <Button
                                                 size="sm"
-                                                onClick={() => handleAssignCode(rec.code, rec.description, true)}
+                                                onClick={() => handleAssignCode(rec.code, rec.description, true, 'ICD-10')}
                                                 className="ml-3 flex-shrink-0"
                                             >
                                                 Assign
@@ -500,7 +502,7 @@ const ClaimDetailPage = () => {
                                             </div>
                                             <Button
                                                 size="sm"
-                                                onClick={() => handleAssignCode(rec.code, rec.description, true)}
+                                                onClick={() => handleAssignCode(rec.code, rec.description, true, 'CPT')}
                                                 className="ml-3 flex-shrink-0"
                                             >
                                                 Assign
