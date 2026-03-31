@@ -142,20 +142,33 @@ def _load_all_indices():
         # ── 0. Validate manifest (with fallback-to-retrain) ───────────────────
         manifest_ok, reason, manifest = _read_manifest()
         if not manifest_ok:
-            logger.warning(
-                "⚠️  Artifacts invalid or outdated (%s) — triggering rebuild …", reason
-            )
-            try:
-                from build_indices import build as _build
-                success = _build(force=False)
-                if success:
-                    manifest_ok, reason, manifest = _read_manifest()
-                    if not manifest_ok:
-                        raise RuntimeError(f"Rebuild succeeded but manifest still invalid: {reason}")
-                else:
-                    raise RuntimeError("build_indices.build() returned False")
-            except Exception as exc:
-                raise RuntimeError(f"Fallback rebuild failed: {exc}") from exc
+            logger.warning("⚠️  Artifacts invalid or outdated: %s", reason)
+
+            # In production (Koyeb free tier) we CANNOT retrain at runtime —
+            # loading the sentence-transformer model would OOM a 512MB container.
+            # Instead we degrade gracefully to BM25-only mode using the corpus files.
+            import os
+            is_production = os.getenv("ENVIRONMENT", "development") == "production"
+
+            if is_production:
+                logger.warning(
+                    "Production environment detected — skipping fallback rebuild "
+                    "(model would OOM). Starting in BM25-only degraded mode."
+                )
+                # _manifest stays None; we'll still try to load BM25 corpora below
+            else:
+                logger.info("Development environment — triggering fallback rebuild …")
+                try:
+                    from build_indices import build as _build
+                    success = _build(force=False)
+                    if success:
+                        manifest_ok, reason, manifest = _read_manifest()
+                        if not manifest_ok:
+                            raise RuntimeError(f"Rebuild succeeded but manifest still invalid: {reason}")
+                    else:
+                        raise RuntimeError("build_indices.build() returned False")
+                except Exception as exc:
+                    raise RuntimeError(f"Fallback rebuild failed: {exc}") from exc
 
         _manifest = manifest
         logger.info(
