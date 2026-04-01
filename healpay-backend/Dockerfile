@@ -65,6 +65,10 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 EXPOSE 8000
 
+# Let Docker detect and restart the container if the app deadlocks post-startup.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
+
 # 2 workers: enough for Koyeb free tier (512 MB).
 # Timeout 60s is now safe — index loading takes <10s, not 120s.
 CMD ["gunicorn", "main:app", "-w", "2", "-k", "uvicorn.workers.UvicornWorker", \

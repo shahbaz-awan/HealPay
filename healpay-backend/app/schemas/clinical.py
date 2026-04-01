@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Literal
 from datetime import datetime
 
 
@@ -31,7 +31,7 @@ class ClinicalEncounterResponse(ClinicalEncounterBase):
 
 # Medical Code Schemas
 class MedicalCodeBase(BaseModel):
-    code_type: str  # "ICD-10" or "CPT"
+    code_type: Literal["ICD-10", "CPT"]  # enforced — no silent bad values
     code: str
     description: str
     is_ai_suggested: bool = False

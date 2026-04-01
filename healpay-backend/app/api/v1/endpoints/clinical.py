@@ -3,9 +3,11 @@ Clinical Encounters API endpoints
 Handles doctor clinical notes and medical coder access
 """
 import logging
+import hashlib
+import time
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from datetime import datetime, date
 
 from app.db.database import get_db
@@ -24,6 +26,32 @@ from app.services.recommendation_service import get_recommendation_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+# ---------------------------------------------------------------------------
+# Recommendation cache — avoids re-running BM25+FAISS for identical inputs
+# Simple TTL dict keyed by (chief_complaint_hash, encounter_type).
+# TTL = 5 minutes. Max 100 entries (evicted by age).
+# ---------------------------------------------------------------------------
+_REC_CACHE: Dict[str, Any] = {}
+_REC_CACHE_TTL = 300  # seconds
+_REC_CACHE_MAX = 100
+
+def _cache_key(chief_complaint: str, encounter_type: str) -> str:
+    raw = f"{chief_complaint.lower().strip()}|{encounter_type.lower().strip()}"
+    return hashlib.md5(raw.encode()).hexdigest()
+
+def _cache_get(key: str):
+    entry = _REC_CACHE.get(key)
+    if entry and (time.monotonic() - entry["ts"]) < _REC_CACHE_TTL:
+        return entry["data"]
+    return None
+
+def _cache_set(key: str, data: Any):
+    if len(_REC_CACHE) >= _REC_CACHE_MAX:
+        # Evict the oldest entry to keep size bounded
+        oldest = min(_REC_CACHE, key=lambda k: _REC_CACHE[k]["ts"])
+        del _REC_CACHE[oldest]
+    _REC_CACHE[key] = {"ts": time.monotonic(), "data": data}
 
 
 @router.get("/ai-health", tags=["AI"])
@@ -428,10 +456,18 @@ def complete_coding(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Encounter not found"
         )
-    
+
+    # Guard invalid status transitions — only pending encounters can be coded
+    VALID_TRANSITION_FROM = {"pending_coding"}
+    if encounter.status not in VALID_TRANSITION_FROM:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Cannot mark as coded: encounter is in '{encounter.status}' status. Only 'pending_coding' encounters can be coded."
+        )
+
     encounter.status = "coded"
     db.commit()
-    
+
     return {"message": "Encounter marked as coded", "encounter_id": encounter_id}
 
 
@@ -712,28 +748,38 @@ def get_code_recommendations(
             detail=reason,
         )
 
-    # ── Generate recommendations ─────────────────────────────────────────────
-    try:
-        icd_recommendations = rec_service.get_recommendations(
-            encounter=encounter,
-            code_type='ICD10_CM',
-            top_n=5
-        )
-        cpt_recommendations = rec_service.get_recommendations(
-            encounter=encounter,
-            code_type='CPT',
-            top_n=3
-        )
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(exc),
-        )
-    except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"AI recommendation engine error: {exc}",
-        )
+    # ── Generate recommendations (with cache) ───────────────────────────────
+    cache_key = _cache_key(
+        encounter.chief_complaint,
+        encounter.encounter_type or ""
+    )
+    cached = _cache_get(cache_key)
+    if cached:
+        logger.info("Recommendation cache hit for encounter %s", encounter_id)
+        icd_recommendations, cpt_recommendations = cached
+    else:
+        try:
+            icd_recommendations = rec_service.get_recommendations(
+                encounter=encounter,
+                code_type='ICD10_CM',
+                top_n=5
+            )
+            cpt_recommendations = rec_service.get_recommendations(
+                encounter=encounter,
+                code_type='CPT',
+                top_n=3
+            )
+            _cache_set(cache_key, (icd_recommendations, cpt_recommendations))
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=str(exc),
+            )
+        except Exception as exc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"AI recommendation engine error: {exc}",
+            )
 
     return RecommendationResponse(
         encounter_id=encounter_id,

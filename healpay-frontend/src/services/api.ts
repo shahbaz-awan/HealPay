@@ -95,10 +95,10 @@ api.interceptors.response.use(
 
       switch (status) {
         case 400:
-          toast.error(typeof message === 'string' ? message : 'Invalid request.')
+          toast.error(typeof message === 'string' ? message : 'Invalid request.', { autoClose: false })
           break
         case 403:
-          toast.error('You do not have permission to perform this action.')
+          toast.error('You do not have permission to perform this action.', { autoClose: false })
           break
         case 404:
           toast.error('Resource not found.')
@@ -106,14 +106,14 @@ api.interceptors.response.use(
         case 422:
           if (Array.isArray(data?.detail)) {
             const errors = data.detail.map((err: any) => err.msg).join(', ')
-            toast.error(`Validation error: ${errors}`)
+            toast.error(`Validation error: ${errors}`, { autoClose: false })
           } else {
-            toast.error(typeof message === 'string' ? message : 'Validation failed.')
+            toast.error(typeof message === 'string' ? message : 'Validation failed.', { autoClose: false })
           }
           console.error('Validation errors:', data?.detail)
           break
         case 500:
-          toast.error('Server error. Please try again later.')
+          toast.error('Server error. Please try again later.', { autoClose: false })
           break
         default:
           if (status !== 401) {
@@ -121,7 +121,7 @@ api.interceptors.response.use(
           }
       }
     } else if (error.request) {
-      toast.error('Network error. Please check your connection.')
+      toast.error('Network error. Please check your connection.', { autoClose: false })
     } else {
       toast.error('An unexpected error occurred.')
     }
