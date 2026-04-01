@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = "HealPay Medical Billing System"
     APP_VERSION: str = "1.0.0"
-    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")  # development | production
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "production")  # production | development
 
     @property
     def DEBUG(self) -> bool:
