@@ -1,4 +1,5 @@
 import logging
+import asyncio
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
@@ -62,6 +63,10 @@ async def send_signup_otp(request: Request, user_data: UserRegister, db: Session
 
     otp_code = generate_otp()
 
+    # Pre-hash the password BEFORE storing in OTP data.
+    # Never store plaintext passwords, even temporarily.
+    hashed_pw = get_password_hash(user_data.password)
+
     # Persist OTP + registration data in DB (survives server restarts)
     store_otp(
         db=db,
@@ -71,7 +76,7 @@ async def send_signup_otp(request: Request, user_data: UserRegister, db: Session
         expiry_minutes=3,
         user_data={
             "email": user_data.email,
-            "password": user_data.password,
+            "hashed_password": hashed_pw,  # pre-hashed — never plaintext
             "first_name": user_data.first_name,
             "last_name": user_data.last_name,
             "phone": user_data.phone,
@@ -96,7 +101,8 @@ async def send_signup_otp(request: Request, user_data: UserRegister, db: Session
         )
 
 @router.post("/register/verify-otp", response_model=dict, status_code=status.HTTP_201_CREATED)
-async def verify_signup_otp(body: OtpVerifyRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+async def verify_signup_otp(request: Request, body: OtpVerifyRequest, db: Session = Depends(get_db)):
     """
     Verify OTP and create user account.
     """
@@ -117,8 +123,14 @@ async def verify_signup_otp(body: OtpVerifyRequest, db: Session = Depends(get_db
             detail="Registration data not found. Please start registration again.",
         )
 
-    # Create user account
-    hashed_password = get_password_hash(user_info["password"])
+    # Create user account — password is already hashed (stored as hashed_password)
+    # Support both old (plaintext 'password') and new (pre-hashed 'hashed_password') format
+    if "hashed_password" in user_info:
+        hashed_password = user_info["hashed_password"]
+    else:
+        # Legacy fallback: re-hash if old plaintext format found
+        hashed_password = get_password_hash(user_info["password"])
+
     new_user = User(
         email=user_info["email"],
         hashed_password=hashed_password,
@@ -141,26 +153,36 @@ async def verify_signup_otp(body: OtpVerifyRequest, db: Session = Depends(get_db
 @limiter.limit("10/minute")
 async def login(request: Request, response: Response, credentials: UserLogin, db: Session = Depends(get_db)):
     """
-    Login endpoint for all user types
-    Returns JWT tokens and user information, sets refresh token HttpOnly cookie.
+    Login endpoint for all user types.
+    Returns JWT access token and user information; sets refresh token as HttpOnly cookie.
     """
     # Find user by email
     user = db.query(User).filter(User.email == credentials.email).first()
-    
-    if not user or not verify_password(credentials.password, user.hashed_password):
+
+    # Run bcrypt in a thread executor to avoid blocking the async event loop.
+    # This is critical on low-CPU servers — synchronous bcrypt freezes all workers.
+    loop = asyncio.get_event_loop()
+    password_valid = False
+    if user:
+        password_valid = await loop.run_in_executor(
+            None, verify_password, credentials.password, user.hashed_password
+        )
+
+    if not user or not password_valid:
         logger.warning("Failed login attempt for: %s", credentials.email)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     # Generate JWT tokens
     token_data = {"sub": user.email, "role": user.role.value}
     access_token = create_access_token(data=token_data)
     refresh_token = create_refresh_token(data=token_data)
-    
-    # Store refresh_token in an HttpOnly cookie
+
+    # Store refresh_token in an HttpOnly cookie — NOT in the response body.
+    # This prevents JavaScript (and XSS) from accessing the refresh token.
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
@@ -170,10 +192,9 @@ async def login(request: Request, response: Response, credentials: UserLogin, db
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
         path="/"
     )
-    
+
     logger.info("User logged in successfully: %s", user.email)
-    
-    # Create user response
+
     user_response = UserResponse(
         id=user.id,
         email=user.email,
@@ -192,36 +213,41 @@ async def login(request: Request, response: Response, credentials: UserLogin, db
         created_at=user.created_at,
         updated_at=user.updated_at
     )
-    
+
+    # refreshToken intentionally omitted from response body (set via HttpOnly cookie above)
     return AuthResponse(
         user=user_response,
         token=access_token,
-        refreshToken=refresh_token
     )
 
 @router.post("/test-login")
 async def test_login(request: Request, response: Response):
     """
-    Mock login to test if Koyeb's Proxy drops the connection due to cookies or headers.
-    Bypasses DB and Bcrypt.
+    Mock login — DEVELOPMENT ONLY. Disabled in production.
     """
+    if settings.ENVIRONMENT == "production":
+        raise HTTPException(status_code=404, detail="Not found")
+
     token_data = {"sub": "admin@healpay.com", "role": "ADMIN"}
     access_token = create_access_token(data=token_data)
     refresh_token = create_refresh_token(data=token_data)
-    
+
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=settings.ENVIRONMENT == "production",
-        samesite="none",
+        secure=False,
+        samesite="lax",
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
         path="/"
     )
-    return {"token": access_token, "refreshToken": refresh_token}
+    return {"token": access_token}
 
 @router.get("/benchmark-bcrypt")
 async def benchmark_bcrypt():
+    """CPU benchmark — DEVELOPMENT ONLY. Disabled in production."""
+    if settings.ENVIRONMENT == "production":
+        raise HTTPException(status_code=404, detail="Not found")
     import time
     start = time.time()
     get_password_hash("password")
