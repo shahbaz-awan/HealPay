@@ -130,6 +130,15 @@ const ClaimDetailPage = () => {
             const rawType = overrideCodeType || (selectedCodeType === 'ICD-10' ? 'ICD-10' : 'CPT')
             const finalCodeType = rawType === 'ICD10_CM' ? 'ICD-10' : rawType
 
+            // Duplicate prevention — check if this code is already assigned
+            const isDuplicate = assignedCodes.some(
+                (c: any) => c.code.toUpperCase() === code.toUpperCase() && c.code_type === finalCodeType
+            )
+            if (isDuplicate) {
+                toast.warn(`Code ${code} is already assigned to this encounter.`)
+                return
+            }
+
             const newCodeData = {
                 encounter_id: Number(id),
                 code_type: finalCodeType,
@@ -261,7 +270,51 @@ const ClaimDetailPage = () => {
 
 
     if (isLoading) {
-        return <div className="flex items-center justify-center min-h-screen">Loading...</div>
+        return (
+            <div className="space-y-6 animate-pulse">
+                {/* Header skeleton */}
+                <div className="flex items-center justify-between">
+                    <div className="h-8 w-36 bg-gray-200 rounded-lg" />
+                    <div className="h-8 w-28 bg-gray-200 rounded-lg" />
+                </div>
+
+                {/* Patient info card skeleton */}
+                <div className="p-6 rounded-xl bg-gray-100 space-y-3">
+                    <div className="h-7 w-56 bg-gray-200 rounded" />
+                    <div className="grid grid-cols-2 gap-4">
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} className="h-5 bg-gray-200 rounded w-40" />
+                        ))}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Clinical notes skeleton — 2 cols */}
+                    <div className="lg:col-span-2 space-y-4">
+                        {[...Array(3)].map((_, i) => (
+                            <div key={i} className="p-5 rounded-xl bg-gray-100 space-y-2">
+                                <div className="h-5 w-32 bg-gray-200 rounded" />
+                                <div className="h-4 w-full bg-gray-200 rounded" />
+                                <div className="h-4 w-3/4 bg-gray-200 rounded" />
+                            </div>
+                        ))}
+                    </div>
+                    {/* Code panel skeleton — 1 col */}
+                    <div className="space-y-4">
+                        <div className="p-5 rounded-xl bg-gray-100 space-y-3">
+                            <div className="h-5 w-40 bg-gray-200 rounded" />
+                            <div className="h-9 w-full bg-gray-200 rounded-lg" />
+                            {[...Array(3)].map((_, i) => (
+                                <div key={i} className="flex items-center justify-between">
+                                    <div className="h-4 w-32 bg-gray-200 rounded" />
+                                    <div className="h-4 w-16 bg-gray-200 rounded" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     if (!encounter) {
@@ -395,8 +448,8 @@ const ClaimDetailPage = () => {
                             <div className="flex items-center gap-3 text-blue-600">
                                 <Sparkles className="w-5 h-5 animate-pulse" />
                                 <div>
-                                    <span className="font-medium">AI engine is loading…</span>
-                                    <p className="text-xs text-blue-500 mt-0.5">First load can take up to 2 minutes. Please wait.</p>
+                                    <span className="font-medium">Loading AI recommendations…</span>
+                                    <p className="text-xs text-blue-500 mt-0.5">Usually ready in 5–10 seconds.</p>
                                 </div>
                             </div>
                         </Card>
@@ -520,8 +573,8 @@ const ClaimDetailPage = () => {
                             <div className="flex items-center gap-3 text-blue-600">
                                 <Sparkles className="w-5 h-5 animate-pulse" />
                                 <div>
-                                    <span className="font-medium">AI engine is loading…</span>
-                                    <p className="text-xs text-blue-500 mt-0.5">First load can take up to 2 minutes. Please wait.</p>
+                                    <span className="font-medium">Loading AI recommendations…</span>
+                                    <p className="text-xs text-blue-500 mt-0.5">Usually ready in 5–10 seconds.</p>
                                 </div>
                             </div>
                         </Card>
