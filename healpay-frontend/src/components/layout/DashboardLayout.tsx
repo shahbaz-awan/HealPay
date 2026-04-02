@@ -23,7 +23,8 @@ import {
 import { useAuthStore } from '@/store/authStore'
 import { UserRole } from '@/types'
 import { Logo } from '@/components/ui/Logo'
-import ThemeToggle from '@/components/ui/ThemeToggle'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { DashboardTour } from '@/components/ui/DashboardTour'
 import NotificationsPanel from '@/components/ui/NotificationsPanel'
 import { GlobalSearch } from '@/components/ui/GlobalSearch'
 
@@ -115,22 +116,23 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors">
+      <DashboardTour />
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 z-40 h-screen transition-transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          } bg-white border-r border-gray-200 w-64`}
+          } bg-white dark:bg-slate-950 border-r border-gray-200 dark:border-slate-800 w-64 tour-sidebar`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-800">
             <Link to="/" className="flex items-center">
               <Logo size="md" />
             </Link>
             {/* Mobile Close Button */}
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400"
             >
               <X className="w-5 h-5" />
             </button>
@@ -147,8 +149,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   key={item.path}
                   to={item.path}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive
-                    ? 'bg-primary-50 text-primary-700 font-medium'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400 font-medium'
+                    : 'text-gray-700 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800'
                     }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -159,24 +161,24 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           </nav>
 
           {/* User Profile Section */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="p-4 border-t border-gray-200 dark:border-slate-800">
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
               >
-                <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-semibold">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center text-white font-semibold">
                   {getUserInitials()}
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  <p className="text-sm font-medium text-gray-900 dark:text-slate-200">
                     {user?.firstName} {user?.lastName}
                   </p>
                   <p className={`text-xs px-2 py-0.5 rounded-full inline-block ${getRoleBadgeColor()}`}>
                     {user?.role}
                   </p>
                 </div>
-                <ChevronDown className={`w-4 h-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {/* User Dropdown */}
@@ -186,33 +188,33 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+                    className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-slate-900 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden"
                   >
                     <Link
                       to={`/${user?.role.toLowerCase()}/profile`}
                       onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                     >
-                      <User className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">My Profile</span>
+                      <User className="w-4 h-4 text-gray-600 dark:text-slate-400" />
+                      <span className="text-sm text-gray-700 dark:text-slate-300">My Profile</span>
                     </Link>
                     <Link
                       to={`/${user?.role.toLowerCase()}/settings`}
                       onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                     >
-                      <Settings className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">Settings</span>
+                      <Settings className="w-4 h-4 text-gray-600 dark:text-slate-400" />
+                      <span className="text-sm text-gray-700 dark:text-slate-300">Settings</span>
                     </Link>
                     <button
                       onClick={() => {
                         setUserMenuOpen(false)
                         handleLogout()
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors border-t border-gray-100 dark:border-gray-700"
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors border-t border-gray-100 dark:border-slate-800"
                     >
-                      <LogOut className="w-4 h-4 text-red-600" />
-                      <span className="text-sm text-red-600">Logout</span>
+                      <LogOut className="w-4 h-4 text-red-600 dark:text-red-400" />
+                      <span className="text-sm text-red-600 dark:text-red-400">Logout</span>
                     </button>
                   </motion.div>
                 )}
@@ -223,23 +225,23 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       </aside>
 
       {/* Main Content Area */}
-      <div className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-0'} min-h-screen`}>
+      <div className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-0'} min-h-screen flex flex-col`}>
         {/* Header */}
-        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
+        <header className="bg-white dark:bg-slate-950 border-b border-gray-200 dark:border-slate-800 sticky top-0 z-30 transition-colors">
           <div className="flex items-center justify-between px-6 py-4">
             {/* Left Side - Menu Button & Search */}
             <div className="flex items-center gap-4">
               {/* Sidebar Toggle Button - Always Visible */}
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-400"
                 title={sidebarOpen ? "Close sidebar" : "Open sidebar"}
               >
-                <Menu className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                <Menu className="w-6 h-6" />
               </button>
 
               {/* Global Search (Ctrl+K) */}
-              <div className="hidden md:flex">
+              <div className="hidden md:flex tour-search">
                 <GlobalSearch />
               </div>
             </div>
@@ -247,7 +249,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             {/* Right Side Actions */}
             <div className="flex items-center gap-3">
               {/* Theme Toggle */}
-              <ThemeToggle />
+              <div className="tour-theme">
+                <ThemeToggle />
+              </div>
 
               {/* Notifications */}
               <NotificationsPanel />
@@ -255,11 +259,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               {/* Desktop User Menu */}
               <div className="hidden lg:block">
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg">
-                  <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center text-white text-sm font-semibold">
                     {getUserInitials()}
                   </div>
                   <div className="text-sm">
-                    <p className="font-medium text-gray-900 dark:text-gray-100">{user?.firstName} {user?.lastName}</p>
+                    <p className="font-medium text-gray-900 dark:text-slate-200">{user?.firstName} {user?.lastName}</p>
                   </div>
                 </div>
               </div>
@@ -268,7 +272,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         </header>
 
         {/* Page Content */}
-        <main className="p-6">
+        <main className="p-6 flex-1 text-slate-800 dark:text-slate-200">
           {children}
         </main>
       </div>
@@ -276,7 +280,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         />
       )}
